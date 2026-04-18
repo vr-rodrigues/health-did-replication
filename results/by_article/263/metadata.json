@@ -1,0 +1,49 @@
+{
+  "id": "263",
+  "title": "Informed Enforcement: Lessons from Pollution Monitoring in China",
+  "author_label": "Axbard, Deng (2024)",
+  "group_label": "unica_controles",
+  "data": {
+    "file": "data/raw/263/replication/Data/firm_enf.dta",
+    "format": "dta",
+    "sample_filter": "min_dist < 50 & starty <= 2010 & !is.na(revenue) & !is.na(key)"
+  },
+  "variables": {
+    "outcome": "any_air",
+    "unit_id": "id",
+    "time": "time",
+    "cluster": "city_id",
+    "treatment_twfe": "Post_avg",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "cs_cluster": "city_id",
+    "additional_fes": [
+      "industry^time",
+      "prov_id^time"
+    ]
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "single",
+    "allow_unbalanced": false
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 4,
+    "event_post": 4,
+    "run_sa": true,
+    "run_gardner": true
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$Post_avg <- as.integer(df$min_dist_10 == 1 & df$post1 == 1)",
+      "df$gvar_CS <- ifelse(df$min_dist_10 == 1, 21, 0)"
+    ]
+  },
+  "original_result": {},
+  "notes": "EVENT STUDY REVIEWED. CS-NT CIs 7x wider than TWFE — structural: can't absorb industry×time + province×time FEs (Pattern 50). Tested: ind dummies (531) in xformla → overfitting (ATT=0); prov dummies (21) → SE worse. Point estimates agree (TWFE=0.0033, CS=0.0026). CS-NYT not applicable (single timing). Axbard & Deng (2023). Table 1a Col 1. Stata: reghdfe any_air c.min_dist_10#c.post1 if min_dist<50 & starty<=2010, absorb(time id industry#time prov_id#time) cluster(city_id). Treatment = firm within 10km of air monitor (min_dist_10) x post-2015 (post1). Single treatment date: Q1 2015 (time=21). 36103 firms (after filter), 32 quarters (2010-2017). Outcome: any air enforcement action (0/1). FE: firm + time + industry*time + province*time. Cluster: city_id (171 cities). SA disabled (single treatment). CS-NYT disabled (single treatment). No controls in baseline. Large panel (1.15M obs), may be slow. Original paper also uses Conley spatial HAC SEs."
+}

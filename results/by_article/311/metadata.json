@@ -1,0 +1,47 @@
+{
+  "id": "311",
+  "title": "Licensing Life-Saving Drugs for Developing Countries: Evidence from the Medicines Patent Pool",
+  "author_label": "Galasso & Schankerman (2024)",
+  "group_label": "escalonada_sem_controles",
+  "data": {
+    "file": "data/raw/311/country_drugs.dta",
+    "format": "dta"
+  },
+  "variables": {
+    "outcome": "access",
+    "unit_id": "ID",
+    "time": "year",
+    "cluster": "product_code",
+    "treatment_twfe": "MPP",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": false
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_sa": true,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 5,
+    "event_post": 5
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$ID <- as.integer(factor(paste(df$country, df$product, sep='_')))",
+      "df$product_code <- as.integer(factor(df$product))",
+      "df$country_code <- as.integer(factor(df$country))",
+      "gvar_df <- df[df$MPP == 1, c('ID', 'year')]; gvar_df <- aggregate(year ~ ID, data=gvar_df, FUN=min); names(gvar_df)[2] <- 'gvar_CS'",
+      "df <- merge(df, gvar_df, by='ID', all.x=TRUE)",
+      "df$gvar_CS[is.na(df$gvar_CS)] <- 0"
+    ]
+  },
+  "original_result": {},
+  "notes": "Staggered DiD: 6746 country×product units, 14 years (2005-2018). 7 treatment cohorts (2011-2017). 84.6% never-treated. Treatment = Medicines Patent Pool membership. Outcome = drug access (binary). Stata uses two-way clustering (product_code × country_code) but template uses one-way (product_code). Unbalanced panel (84.8% fill rate). Bacon decomposition disabled due to large dataset size."
+}

@@ -1,0 +1,295 @@
+\documentclass[12pt,oneside]{MastersDoctoralThesis_dry_en}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage{lscape}
+\usepackage{rotating}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{bm}
+\DeclareMathOperator{\var}{Var}
+\AtBeginDocument{\setstretch{1.15}}
+\setlength{\parindent}{1.3em}
+\setlength{\parskip}{0pt}
+
+\captionsetup[table]{
+  font=small,
+  labelfont=bf,
+  justification=centering,
+  singlelinecheck=false,
+  margin=0pt
+}
+
+%----------------------------------------------------------------------------------------
+%   UTILITIES
+%----------------------------------------------------------------------------------------
+
+\usepackage{verbatim}
+\usepackage{epigraph}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+
+\usepackage{pdflscape}
+\usepackage{graphicx}
+\usepackage{caption}
+
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{tcolorbox}
+\usepackage{caption}
+\usepackage{xcolor}
+
+\usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex}
+\addbibresource{example.bib}
+\usepackage[autostyle=true]{csquotes}
+
+%----------------------------------------------------------------------------------------
+%   PAGE LAYOUT
+%----------------------------------------------------------------------------------------
+
+\geometry{
+    paper=a4paper,
+    inner=2.7cm,
+    outer=2.4cm,
+    bindingoffset=0.2cm,
+    top=2.4cm,
+    bottom=2.5cm,
+    includefoot
+}
+
+%----------------------------------------------------------------------------------------
+%   DRY CHAPTER / SECTION STYLE
+%----------------------------------------------------------------------------------------
+
+\usepackage[explicit]{titlesec}
+
+% No “Chapter 1” line in strong emphasis: only a small chapter number above the title.
+\titleformat{\chapter}[display]
+  {\normalfont\centering}
+  {\normalfont\normalsize\thechapter}
+  {0.35ex}
+  {\Large\bfseries #1}
+
+% Fix: \centering in \titleformat{\chapter} leaks into body text.
+% Patch LaTeX's post-heading hook to restore justified alignment.
+\makeatletter
+\g@addto@macro\@afterheading{%
+  \global\leftskip\z@
+  \global\rightskip\z@
+  \global\parfillskip\z@ plus 1fil\relax}
+\makeatother
+
+\titlespacing*{\chapter}{0pt}{0.9cm}{1.1cm}
+
+\titleformat{\section}
+  {\normalfont\large\bfseries}
+  {\thesection}{0.8em}{#1}
+
+\titleformat{\subsection}
+  {\normalfont\normalsize\bfseries}
+  {\thesubsection}{0.8em}{#1}
+
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\itshape}
+  {\thesubsubsection}{0.8em}{#1}
+
+\titlespacing*{\section}{0pt}{2.2ex plus .6ex minus .2ex}{0.9ex}
+\titlespacing*{\subsection}{0pt}{1.9ex plus .5ex minus .2ex}{0.6ex}
+\titlespacing*{\subsubsection}{0pt}{1.5ex plus .4ex minus .2ex}{0.4ex}
+
+\captionsetup{
+  font=small,
+  labelfont=bf,
+  justification=justified,
+  singlelinecheck=false,
+  margin=0pt
+}
+
+\clearpairofpagestyles
+\ohead*{\pagemark}
+\pagestyle{plain}
+\setchapterpagestyle{plain}
+
+%----------------------------------------------------------------------------------------
+%   THESIS INFORMATION
+%----------------------------------------------------------------------------------------
+
+\thesistitle{Do Health Policy Conclusions Survive Modern DiD? Re-estimating TWFE Studies}
+\supervisor{Cristine \textsc{Pinto} \\ Pedro H. C. \textsc{Sant'Anna}}
+\examiner{}
+\degree{Master's}
+\author{Victor \textsc{Rangel}}
+\addresses{}
+
+\subject{Public Policy}
+\keywords{}
+\university{{Insper}}
+\department{{Master in Public Policy}}
+\faculty{{Center for Management and Public Policy}}
+
+\AtBeginDocument{
+\hypersetup{pdftitle=\ttitle}
+\hypersetup{pdfauthor=\authorname}
+\hypersetup{pdfkeywords=\keywordnames}
+}
+
+\begin{document}
+
+\frontmatter
+\pagestyle{plain}
+
+%----------------------------------------------------------------------------------------
+%   TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\begin{titlepage}
+\begin{center}
+
+\vspace*{.06\textheight}
+{\textcolor{Red}{\scshape\LARGE \bfseries \univname}\par}\vspace{.5cm}
+{\textcolor{Red}{\scshape\large Professional Master's Program in Public Policy}\par}\vspace{1cm}
+
+\textsc{\Large Master's Dissertation}\\[0.5cm]
+
+\HRule \\[0.4cm]
+{\huge \bfseries \ttitle\par}\vspace{0.4cm}
+\HRule \\[1.5cm]
+ 
+\begin{minipage}[t]{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Author:}\\
+{\textcolor{Red}{\authorname}}
+\end{flushleft}
+\end{minipage}
+\begin{minipage}[t]{0.4\textwidth}
+\begin{flushright} \large
+\emph{Advisors:} \\
+{\textcolor{Red}{\supname}}
+\end{flushright}
+\end{minipage}\\[3cm]
+ 
+\vfill
+
+\large \textit{Dissertation submitted to the Professional Master's Program in Public Policy as partial fulfillment of the requirements for the degree of}\\[0.3cm]
+{\textcolor{red}{\deptname}}\\[1cm]
+
+\vfill
+\end{center}
+\end{titlepage}
+
+%----------------------------------------------------------------------------------------
+%   ABSTRACT
+%----------------------------------------------------------------------------------------
+
+\begin{abstract}
+\addchaptertocentry{\abstractname}
+
+Two-way fixed-effects (TWFE) difference-in-differences (DiD) has been the default
+estimator in applied health-policy research for decades, yet a rapidly growing
+methodological literature has shown that TWFE can implicitly weight cohort--time
+effects in ways that conflict with the causal parameter the analyst has in mind.
+This dissertation asks whether the conclusions of 56 published health-economics
+papers that used TWFE survive reestimation with modern heterogeneity-robust
+estimators: Callaway--Sant'Anna (CS-DID), Sun--Abraham (SA),
+Borusyak--Jaravel--Spiess (BJS), Goodman-Bacon's decomposition, and the
+Rambachan--Roth (HonestDiD) sensitivity framework.
+
+The exercise follows each paper's own preferred specification and replaces only
+the estimator, so any divergence is attributable to methodology rather than to
+redesign. Across all 56 articles, the sign of the effect is preserved in 53 cases
+and significantly reverses in only 3. The more interesting changes happen on
+other margins. Standard errors rise by roughly 40\% on average under
+heterogeneity-robust estimation, 12 articles lose conventional statistical
+significance, and the magnitude of the point estimate moves by more than 20\% in
+the majority of staggered-adoption designs. Bacon decompositions show that
+treated-versus-treated comparisons account for a substantial share of the
+identifying variation in staggered TWFE specifications, which is consistent with
+the mechanism emphasized by the theory literature. HonestDiD sensitivity
+exercises further show that robustness to parallel-trends violations is limited
+under both TWFE and CS-DID.
+
+The contribution is threefold. First, I construct a reproducible metadata-driven
+pipeline that re-estimates each paper from its original replication package with
+a fixed random seed, making every bootstrap-dependent quantity bit-identical
+across runs. Second, the comparative evidence shows that the practical cost of
+legacy TWFE designs in health economics is concentrated in precision and
+magnitude rather than in directional conclusions. Third, the package itself
+(released under CC-BY-4.0 and compliant with the AEA Data and Code Availability
+Policy 1.0) provides a template for future methodological audits of applied
+literatures.
+
+\end{abstract}
+
+%----------------------------------------------------------------------------------------
+%   ACKNOWLEDGEMENTS
+%----------------------------------------------------------------------------------------
+
+\begin{acknowledgements}
+\addchaptertocentry{\acknowledgementname}
+
+I am grateful to my advisors, Cristine Pinto and Pedro H.~C. Sant'Anna, for
+their guidance, intellectual generosity, and patience throughout this project.
+Pedro's open-source implementations of modern DiD methods made the empirical
+exercise possible, and Cristine's feedback shaped every stage of the design and
+writing. I thank Insper's Center for Management and Public Policy for the
+institutional support that made the Master's possible, and the faculty of the
+Professional Master's Program in Public Policy for the classes and conversations
+that preceded this work.
+
+This dissertation builds on the replication packages kindly released by the
+original authors of the 56 studies I reanalyze. Science advances because
+researchers make their data and code available, and this project is in their
+debt.
+
+Finally, I thank my family and friends for their support during the writing of
+this dissertation.
+
+\end{acknowledgements}
+
+%----------------------------------------------------------------------------------------
+%   TABLE OF CONTENTS, LIST OF FIGURES, LIST OF TABLES
+%----------------------------------------------------------------------------------------
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+%----------------------------------------------------------------------------------------
+%   THESIS CONTENT - CHAPTERS
+%----------------------------------------------------------------------------------------
+
+\mainmatter
+\pagestyle{plain}
+
+\include{Chapters/Chapter1}
+\include{Chapters/Chapter2}
+\include{Chapters/Chapter3}
+\include{Chapters/Chapter4}
+\include{Chapters/Chapter5}
+
+%----------------------------------------------------------------------------------------
+%   BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
+
+\printbibliography[heading=bibintoc,title={References}]
+
+%----------------------------------------------------------------------------------------
+%   APPENDICES
+%----------------------------------------------------------------------------------------
+
+\appendix
+
+\include{Appendices/AppendixA}
+\include{Appendices/AppendixB}
+\include{Appendices/AppendixC}
+\include{Appendices/AppendixD}
+
+\end{document}

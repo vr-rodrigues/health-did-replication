@@ -1,0 +1,58 @@
+{
+  "id": "281",
+  "title": "Dynamic responses to smoking bans: Evidence from young adults in a developing country",
+  "author_label": "Steffens, Pereda (2025)",
+  "group_label": "unica_sem_controles",
+  "data": {
+    "file": "data/raw/281/data_extracted/data/raw/pns_2013.dta",
+    "format": "dta",
+    "sample_filter": "capital == 1 & year >= 2005 & age >= 15 & age <= 29 & t2008 == 0 & t2010 == 0 & t2011 == 0"
+  },
+  "variables": {
+    "outcome": "smoke",
+    "unit_id": "id",
+    "time": "year",
+    "cluster": "uf",
+    "weight": "weight",
+    "treatment_twfe": "Post_avg",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "single",
+    "allow_unbalanced": false
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 4,
+    "event_post": 4
+  },
+  "preprocessing": {
+    "time_recode": {},
+    "composite_twfe": {},
+    "composite_vars": {},
+    "construct_vars": [
+      "df <- df %>% dplyr::filter(!is.na(V00291))",
+      "df <- df %>% dplyr::mutate(id_chr = paste0(as.character(V0001), as.character(V0024), as.character(UPA_PNS), ifelse(nchar(as.character(V0006_PNS)) == 1, paste0('0', as.character(V0006_PNS)), as.character(V0006_PNS)), as.character(C00301)), uf = as.numeric(V0001), age_raw = as.numeric(C008), weight = as.numeric(V0029), capital = as.integer(V0031 == 1), smoker = as.numeric(P050), former_daily_smoker = as.numeric(P051), former_smoker = as.numeric(P052), starting_age = as.numeric(P053), years_quit = as.numeric(P05901), months_quit = as.numeric(P05902))",
+      "df <- df %>% dplyr::mutate(regular_smoker = as.integer(smoker == 1), former_regular = as.integer(smoker == 3 & former_smoker == 1), smoking_time = dplyr::if_else(!is.na(starting_age), age_raw - starting_age, NA_real_), add_year = dplyr::case_when(!is.na(months_quit) & months_quit <= 6 ~ 0, !is.na(months_quit) & months_quit > 6 ~ 1, TRUE ~ NA_real_), quit_time = years_quit + add_year, stock = smoking_time - quit_time, mistake = as.integer(stock < 0))",
+      "df <- df %>% dplyr::filter(is.na(mistake) | mistake == 0)",
+      "n_base__ <- nrow(df); df <- df[rep(seq_len(n_base__), each = 10), ]",
+      "df$year <- rep(2004:2013, times = n_base__)",
+      "df <- df %>% dplyr::mutate(offset__ = 2013 - year, age = age_raw - offset__, smoke = as.integer((regular_smoker == 1 & !is.na(smoking_time) & smoking_time >= offset__) | (former_regular == 1 & !is.na(quit_time) & !is.na(smoking_time) & quit_time <= offset__ & smoking_time >= offset__)))",
+      "df <- df %>% dplyr::mutate(id = dplyr::dense_rank(id_chr), t2008 = as.integer(uf == 11), t2009 = as.integer(uf %in% c(13, 14, 25, 35, 41, 52, 15, 28, 29, 12, 50, 33)), t2010 = as.integer(uf == 22), t2011 = as.integer(uf == 51))",
+      "df <- df %>% dplyr::mutate(Post_avg = as.integer(t2009 == 1 & year >= 2009), gvar_CS = dplyr::if_else(t2009 == 1, 2009, 0))",
+      "df <- df %>% dplyr::select(id, id_chr, uf, capital, weight, year, age, smoke, t2008, t2009, t2010, t2011, Post_avg, gvar_CS)"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": {},
+    "se_twfe": {}
+  },
+  "notes": "Outcome selection protocol: main result chosen from Figure 3a (average effects on smoking prevalence). No explicit preferred specification among columns; same outcome and sample across variants, so protocol selects the first/main specification with the fewest time-varying controls. Implemented as a 2009-treated single-timing DiD after excluding 2008, 2010, and 2011 cohorts, matching the paper's baseline event-study sample."
+}

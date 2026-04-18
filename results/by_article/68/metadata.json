@@ -1,0 +1,43 @@
+{
+  "id": "68",
+  "title": "Does Abolishing User Fees Lead to Improved Health Status? Evidence from Post-Apartheid South Africa",
+  "author_label": "Tanaka (2014)",
+  "group_label": "unica_sem_controles",
+  "data": {
+    "file": "data/raw/68/replication/Analyze_KIDS.csv",
+    "format": "csv",
+    "sample_filter": "ageyr < 4 & waz > -6 & waz < 5 & !is.na(clinic93)"
+  },
+  "variables": {
+    "outcome": "waz",
+    "unit_id": "clustnum",
+    "time": "year",
+    "cluster": "clustnum",
+    "treatment_twfe": "postXhigh",
+    "gvar_cs": "gvar_CS"
+  },
+  "panel_setup": {
+    "treatment_timing": "single",
+    "data_structure": "rcs",
+    "time_format": "numeric"
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$post <- as.integer(df$year == 98)",
+      "df$high <- as.integer(df$clinic93 == 1)",
+      "df$postXhigh <- df$post * df$high",
+      "df$gvar_CS <- ifelse(df$clinic93 == 1, 94, 0)"
+    ]
+  },
+  "analysis": {
+    "has_event_study": false,
+    "run_sa": false,
+    "run_bjs": false,
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "twfe_fe_override": "clustnum",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "notes": "T=2 (1993 vs 1998). RCS individual-level data. Treatment: clinic93=1 (high clinic access pre-policy). User fees abolished 1994. Outcome: weight-for-age z-score (waz). 62 clusters, ~1071 obs in main sample. CS-DID with panel=FALSE. No event study possible with T=2."
+  }
+}

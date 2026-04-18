@@ -1,0 +1,46 @@
+{
+  "id": "337",
+  "title": "Crimes against Morality: Unintended Consequences of Criminalizing Sex Work",
+  "author_label": "Cameron, Seager, Shah (2021)",
+  "group_label": "unica_sem_controles",
+  "data": {
+    "file": "data/raw/337/Data Files/data/Crimes-Against-Morality_Main_data-constructed.dta",
+    "format": "dta",
+    "sample_filter": "dataset == 1 & !is.na(sept_any)",
+    "data_structure": "repeated_cross_section"
+  },
+  "variables": {
+    "outcome": "sept_any",
+    "unit_id": "wsid",
+    "time": "wave",
+    "cluster": "wsid",
+    "treatment_twfe": "dd_cl",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "repeated_cross_section",
+    "treatment_timing": "single",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_sa": false,
+    "run_bacon": false,
+    "has_event_study": false,
+    "bjs_gvar": ""
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$gvar_CS <- ifelse(df$closing == 1, 2L, 0L)"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": 0.2726,
+    "se_twfe": 0.0316
+  },
+  "notes": "Cameron, Seager, Shah (QJE 2021). Criminalizing sex work in Malang, East Java, Indonesia. Single treatment (Nov 2014), 2 periods (baseline Feb-Mar 2014, endline May-Jun 2015). Unit = worksite (wsid), 17 total but only 12 in sept_any sample. 6 criminalized (closing=1), 6 non-criminalized in STI sample. Outcome = sept_any (biological STI test positive, 0/1). Treatment variable dd_cl = closing * el (pre-constructed DiD composite). Stata: areg sept_any dd_cl el, abs(wsid) cluster(wsid). Table II Column 1 Panel A: beta=0.273, SE=0.101 (conventional clustered), N=459, baseline mean=0.465. Paper uses wild cluster bootstrap percentile-t p-values (Cameron, Gelbach, Miller 2008) because only 17 clusters. R feols with wsid+wave FEs gives identical coefficient 0.2726. Note: data_structure=repeated_cross_section because only 385 unique uid out of 459 obs (individuals enter/exit). With only 2 periods and single treatment timing, CS-NT reduces to standard DiD. SA disabled (single treatment timing, 2 periods). No event study (only 2 periods). IMPORTANT: conventional clustered SEs will differ from paper's reported bootstrap p-values. Paper reports *** significance via bootstrap, not conventional SEs."
+}

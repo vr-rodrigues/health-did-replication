@@ -1,0 +1,46 @@
+{
+  "id": "61",
+  "title": "Giving Mom a Break: The Impact of Higher EITC Payments on Maternal Health",
+  "author_label": "Evans, Garthwaite (2014)",
+  "group_label": "unica_sem_controles",
+  "data": {
+    "file": "data/raw/61/AEJ_Data_Programs/brfss/BRFSS_Final_Data.dta",
+    "format": "dta",
+    "sample_filter": "kids > 0 & educ <= 2"
+  },
+  "variables": {
+    "outcome": "excel_vgood",
+    "unit_id": "fips",
+    "time": "year",
+    "cluster": "fips",
+    "treatment_twfe": "dd_treatment",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "twoplus_kids",
+      "eitc_expand"
+    ],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "repeated_cross_section",
+    "treatment_timing": "single",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_bacon": false,
+    "has_event_study": false,
+    "bjs_gvar": ""
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$gvar_CS <- ifelse(df$kids > 1, 1995, 0)"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": 0.0095
+  },
+  "notes": "Stata: reg excel_vgood dd_treatment twoplus_kids eitc_expand if educ<=2, cluster(fips). Individual BRFSS survey data. Treatment = EITC expansion interacted with 2+ kids. Single adoption 1995. TWFE fix (Round 3): Stata uses plain OLS with NO unit/time FEs (treatment dd_treatment already encodes DiD variation). Template incorrectly added fips+year FEs giving 0.01032 vs Stata 0.00948. Fix: feols(excel_vgood ~ dd_treatment + twoplus_kids + eitc_expand, cluster=~fips) without | FE spec → 0.009483 (exact match). EVENT STUDY NOT IMPLEMENTED: treatment is defined at the individual level (kids > 1), not at the unit_id (fips) level."
+}

@@ -1,0 +1,70 @@
+{
+  "id": "21",
+  "title": "The Effect of Prescription Drug Monitoring Programs on Opioid Utilization in Medicare",
+  "author_label": "Buchmueller, Carey (2018)",
+  "group_label": "escalonada_sem_controles",
+  "data": {
+    "file": "data/raw/21/id_36.dta",
+    "format": "dta",
+    "sample_filter": "insample == 1",
+    "es_sample_filter": "!(state_label %in% c('Nevada','Louisiana','New York','Tennessee'))"
+  },
+  "variables": {
+    "outcome": "GT4pres",
+    "unit_id": "ssastate",
+    "time": "halfyear",
+    "cluster": "ssastate",
+    "weight": "takers",
+    "treatment_twfe": "Post_avg",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "run_bacon": true,
+    "has_event_study": true,
+    "event_pre": 4,
+    "event_post": 2,
+    "bjs_gvar": ""
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$GT4pres[!is.na(df$GT4pres) & df$GT4pres == 99999] <- NA",
+      "df$insample <- as.integer(as.character(haven::as_factor(df$sample)) == 'all')",
+      "th2012h2 <- (2012-1960)*2 + 1L",
+      "th2012h1 <- (2012-1960)*2",
+      "th2011h1 <- (2011-1960)*2",
+      "df$eventhalfyear <- as.numeric(df$halfyear) - th2012h2",
+      "state_ch <- tryCatch(as.character(haven::as_factor(df$state)), error=function(e) as.character(df$state))",
+      "df$eventhalfyear[state_ch %in% c('New York','Tennessee')] <- df$eventhalfyear[state_ch %in% c('New York','Tennessee')] - 2",
+      "df$eventhalfyear[state_ch == 'Delaware'] <- df$eventhalfyear[state_ch == 'Delaware'] + 1",
+      "df$eventhalfyear[state_ch == 'Ohio'] <- df$eventhalfyear[state_ch == 'Ohio'] + 1",
+      "df$eventhalfyear[state_ch == 'Oklahoma'] <- df$eventhalfyear[state_ch == 'Oklahoma'] + 3",
+      "df$eventhalfyear[state_ch == 'Nevada'] <- df$eventhalfyear[state_ch == 'Nevada'] + 10",
+      "df$eventhalfyear[state_ch == 'Louisiana'] <- df$eventhalfyear[state_ch == 'Louisiana'] + 9",
+      "df <- as.data.frame(dplyr::group_by(df, ssastate) |> dplyr::mutate(evermustaccess = max(mustaccess, na.rm=TRUE)))",
+      "df$Post_avg <- as.integer(!is.na(df$eventhalfyear) & df$eventhalfyear >= 0 & df$evermustaccess == 1)",
+      "df$gvar_CS <- 0L",
+      "df$gvar_CS[df$evermustaccess == 1] <- th2012h2",
+      "df$gvar_CS[state_ch == 'Delaware'] <- th2012h1",
+      "df$gvar_CS[state_ch == 'Ohio'] <- th2012h1",
+      "df$gvar_CS[state_ch == 'Oklahoma'] <- th2011h1",
+      "df$state_label <- state_ch"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": -0.0019,
+    "se_twfe": 0.0008,
+    "att_csdid_nt": -0.0018,
+    "se_csdid_nt": 0.0013
+  },
+  "notes": "TWO SEPARATE EVENT STUDY PDFs — event_study_script.R produces: (a) event_study_com_binning.pdf (window -4 to 2, F4 bins eventhalfyear<=-4) and (b) event_study_sem_binning.pdf (window -9 to 2, separate F9-F2 dummies). CRITICAL FIX: event dummies must be 0 for never-treated states (evermustaccess==0) — otherwise never-treated states get L0=1 at halfyear=105 and dilute treatment effect by ~50%. Fix: eventhalfyear_t = ifelse(evermustaccess==1, eventhalfyear, NA). ES sample excludes NV/LA/NY/TN (es_sample_filter). Stata halfyear integers: th2012h2=105, th2012h1=104, th2011h1=102. gvar_CS: OK=102, DE/OH=104, KY/NM/WV=105, never-treated=0. MATCHES: TWFE com binning EXACT (F4=0.00067, F3=-0.00171, F2=-0.00130, L0=-0.00353); BJS EXACT (tau0=-0.00356, tau1=-0.00179, tau2=-0.00099). APPROXIMATIONS: TWFE sem L2 slightly off (R=-0.00127 vs Stata=-0.00100). SA from sunab(gvar_SA=Inf for NT). BJS via did_imputation v0.5.0 with yname/gname/tname/idname args — R package cannot estimate pre-period BJS (negative horizons silently ignored). Point estimate TWFE -0.00187 matches Stata exactly. CS-NT FIX (Round 3): Stata uses csdid2 with long2 aggregation (averages over event-time periods = dynamic). R aggte(type='simple') gave -0.00155 (14.9% gap). aggte(type='dynamic') gives -0.001888 (3.7% gap, SE=0.000859 vs Stata SE~0.00123). results.csv updated to use type='dynamic' value."
+}

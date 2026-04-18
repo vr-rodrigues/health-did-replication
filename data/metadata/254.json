@@ -1,0 +1,47 @@
+{
+  "id": "254",
+  "title": "The Effect of Medicaid Reimbursement Rates on Nursing Home Staffing",
+  "author_label": "Gandhi et al. (2024)",
+  "group_label": "unica_sem_controles",
+  "data": {
+    "file": "data/raw/254/weekly_panel_subset.csv",
+    "format": "csv"
+  },
+  "variables": {
+    "outcome": "hours_nursing_ratio_i",
+    "unit_id": "ccn",
+    "time": "wk_end_mdy",
+    "cluster": "ccn",
+    "treatment_twfe": "Post_avg",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "single",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 7,
+    "event_post": 4,
+    "run_sa": true,
+    "run_bjs": false,
+    "bjs_gvar": "",
+    "legacy_analysis": true,
+    "legacy_reason": "Requires custom preprocessing (weekly→quarterly aggregation, merge with ccn_high_mcaid_il.csv, bubble-period exclusion, multi-scenario high/low heterogeneity) implemented in results/254/id254_script.R. Template produces only TWFE+CS-NT for main scenario; bundled results.csv retains the full 10-column schema including heterogeneity estimates."
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$gvar_CS <- ifelse(df$high_mcaid_il == 1, treat_yq, 0L)",
+      "df$Post_avg <- as.integer(df$post == 1 & df$high_mcaid_il == 1)"
+    ]
+  },
+  "original_result": {},
+  "notes": "EVENT STUDY REVIEWED — custom discretized treatment, no standard ES. Gandhi et al. (2024). DISCRETIZED treatment (created by analyst, not paper). Paper uses continuous treatment (illinois * post) for main spec and heterogeneity by Medicaid share (high_mcaid_il / low_mcaid_il) as robustness. We create binary treatment: high-Medicaid IL facilities (342 CCNs, above-median Medicaid share) = treated, low-Medicaid IL facilities (308 CCNs) = control. Single treatment date: Q3 2022 (first post-bubble quarter). Bubble (Jan-Jun 2022) excluded. Weekly data aggregated to quarterly for CS. Custom script: id254_script.R."
+}

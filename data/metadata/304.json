@@ -1,0 +1,46 @@
+{
+  "id": "304",
+  "title": "Recessions, Mortality, and Migration Bias: Evidence from the Lancashire Cotton Famine",
+  "author_label": "Arthi, Beach & Hanlon (2022)",
+  "group_label": "unica_sem_controles",
+  "data": {
+    "file": "data/raw/304/analysis_data.csv",
+    "format": "csv"
+  },
+  "variables": {
+    "outcome": "census_mr_tot",
+    "unit_id": "unit_id",
+    "time": "period",
+    "cluster": "unit_id",
+    "weight": "pop_census_tot",
+    "treatment_twfe": "cotton_dist_post",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "single",
+    "allow_unbalanced": false
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_sa": false,
+    "run_bacon": true,
+    "has_event_study": false,
+    "event_pre": 0,
+    "event_post": 0
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$unit_id <- as.integer(factor(df$master_name))"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": 2.1935,
+    "se_twfe": 0.4635
+  },
+  "notes": "Classic 2x2 DiD: 538 districts, 2 periods (1851 pre, 1861 post). Treatment = cotton-producing district. Weighted by census population. Only 2 periods so no event study. SA disabled (single cohort). Analysis data built by data/304/build_analysis_data.R from raw Stata files. Column 1 baseline — no controls."
+}

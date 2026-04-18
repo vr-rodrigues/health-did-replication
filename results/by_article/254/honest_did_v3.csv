@@ -1,0 +1,5 @@
+"estimator","vcov_type","n_pre","n_post","target","breakdown_Mbar"
+"TWFE","full",9,11,"first",2
+"TWFE","full",9,11,"avg",0.5
+"CS-NT","full",3,4,"first",1.75
+"CS-NT","full",3,4,"avg",1.25

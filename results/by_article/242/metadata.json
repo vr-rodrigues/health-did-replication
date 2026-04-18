@@ -1,0 +1,56 @@
+{
+  "id": "242",
+  "title": "Blue Collar Booms and American Mortality: Evidence from the Fracking Revolution",
+  "author_label": "Moorthy, Shaloka (2025)",
+  "group_label": "escalonada_controles",
+  "data": {
+    "file": "data/raw/242/dta/final_playonly.dta",
+    "format": "dta",
+    "sample_filter": "year >= 2002 & year <= 2013 & !is.na(lnearns_gen1_a1499)"
+  },
+  "variables": {
+    "outcome": "lnearns_gen1_a1499",
+    "unit_id": "cntyfips2000",
+    "time": "year",
+    "cluster": "cntyfips2000",
+    "weight": "pop2000",
+    "treatment_twfe": "ddtquartile1",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "i(year, medianhhinc1990)",
+      "i(year, pcthighschool1990)",
+      "i(year, pctmanufacturing1990)",
+      "i(year, pctmarried1990)",
+      "i(year, pctrural1990)",
+      "i(year, pctveteran1990)",
+      "i(year, pctwhite11990)"
+    ],
+    "cs_controls": [],
+    "additional_fes": [
+      "splay1_year_fe"
+    ]
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": false
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 5,
+    "event_post": 5,
+    "run_sa": true,
+    "run_gardner": true,
+    "cs_max_e": 5
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$gvar_CS <- ifelse(df$tquartile1 == 1, as.numeric(df$splayyear1), 0)"
+    ]
+  },
+  "original_result": {},
+  "notes": "EVENT STUDY REVIEWED. Figure 2 / main DiD specification. Stata: reghdfe lnearns_gen1_a1499 ddtquartile1 c.medianhhinc1990#i.year ... [aw=pop2000] if balancesample==1, absorb(splay1_year_fe cntyfips2000) vce(cl cntyfips2000). 9 staggered cohorts (2001-2012), 112 treated counties (top-quartile RPI), 407 never-treated control counties (same shale plays, lower RPI). splay1_year_fe = shale_play x year FE (464 categories), replaces standard year FE. Controls are c.X1990#i.year (baseline-x-year interactions) — use feols i(year, X) syntax. cs_controls empty because att_gt cannot handle baseline-x-year interactions. lnearns_gen1_a1499 has 8513 non-NA within balancesample (QWI coverage starts ~2002). Pattern 37 applies. | Outcome selection: Rule (ii) largest N. Mortality data (Table 6) requires restricted-access files not in replication package. Earnings are the primary available outcome in the public replication data. Audit confirmed. | CS-DID dynamic restricted to max_e=5: treatment (ddtquartile1) turns OFF at e~6, so e>=6 captures post-treatment rebound, not causal effect. Unrestricted dynamic gave ATT=0.124 (driven by late horizons with 2-5 cohorts and ATT~0.25); restricted to e<=5 gives ATT=0.018, consistent with TWFE=0.019 and group=0.008."
+}

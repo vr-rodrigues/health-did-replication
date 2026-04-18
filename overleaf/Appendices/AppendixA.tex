@@ -1,0 +1,389 @@
+\chapter{Specification Selection Protocol and Decision Log}
+\label{AppendixA}
+
+This appendix documents the protocol used to select the main specification for each article and the log of decisions adopted.
+
+\section{Selection Rule}
+
+For each article, we select \emph{one} outcome and \emph{one} specification. The hierarchical rule is:
+
+\begin{enumerate}[label=\roman*.]
+  \item \textbf{Author declaration.} Specifications described as \emph{main}, \emph{preferred}, or \emph{baseline}.
+  \item \textbf{Largest sample.} If more than one candidate remains, the specification with the largest $N$.
+  \item \textbf{Tiebreakers:}
+    \begin{enumerate}[label=(\alph*)]
+      \item most aggregated variable;
+      \item most parsimonious specification in time-varying covariates;
+      \item documented random selection.
+    \end{enumerate}
+\end{enumerate}
+
+When the article reports only a dynamic event study without a static ATT, we re-estimate a collapsed version with a single post-treatment indicator (Collapse = 1).
+
+\newpage
+\section{Decision Log}
+
+\begin{small}
+\setlength{\LTleft}{-1cm}
+\setlength{\LTright}{-1cm}
+\begin{longtable}{p{2.2cm} p{3.0cm} p{5.0cm} p{0.8cm} p{4.5cm}}
+\caption{Main outcome selection by reanalyzed article}\label{tab:decision_log}\\
+\toprule
+\textbf{Article} & \textbf{Selected outcome} & \textbf{Rule applied \& rationale} & \textbf{Coll.} & \textbf{Textual quote} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Article} & \textbf{Selected outcome} & \textbf{Rule applied \& rationale} & \textbf{Coll.} & \textbf{Textual quote} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r}{\footnotesize\itshape continued on next page} \\
+\endfoot
+\bottomrule
+\endlastfoot
+
+% ===== CALIBRATION SET =====
+
+\textcite{dranove2021dose}
+& Log price per prescription (Table 4, col.~4)
+& Rule i+iii --- declared preference. Footnote 23 defines col.~4 as preferred. Under iii(a), price is the primary focus of the article.
+& 0
+& ``column 4 our preferred estimate'' (fn.~23) \\
+
+\textcite{buchmueller2018effect}
+& GT4pres --- prescriptions from $>$4 physicians (Table 6, Panel B)
+& Rule i --- declared preference. Doctor \emph{shopping} outcome is the article's main contribution.
+& 0
+& ``our preferred model combines these two categories of states into a single control group'' (p.~96) \\
+
+\textcite{carrillo2019provider}
+& Physicians per capita (Table 2, col.~5)
+& Rule i --- declared preference. Physician supply is the main outcome; child health (Table 6) is supplementary.
+& 0
+& ``The estimated coefficient from our preferred specification that adjusts for all baseline controls'' (p.~175) \\
+
+\textcite{bosch2014tradeoffs}
+& Log employers $\leq$50 (Table 2, col.~7)
+& Rule i+iii(a) --- ``Table 2 presents the main results''. Col.~7 aggregates firm sizes 1--50. Only event study reported.
+& 1
+& ``Table 2 presents the main results of the paper'' \\
+
+\textcite{clemens2015regulatory}
+& Private insurance coverage (Table 5, PA, col.~1)
+& Rule i --- declared preference.
+& 0
+& ``I estimate equation~(4) as a check on the robustness of \ldots\ equation~(3) rather than as the baseline specification'' (p.~120) \\
+
+\textcite{schmitt2018multimarket}
+& Log non-medication price (Table 2, PA, col.~2)
+& Rule i+ii --- ``Main results'' declared. Largest $N$ among main outcomes.
+& 0
+& ``additional models that modify various assumptions of the main analysis'' (p.~377) \\
+
+\textcite{evans2014giving}
+& Excellent/very good self-reported health (Table 3)
+& Rule i+ii --- ``Main results'' declared. Largest $N$. Plain OLS without fixed effects (template adds FEs; $\sim$9\% divergence expected).
+& 0
+& ``unlike our main results, this specification cannot control for contemporaneous events impacting women with children'' (fn.~6) \\
+
+\textcite{akosaantwi2013effects}
+& Any health insurance (Table 2, col.~1)
+& Rule i+iii(a) --- ``Main DD Results''. Any health insurance = most aggregated coverage measure.
+& 0
+& ``we are conservative in our use of equation~(1) as our main specification'' (p.~15) \\
+
+\textcite{tanaka2014abolishing}
+& Weight-for-age Z-score (Table 3, col.~5)
+& Rule i --- declared preference.
+& 0
+& ``The preferred estimate in column~5 suggests that \ldots\ removing user fees improved WAZ'' (p.~292) \\
+
+\textcite{lawler2023effect}
+& Ever breastfed (Table 2, col.~1)
+& Rule i+ii --- ``core finding'' declared. Largest $N$ (354,642).
+& 0
+& ``In the main tables we report standard difference-in-differences estimates \ldots'' \\
+
+\textcite{carpenter2019direct}
+& Prob.\ receiving 1 dose Tdap, ages 10--12 (Table 1, col.~1)
+& Rule i+iii(b) --- ``main results'' declared. Between the two outcomes in Table 1, col.~1 has the largest $N$ (116,304) and is more parsimonious.
+& 0
+& ``Our main results are not sensitive to removing the controls in the Z vector.'' (p.~107) \\
+
+\textcite{marcus2022long}
+& Sports club membership (Table 2, col.~3)
+& Rule i --- declared preference.
+& 0
+& ``In our third and preferred specification, we augment equation~(2) with municipality fixed effects'' (p.~138) \\
+
+\textcite{bhalotra2021urban}
+& Under-5 mortality rate, diarrheal/respiratory diseases (Table 3, col.~1)
+& Rule ii+iii(c) --- Table with respiratory controls has largest $N$. Documented random tiebreaker between panels.
+& 0
+& ``We view the specifications using respiratory diseases as controls as the most conservative.'' (p.~504) \\
+
+\textcite{levine2011effective}
+& Private insurance (Table 5, PA, col.~2)
+& Rule i+ii --- SCHIP (Table 3) is main, but uses age discontinuity (not amenable to the template). Secondary parental coverage analysis (Table 5, staggered DiD) is amenable.
+& 0
+& ``Table 3 shows our main results for SCHIP'' \\
+
+\textcite{hoynes2015income}
+& \% low birthweight (Table 2, col.~1)
+& Rule i+ii+iii(b) --- ``Main Estimates''. Largest $N$. Most parsimonious.
+& 0
+& ``Our main estimates are for a `high-impact sample'\,\ldots\, Results from estimating equation (1) \ldots\ are shown in Table 2.'' \\
+
+\textcite{greenstone2014environmental}
+& PM --- mean particulate matter (Equation 2C)
+& Rule i+iii(a) --- ``Preferred econometric specification''. PM = most aggregated pollutant. Two-stage procedure (template approximation).
+& 1
+& ``In the preferred econometric specification that controls for city fixed effects, year fixed effects, and differential preexisting trends among adopting cities'' (p.~3041) \\
+
+% ===== EXPANSION SET =====
+
+\textcite{maclean2025paid}
+& Childcare hours, minutes/day (Appendix Table 10)
+& Rule i --- Main estimator is Gardner (did2s); TWFE reported in Appendix Table~10.
+& 0
+& ``we use the Gardner (2022) approach in our main specification'' (p.~7) \\
+
+\textcite{li2025shortened}
+& Log drug price (Table 3, col.~3)
+& Rule i --- TWFE with controls. Two-invoice system in China. 13 cohorts, all eventually treated.
+& 0
+& ``Baseline: Two-way fixed effects model for the impact of TIS on drug prices'' (Table~3) \\
+
+\textcite{estrada2024dismissal}
+& Left school after 1 year (Table 2, col.~1)
+& Rule i --- Chilean reform of 2014. Simple DiD (treated $\times$ post).
+& 0
+& ``Our main outcomes are dummy variables for whether the teacher was not working in the same public school'' (p.~12) \\
+
+\textcite{sarmiento2023air}
+& PM10 (particulate matter)
+& Rule i --- CS-DD is the article's primary estimator. TWFE on annual data for comparability.
+& 0
+& ``We select the doughnut design as our preferred specification'' (p.~9) \\
+
+\textcite{kresch2020buck}
+& Total investment / 1000 (Table 3, col.~1)
+& Rule i --- Total investment of Brazilian municipalities. Single cohort: all treated in 2006 (Fiscal Responsibility Law).
+& 0
+& ``the main specification'' (fn.~11) \\
+
+\textcite{myers2017power}
+& Prob.\ first birth before age 19
+& Rule i --- TWFE uses continuous treatment (fraction of ages 14--17 with pill access). CS/SA/Gardner use discretized binary version.
+& 0
+& ``Using the results from model 3'' (p.~2200) \\
+
+\textcite{soliman2025disrupting}
+& MME per capita $\times$ 10 (Table 1, col.~1)
+& Rule i --- DEA crackdown on pain clinics. Staggered county-year panel.
+& 0
+& ``State-by-year fixed effects \ldots\ are included in my preferred specification'' (p.~175) \\
+
+\textcite{moorthy2025bluecollar}
+& Log earnings, generation 1 (Figure 2)
+& Rule ii --- Largest $N$. Mortality data (Table 6) requires restricted access not available in the package.
+& 0
+& ``Our baseline specification uses the IHS of mortality as the outcome variable and controls for the relevant contemporaneous population'' (p.~12) \\
+
+\textcite{bancalari2024unintended}
+& Infant mortality rate (Table 2, PA, col.~1)
+& Rule i --- Baseline specification without controls. TWFE $= +0.74$ (SE $= 0.42$).
+& 0
+& ``The main finding of this paper underscores an increase in early-life mortality during the implementation of sewerage infrastructure'' (p.~16) \\
+
+\textcite{gandhi2025alleviating}
+& Nursing hours ratio (binarized treatment)
+& Rule i --- Article uses continuous treatment (Illinois $\times$ post). Treatment binarized for CS-DID.
+& 0
+& ``Figure 1 previews our main result'' (p.~9) \\
+
+\textcite{anderson2024imposing}
+& Black post-neonatal mortality
+& Rule i --- Hospital desegregation via Medicare. Staggered treatment 1967--1973 (7 cohorts).
+& 0
+& ``the fully specified regression model'' (p.~16) \\
+
+\textcite{axbard2024informed}
+& Any environmental enforcement action (Table 1a, col.~1)
+& Rule i --- Treatment = firm within 10km of monitor $\times$ post-2015. Binary outcome (0/1). Single treatment date.
+& 0
+& ``we include the distances \ldots\ in our main specification and interact the distance bins with the time fixed effects'' (p.~233) \\
+
+\textcite{bhalotra2023maternal}
+& Log maternal mortality ratio (col.~4)
+& Rule i --- Reserved legislative quotas for women. 22 countries, staggered adoption 1989--2013. No controls at baseline.
+& 0
+& ``we use this estimator as our main specification'' (p.~2181) \\
+
+\textcite{sekhri2024curse}
+& High-yield variety adoption (Table 3, col.~2)
+& Rule ii --- Largest $N$. Health outcomes (Table 9) require restricted NFHS data not available in the package.
+& 0
+& ``our preferred specification includes district fixed effects, state $\times$ birth-year fixed effects, and district-specific linear trends'' (p.~4) \\
+
+\textcite{steffens2025smoking}
+& Smoking prevalence (Figure 3a)
+& Rule i --- Main result from Figure 3a. Single-timing DiD (2009 cohort).
+& 0
+& ``The main specification in this paper is based on a generalized difference-in-differences design'' (p.~7) \\
+
+\textcite{arbogast2024burdens}
+& Medicaid/CHIP enrollment rate
+& Rule i --- Administrative burdens and enrollment. 15 treated states, 12 staggered cohorts. Dataset reconstructed via Census API.
+& 0
+& ``premium changes, income cutoffs, and work requirements are controlled for in the baseline specifications'' (p.~12) \\
+
+\textcite{arthi2022recessions}
+& Total census mortality rate (Table 2, col.~1)
+& Rule i --- Baseline specification. Classic 2$\times$2 DiD: 538 districts, 2 periods (1851, 1861). No controls.
+& 0
+& ``our preferred all-age results in column~3 of Table~2 imply that the cotton shock generated 24,418 excess deaths'' (p.~247) \\
+
+\textcite{brodeur2025shootings}
+& Log employment/population (Table 2, col.~1)
+& Rule iii(c) --- Documented random selection. Mass shootings and local employment.
+& 0
+& ``Our preferred specification includes Census divisions $\times$ year fixed effects'' (p.~116) \\
+
+\textcite{johnson2024legal}
+& Log accident rate (Table 2, col.~1)
+& Rule i --- TWFE with state+year FEs. Simplest specification. Retaliatory discharge protection and workplace safety.
+& 0
+& ``Our main specification is as follows'' (p.~1242) \\
+
+\textcite{galasso2024licensing}
+& Drug access (binary)
+& Rule i --- Medicines Patent Pool. 7 treatment cohorts (2011--2017). 84.6\% never treated.
+& 0
+& ``Table 2 provides the baseline results'' (Section VI.A) \\
+
+\textcite{xu2023bureaucratic}
+& Log deaths at city level (Table 2, col.~3)
+& Rule i --- 1918 pandemic and bureaucratic representation in India. Single treatment timing.
+& 0
+& ``Since the main results also hold for this subsample \ldots\ the results will still be informative'' (p.~490) \\
+
+\textcite{prem2023rise}
+& Coca area per grid cell
+& Rule i --- Article uses continuous treatment (suitability $\times$ announcement); binarized at median for CS-DID. Single date 2014.
+& 0
+& ``Our preferred specification controls for a large set of predetermined municipal characteristics'' (p.~347) \\
+
+\textcite{clarke2021abortion}
+& Abortion-related morbidity / 1000 pop (Table 2, PA, col.~1)
+& Rule i --- Legalization in Mexico City's Federal District (March 2007). Single treated unit.
+& 0
+& ``Our preferred estimates are those including population weights with full time-varying controls'' (p.~13) \\
+
+\textcite{lemoglie2022mafia}
+& Log new enterprises (Table 2, col.~5)
+& Rule i --- Mafia $\times$ 2007 financial crisis. Full model with controls + North $\times$ year interactions.
+& 0
+& ``we refer to the most complete specification in column 5 as the `complete model'\,'' (p.~150) \\
+
+\textcite{cameron2021crimes}
+& Positive biological STI test (Table II, col.~1, PA)
+& Rule i --- Criminalization of sex work in Malang, Indonesia. Single treatment (November 2014), 2 periods.
+& 0
+& ``The main specification used in the analysis is'' (p.~440) \\
+
+\textcite{courtemanche2025calorie}
+& BMI (Table 3, col.~1)
+& Rule i --- Calorie labeling laws. County FE + monthly FE + county linear trends.
+& 0
+& ``main two-way fixed-effects estimates'' (footnote~29, p.~1692) \\
+
+\textcite{bargain2019women}
+& Composite empowerment index (Table 1, col.~4)
+& Rule i --- Arab Spring in Egypt. Model 4 (baseline). 2 periods (2008, 2014).
+& 0
+& ``we estimate our main difference-in-difference model as follows'' (Section 3.3) \\
+
+\textcite{anderson2019tuberculosis}
+& Log pulmonary TB mortality (Table 3B, col.~1)
+& Rule i --- Anti-TB public health campaign (1900--1917). 548 cities, 16 staggered cohorts.
+& 0
+& ``baseline regression'' (p.~151); Section IV: ``Baseline Results'' \\
+
+\textcite{kuziemko2018managed}
+& Black infant mortality $\times$100 (Table 3)
+& Rule i --- Managed care in Texas. 71 treated counties (7 cohorts: 1993--2006), 179 never treated.
+& 0
+& ``Our preferred specification includes county linear time trends'' (p.~261) \\
+
+\textcite{malkova2018maternity}
+& General fertility rate (official)
+& Rule ii --- Soviet maternity benefits. All eventually treated: 2 cohorts (1981, 1982). 82 oblasts. Equation (1) is the foundational specification; Table 2 presents initial results.
+& 0
+& --- \\
+
+\textcite{rossinslater2017signing}
+& Married to biological father (Table 3, col.~5)
+& Rule i --- Paternity establishment. 44 states, 8 staggered cohorts (1990--1999). Primary aggregate indicator.
+& 0
+& ``the main results presented in the above tables'' (Tables 8--9) \\
+
+\textcite{kahn2015water}
+& Chemical Oxygen Demand, mg/L (Table 3, col.~2)
+& Rule ii+iii(a) --- 2006 policy change in China. Single timing. 497 stations, 7 years. Table 3 (station FE) is the most demanding specification; col.~2 (COD) is the most aggregated pollutant.
+& 0
+& --- \\
+
+\textcite{bailey2015war}
+& Age-adjusted mortality, elderly (Table 2, PB, col.~2)
+& Rule i --- Article title emphasizes ``Mortality of Older Americans''. Figure 7D is the main event study. Staggered CHC rollout 1965--1974.
+& 0
+& ``our baseline specification of equation (1)'' (Figures 5, 8, 9) \\
+
+\textcite{gallagher2014learning}
+& Log(flood insurance policies per capita + 1) (Figure 2)
+& Rule i --- Equation (1) described as ``the main estimating equation''. Only event study coefficients reported.
+& 1
+& ``Equation~(1) is the main estimating equation'' (p.~214) \\
+
+\textcite{deangelo2014life}
+& Fatalities / VMT (Table 4, col.~1)
+& Rule ii+iii(a) --- Largest $N$: full US sample ($N$=3384) vs.\ geographic control WA+ID ($N$=216). iii(a): fat\_vmt (aggregate) over fat\_good\_vmt (subcategory).
+& 0
+& --- \\
+
+\textcite{hausman2014corporate}
+& Collective dose per person-rem (Table 6, col.~1)
+& Rule i+iii(a) --- Production outcomes use Poisson/NB (incompatible with template). personrem chosen as aggregate measure (collective dose) over rem (worker average). Nuclear divestiture, 9 cohorts.
+& 0
+& ``the preferred specification is an unconditional negative binomial'' (p.~192) \\
+
+\textcite{danzer2023pensions}
+& Fertility (Table 3, col.~2)
+& Rule i --- Pension reform in Brazil (1991). DiD = TREAT $\times$ AFTER. RCS (PNAD). Single timing.
+& 0
+& ``None of the alternative specifications alter our main results'' (p.~160) \\
+
+\textcite{jayachandran2010modern}
+& Log mortality rate (Table 4, PB, col.~1)
+& Rule i --- Disease-time DiD: MMR (treated) vs.\ TB (control) before/after sulfonamides (1937). State panel 1925--1943.
+& 0
+& ``the slope-change model is our preferred specification'' (p.~131) \\
+
+\textcite{fisman2017distortionary}
+& I(Deaths/Quota $>$ 1) (Table 2, col.~1)
+& Rule ii --- LPM binary outcome. Staggered NSNP law adoption by 19 provinces (2005--2012). China's death quota program. Col.~1 = full sample.
+& 0
+& --- \\
+
+\textcite{cao2023mitigating}
+& Fire count within 0--90km (Table 2, col.~3)
+& Rule i --- Biomass power plants and agricultural fires. Staggered treatment. 954 plants, monthly data 2001--2019.
+& 0
+& ``In the main results, we use land type classifications to identify hotspots in cropland'' (p.~10) \\
+
+\end{longtable}
+\end{small}
+
+\medskip\noindent
+\textit{Notes:} Collapse = 0 indicates that the static ATT is directly available in the article; Collapse = 1 indicates that only event study coefficients were reported and the static ATT was re-estimated with a single post-treatment indicator. The selection rules follow: (i) author-declared preference; (ii) largest sample size; (iii-a) broadest conceptual scope; (iii-b) greatest parsimony; (iii-c) documented random selection. When the textual quote is not available (``---''), the decision was based on reading the article and replication package, documented in the corresponding \texttt{metadata.json} file. Complete article cards are in Appendix~\ref{AppendixB}.

@@ -1,0 +1,46 @@
+{
+  "id": "241",
+  "author_label": "Soliman (2025)",
+  "group_label": "escalonada_sem_controles",
+  "data": {
+    "file": "data/raw/241/analysis_panel.dta",
+    "format": "dta",
+    "es_sample_filter": "rel_year >= -3 & rel_year <= 3 | gvar_CS == 0"
+  },
+  "variables": {
+    "outcome": "MME_PC",
+    "unit_id": "county_fips",
+    "time": "year",
+    "cluster": "county_fips",
+    "treatment_twfe": "treatment",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "additional_fes": [
+      "state^year"
+    ]
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": false
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 2,
+    "event_post": 3,
+    "run_sa": true,
+    "run_gardner": true
+  },
+  "preprocessing": {
+    "construct_vars": []
+  },
+  "original_result": {
+    "beta_twfe": -31.52,
+    "se_twfe": 5.767
+  },
+  "notes": "EVENT STUDY REVIEWED. Soliman (2025) DEA crackdowns on pill mills. Staggered county-year panel. 3006 counties (95 treated, 8 cohorts 2007-2014, 2911 never-treated). Paper uses county + state*year FEs (additional_fes). Paper restricts TWFE to rel_year in [-3,3] (line 239 of Manuscript Code.R), dropping 247 treated-county obs far from treatment. Never-treated have rel_year=0 (always in window). Without filter: TWFE=-33.65 (6.76% gap). With filter: TWFE=-31.52 (exact match). CS segfaults on filtered sample (unbalanced panel: treated 4-7yrs, never-treated 9yrs triggers did pkg C code crash). STANDALONE SCRIPT required: investigate_241.R runs TWFE on filtered data, CS/SA/BJS on full data. Template cannot handle separate TWFE/CS samples. No controls in main spec. Outcome = MME per capita * 10. Table 1 Col 1. Replication code is R (not Stata). Original code: data/241/Files for Replication/Programs/AEJPol-2023-0640 Manuscript Code.R."
+}

@@ -1,0 +1,44 @@
+{
+  "id": "213",
+  "title": "The Effect of High Dismissal Protection on Bureaucratic Turnover and Productivity",
+  "author_label": "Estrada & Lombardi (2022)",
+  "group_label": "unica_sem_controles",
+  "data": {
+    "file": "data/raw/213/Working dataset/dataset_turnover_analysis.dta",
+    "format": "dta",
+    "sample_filter": "sample_turnover == 1 & age < 55"
+  },
+  "variables": {
+    "outcome": "left_school_plus1",
+    "unit_id": "treated",
+    "time": "agno",
+    "cluster": "clave",
+    "treatment_twfe": "treated_post",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "repeated_cross_section",
+    "treatment_timing": "single",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 3,
+    "event_post": 3,
+    "run_sa": true,
+    "run_gardner": true
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$gvar_CS <- ifelse(df$treated == 1, 2014, 0)"
+    ]
+  },
+  "original_result": {},
+  "notes": "EVENT STUDY REVIEWED. Estrada & Lombardi (2022) AEJ:Applied. Chile 2014 law reform granted permanent contracts to temp teachers with 3+ consecutive years. Treated: 3yr seniority, Control: 2yr seniority. Cohorts 2010-2014 (2014 is post). Simple DiD: reg y treated_post treated i.agno, cluster(clave). No unit FEs — treated is binary group indicator absorbed as FE. Outcome: left_school_plus1 (not working in same school after 1yr). Table 2, Col 1. Expected negative coefficient (dismissal protection reduces turnover)."
+}

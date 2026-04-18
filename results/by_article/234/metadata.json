@@ -1,0 +1,41 @@
+{
+  "id": "234",
+  "title": "The Power of Abortion Policy: Re-examining the Effects of Young Women's Access to Reproductive Control",
+  "author_label": "Myers (2017)",
+  "group_label": "escalonada_sem_controles",
+  "data": {
+    "file": "data/raw/234/analysis_data.csv",
+    "format": "csv"
+  },
+  "variables": {
+    "outcome": "firstbirth18",
+    "unit_id": "state",
+    "time": "yob",
+    "cluster": "state",
+    "treatment_twfe": "epillconsent18",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "cs_cluster": "state",
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": false,
+    "cs_allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "run_bacon": true,
+    "has_event_study": true,
+    "event_pre": 5,
+    "event_post": 5,
+    "run_sa": true,
+    "run_gardner": true
+  },
+  "preprocessing": {},
+  "original_result": {},
+  "notes": "Myers (2017) JPE. TWFE uses CONTINUOUS epillconsent18 (fraction of years 14-17 with pill consent, values 0/0.25/0.50/0.75/1.00) matching original specification. CS/SA/Gardner use DISCRETIZED binary pillconsent18 for group identification. Original multivariate spec includes 6 policy exposures + state trends — our univariate TWFE gives -0.0053 vs original -0.0084 (both insig). Pre-aggregated from 272K individual CPS obs to 49 states x 24 birth-cohorts (1935-1958) panel (weighted mean). 2 non-absorbing states (28,30) excluded. 9 treatment cohorts (1942-1956), 3 never-treated (29,31,56). Outcome: probability of first birth before age 19. EVENT STUDY REVIEWED: All 4 estimators (TWFE, CS-NT, SA, Gardner) show null results at every horizon — point estimates bounce around ±0.01, all CIs include zero. No pre-trends, no post-treatment effect. Classic null. The +350% TWFE-vs-CS ratio is meaningless (both ≈0)."
+}

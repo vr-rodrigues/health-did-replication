@@ -1,0 +1,199 @@
+\chapter{AI-Assisted Reanalysis Pipeline}
+\label{AppendixC}
+
+This appendix documents the automated pipeline used to reanalyze 56 TWFE studies with modern DiD estimators. The architecture follows the framework proposed by \textcite{xu2026scaling}, who show that large-scale reanalysis can be organized as a multi-layer system where a language-model orchestrator coordinates deterministic computational agents through structured file-based communication. \textcite{xu2026scaling} evaluate their framework on 92 instrumental-variable studies, of which 67 have manually verified reproducible 2SLS estimates and 25 are newly published, analyzing up to three specifications per paper (215 total) across seven pipeline stages, and report 87\% end-to-end success. The present project adapts their core principles to a three-stage DiD-specific workflow covering 56 articles.
+
+\section{Calibration and Scaling Strategy}
+\label{sec:calibration}
+
+The pipeline was developed through a process analogous to supervised learning. The ``training set'' consisted of 11 articles that had already been reanalyzed manually in this dissertation, for which the correct TWFE and CS-DID estimates were known. The ``test set'' comprised the remaining 45 articles, which the pipeline would process semi-automatically once calibration was complete.
+
+Calibration proceeded as an iterative loop. In each iteration, the LLM orchestrator (Claude Sonnet 4, Anthropic 2025, accessed through Claude Code) was instructed to reanalyze all 11 calibration articles from scratch, with no memory of previous attempts. The orchestrator read each article's PDF and replication code, filled \texttt{metadata.json}, and invoked the fixed R template. The resulting TWFE and CS-DID estimates were then compared against the known manual results. Two validation thresholds governed acceptance. The reestimated TWFE coefficient had to match the original paper's estimate exactly (up to rounding), and the CS-DID estimate had to fall within 10\% of the manually obtained value (allowing for minor R-vs-Stata implementation differences in \texttt{att\_gt}). When an article failed either threshold, the failure was diagnosed, and a new entry was added to the knowledge base (\texttt{failure\_patterns.md}) recording the context, root cause, and resolution rule. The loop was then restarted. The orchestrator reprocessed all 11 articles, now reading the updated knowledge base before each profiling step, so that previously encountered pitfalls were avoided without relearning. Over successive iterations, the knowledge base grew from zero to 28 documented patterns, and the pass rate on the calibration set converged to 100\%.
+
+This design mirrors the logic of supervised learning. Labeled examples (manual estimates) provide the loss signal, the knowledge base acts as the learned parameters, and successive iterations reduce error until the system generalizes to unseen articles. The difference from statistical learning is that each ``parameter update'' is an interpretable, version-controlled text entry, making the accumulated knowledge auditable and transferable.
+
+Once all 11 calibration articles passed both thresholds, the pipeline entered its second phase, processing the remaining 45 articles semi-automatically. For each new article, the LLM orchestrator read the PDF and replication code, filled \texttt{metadata.json}, and invoked the R template, consulting the full 28-pattern knowledge base throughout. Human review was required at two checkpoints, approving the Profiler's specification choices (Stage~1) and diagnosing any Analyst failures (Stage~2). New failures encountered on expansion articles were added to the knowledge base. This two-phase design ensures that the pipeline is validated against known ground truth before processing unseen articles, and that the knowledge base provides institutional memory preventing the system from repeating resolved failures.
+
+\section{Design Principles}
+
+The pipeline rests on a strict separation between scientific reasoning and computational execution. The LLM reads papers and makes specification decisions, while a fixed R script handles all estimation. The two layers communicate exclusively through a structured JSON file (\texttt{metadata.json}), so that no analytical choice is hidden inside code modifications. The R template is never modified per article, and all article-specific logic resides in \texttt{metadata.json}. Given identical metadata and data, the template produces identical results, eliminating a class of replication failures tied to ad-hoc script edits. Implementation failures are recorded in a version-controlled knowledge base (\texttt{failure\_patterns.md}) that the orchestrator reads before profiling each new article, allowing the system to avoid previously encountered pitfalls without relearning them. All inter-stage communication is file-based, so an interrupted run can be resumed from the last completed stage without loss.
+
+\section{Architecture}
+
+The system is organized in three layers (Figure~\ref{fig:pipeline_arch}). Layer~1 is the LLM orchestrator, governed by a master instruction file (\texttt{CLAUDE.md}) that defines the project scope, directory structure, estimator selection rules, and safety constraints. Layer~2 comprises three skill files (\texttt{SKILL\_profiler.md}, \texttt{SKILL\_analyst.md}, \texttt{SKILL\_reporter.md}) that define the contract for each pipeline stage, together with a knowledge base (\texttt{failure\_patterns.md}) that accumulates implementation lessons across articles. Layer~3 is the execution layer, a single fixed R script (\texttt{did\_analysis\_template.R}) that performs all estimation deterministically.
+
+\begin{figure}[H]
+\centering
+\begin{tcolorbox}[colback=gray!5, colframe=gray!60, width=\textwidth, title=Pipeline Architecture]
+\footnotesize
+\begin{verbatim}
+Layer 1: LLM Orchestrator (CLAUDE.md)
+  |
+  |--- reads ---> Layer 2: Skill files + Knowledge base
+  |                 |--- SKILL_profiler.md
+  |                 |--- SKILL_analyst.md
+  |                 |--- SKILL_reporter.md
+  |                 |--- failure_patterns.md (28 patterns)
+  |
+  |--- coordinates ---> 3-Stage Pipeline:
+  |
+  |  [Stage 1: PROFILER]      [Stage 2: ANALYST]       [Stage 3: REPORTER]
+  |  PDF + Code + Data --->   metadata.json + Data --> results.csv + PDF
+  |       |                        |                        |
+  |  metadata.json            results.csv              report.md
+  |                           event_study.pdf
+  |
+  '--- executes ---> Layer 3: did_analysis_template.R (fixed)
+\end{verbatim}
+\end{tcolorbox}
+\caption{Three-layer architecture for AI-assisted DiD reanalysis. The LLM orchestrator (Layer~1) reads skill descriptions and failure patterns (Layer~2) to fill article-specific metadata, which drives a fixed R template (Layer~3).}
+\label{fig:pipeline_arch}
+\end{figure}
+
+
+\section{Pipeline Stages}
+
+\noindent\textbf{Stage 1: Profiler.}\enspace
+The Profiler reads the article PDF (\texttt{pdf/[id].pdf}) and the replication package (\texttt{data/[id]/}) to produce \texttt{results/[id]/metadata.json}. It examines the methodology section and main results table to identify the outcome variable, treatment indicator, unit of observation, time period, and whether treatment adoption is staggered or single-date. It then reads the replication code (\texttt{.do} or \texttt{.R} files) to extract exact variable names, sample restrictions, control variables, and clustering choices, and inspects the data file to confirm that variable names match (case-sensitive in R).
+
+When multiple specifications are reported, the Profiler applies a hierarchical selection protocol. It first looks for a specification explicitly labeled ``main,'' ``preferred,'' or ``baseline.'' If no such label exists, it selects the specification with the most observations. If still tied, it chooses the one with fewest time-varying controls, and if still tied, it uses the first specification presented. The Profiler then fills all fields of \texttt{metadata.json} (see Section~\ref{sec:metadata_contract}) and validates internal consistency. In particular, \texttt{run\_csdid\_nyt} and \texttt{run\_bacon} are set to \texttt{true} if and only if treatment timing is staggered, and \texttt{has\_event\_study} reflects the original paper.
+
+\medskip
+\noindent\textbf{Stage 2: Analyst.}\enspace
+The Analyst takes \texttt{results/[id]/metadata.json} and the raw data as input, producing \texttt{results/[id]/results.csv} and, when applicable, \\\texttt{results/[id]/event\_study.pdf}. The entire estimation runs through a single command, \texttt{Rscript templates/did\_analysis\_template.R [id]}. The template reads \\\texttt{metadata.json} and performs estimations conditional on flags set by the Profiler. TWFE is always estimated via \texttt{fixest::feols} with unit and time fixed effects and clustered standard errors. CS-DID with never-treated controls is always estimated via \texttt{did::att\_gt} with \texttt{control\_group = "nevertreated"}, aggregated to a scalar ATT via \texttt{aggte}. When treatment adoption is staggered, the template additionally runs CS-DID with not-yet-treated controls and a Bacon decomposition (\texttt{bacondecomp::bacon}). If the original paper reports an event study, Sun-Abraham estimates are obtained via \texttt{fixest::feols} with \texttt{sunab()}, and Gardner estimates via \texttt{did2s::did2s}.
+
+\medskip
+\noindent\textbf{Stage 3: Reporter.}\enspace
+The Reporter reads \texttt{results.csv}, \texttt{event\_study.pdf}, and \\\texttt{metadata.json} to produce a structured report (\texttt{results/[id]/report.md}) covering six sections, from article summary through specification, point estimates, comparison with the original finding, event study assessment, and conclusion. The conclusion classifies each reanalysis as \textit{confirmed} (CS-DID and TWFE agree in sign and significance, with magnitude difference below 20\%), \textit{partial} (same sign and significance but magnitude differs by 20\% or more, or marginal significance change), or \textit{challenged} (sign reversal, or one estimator significant while the other is not).
+
+
+\section{The Metadata Contract}
+\label{sec:metadata_contract}
+
+The \texttt{metadata.json} file is the sole interface between the Profiler (scientific reasoning) and the Analyst (deterministic computation). Table~\ref{tab:metadata_fields} documents its key fields.
+\begin{longtable}{>{\ttfamily\footnotesize\raggedright}p{6.0cm} >{\small\raggedright\arraybackslash}p{9.0cm}}
+\caption{Key fields of \texttt{metadata.json}.} \label{tab:metadata_fields} \\
+\toprule
+\textnormal{\textbf{Field}} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\toprule
+\textnormal{\textbf{Field}} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{2}{r}{\footnotesize\itshape Continued on next page} \\
+\endfoot
+\bottomrule
+\endlastfoot
+
+id & Mapping ID for the article \\
+title & Full article title \\
+group\_label & Category: \texttt{escalonada\_controles}, \texttt{escalonada\_sem\_controles}, \texttt{unica\_controles}, or \texttt{unica\_sem\_controles} \\
+data.file & Path to the data file relative to project root \\
+data.sample\_filter & R expression applied via \texttt{dplyr::filter()} \\[3pt]
+variables.outcome & Outcome variable name \\
+variables.unit\_id & Panel unit identifier \\
+variables.time & Time period variable \\
+variables.treatment\_twfe & Binary post-treatment indicator for TWFE \\
+variables.gvar\_cs & Cohort variable for CS-DID (0 = never-treated) \\
+variables.twfe\_controls & Time-varying controls in the TWFE regression \\
+variables.cs\_controls & Controls passed to \texttt{att\_gt(xformla=)} \\
+variables.cluster & Clustering variable for standard errors \\
+variables.weight & Observation weights \\
+variables.additional\_fes & Extra fixed effects beyond unit + time \\[3pt]
+panel\_setup.data\_structure & \texttt{"panel"} or \texttt{"repeated\_cross\_section"} \\
+panel\_setup.treatment\_timing & \texttt{"staggered"} or \texttt{"single"} \\[3pt]
+analysis.run\_csdid\_nyt & Run CS-DID with not-yet-treated controls \\
+analysis.run\_bacon & Run Bacon decomposition \\
+analysis.has\_event\_study & Whether the original paper reports an event study \\
+analysis.event\_pre & Number of pre-treatment periods in the event window \\
+analysis.event\_post & Number of post-treatment periods in the event window \\[3pt]
+preprocessing.time\_recode & Mapping for non-contiguous time periods \\
+preprocessing.construct\_vars & R expressions evaluated before estimation \\[3pt]
+original\_result.beta\_twfe & Original TWFE coefficient (for validation) \\
+
+\end{longtable}
+
+The \texttt{preprocessing.construct\_vars} field deserves particular attention. Because the R template is never modified, any article-specific data manipulation (constructing a treatment indicator, creating a cohort variable, recoding missing values) must be expressed as R code strings in this array. These expressions are evaluated sequentially within the template's data environment before any estimation begins. A typical entry might define a post-treatment indicator as \texttt{"df\$Post\_avg <- as.integer(df\$year >= df\$treat\_year \& df\$treated == 1)"} or filter missing observations as \texttt{"df <- df \%>\% filter(!is.na(df\$outcome\_var))"}. This mechanism keeps the template fixed while accommodating the heterogeneity of 56 different replication packages.
+
+
+\section{Knowledge Base}
+
+Large-scale reanalysis is inherently iterative, as \textcite{xu2026scaling} emphasize, because the system encounters novel implementation failures that must be diagnosed, resolved, and remembered. This project addresses that challenge through a version-controlled knowledge base (\texttt{knowledge/failure\_patterns.md}). Each entry records the estimation step and data configuration that triggered the failure, the underlying technical reason, and a reusable corrective instruction.
+
+Over the course of analyzing 56 articles, 28 patterns were documented across five categories. Estimator output extraction patterns (1--4, 19) deal with Sun-Abraham's \texttt{iplot} returning no SE column (1), Gardner/did2s term naming differing from Stata (2), negative horizons being silently dropped (3), and individual-level repeated cross-sections being incompatible with BJS (4, 19). CS-DID estimation patterns (5, 8, 15, 22--26, 42--43) cover singular covariance matrices in small cohorts (5), repeated cross-section panel configuration (8), cohort variables that vary within units (15), BJS aggregation requirements (22), time-varying treatment incompatibility (23), base-period selection and cumulative-versus-marginal effect discrepancies between R and Stata (24, 26), late-treated units incorrectly absorbed into the never-treated group (25), propensity score overfitting with geographic dummies (42), and integer truncation of infinity in cohort variables (43). Stata-to-R data translation patterns (7, 9--12, 16) handle half-year and monthly date formats (7, 12), non-contiguous time periods (9), filter syntax differences (10), treatment variable construction (11), and Stata's \texttt{xi}-expanded variable names (16). Event study construction patterns (13--14, 18, 20--21) resolve tail-bin renaming that inflates the post-treatment average (13), incorrect cohort identification from pre-treatment dummies (14), never-treated unit exclusion (18), control-variable collinearity with event dummies (20), and article-specific sample restrictions in event studies (21). A TWFE specification pattern (17) addresses articles that use plain OLS without fixed effects, where the template's mandatory unit and time FEs produce a systematic ${\sim}10\%$ divergence from the original estimate. One additional pattern (6) documents a Windows-specific file-locking issue with PDF output.
+
+The orchestrator reads this knowledge base before profiling each new article. When a known pattern is recognized, such as Stata monthly dates, the Profiler preemptively applies the resolution rule in \texttt{metadata.json} rather than discovering the failure at the Analyst stage.
+
+
+\section{Directory Structure}
+
+The complete project directory is organized as follows.
+
+\begin{tcolorbox}[colback=gray!5, colframe=gray!60, width=\textwidth]
+\footnotesize
+\begin{verbatim}
+replication_analysis/
+  CLAUDE.md                        # Master instructions (Layer 1)
+  skills/
+    SKILL_profiler.md              # Profiler contract (Layer 2)
+    SKILL_analyst.md               # Analyst contract (Layer 2)
+    SKILL_reporter.md              # Reporter contract (Layer 2)
+  knowledge/
+    failure_patterns.md            # Failure patterns (Layer 2)
+  templates/
+    did_analysis_template.R        # Fixed R template (Layer 3)
+  data/
+    [id]/                          # Replication data per article
+  pdf/
+    [id].pdf                       # Article PDFs
+  results/
+    [id]/
+      metadata.json                # Profiler output
+      results.csv                  # Analyst output
+      event_study.pdf              # Event study (if applicable)
+      report.md                    # Reporter output
+  start_information/               # Reference materials (read-only)
+\end{verbatim}
+\end{tcolorbox}
+
+
+\section{Replication Instructions}
+
+Replicating or extending this project requires R (version $\geq$ 4.4) with the following packages installed: \texttt{fixest}, \texttt{did}, \texttt{did2s}, \texttt{bacondecomp}, \texttt{haven}, \texttt{dplyr}, \texttt{ggplot2}, \texttt{tidyr}, \texttt{jsonlite}. It also requires access to an LLM capable of reading PDFs and structured files (this project used Claude Sonnet 4, Anthropic 2025, accessed through Claude Code, with the instruction set in \texttt{CLAUDE.md}).
+
+To add a new article, place the article PDF in \texttt{pdf/[id].pdf} and the replication package in \texttt{data/[id]/}, and create an empty directory \texttt{results/[id]/}. The Profiler stage, following \texttt{SKILL\_profiler.md}, reads the article and replication code to fill \texttt{results/[id]/metadata.json}. This step requires scientific judgment in identifying the main specification, mapping variable names, and determining whether adoption is staggered. The knowledge base (\texttt{failure\_patterns.md}) should be consulted for known pitfalls. The Analyst stage then runs \texttt{Rscript templates/did\_analysis\_template.R [id]}. If the script fails, the error should be diagnosed, \texttt{metadata.json} corrected, and the script rerun. New failure patterns should be added to the knowledge base with the standard three-field structure. The Reporter stage, following \texttt{SKILL\_reporter.md}, reads \texttt{results.csv} and \texttt{event\_study.pdf} to write \texttt{results/[id]/report.md} with the standardized classification (confirmed, partial, or challenged).
+
+For articles in the calibration set described in Section~\ref{sec:calibration}, validation involves comparing the template output against the manual estimates. TWFE should match the original paper exactly (up to rounding). CS-DID may differ slightly due to R vs.\ Stata implementation differences (acceptable threshold $\leq 10\%$). New articles without prior manual analysis should be spot-checked by inspecting the \texttt{metadata.json} specification choices and verifying that the reestimated TWFE reproduces the original paper's coefficient.
+
+
+\section{Comparison with \textcite{xu2026scaling}}
+
+Table~\ref{tab:framework_comparison} summarizes the main differences between the two frameworks. The primary distinction is scale versus depth. \textcite{xu2026scaling} process 92 articles with relatively homogeneous estimation (2SLS), whereas this project processes fewer articles but must handle substantial heterogeneity in data formats, variable encoding, and panel structure. The fixed-template design with \texttt{construct\_vars} preprocessing is this project's response to that heterogeneity. All idiosyncratic manipulation is expressed declaratively in \texttt{metadata.json}, keeping estimation code uniform across articles.
+
+Both frameworks separate scientific reasoning (what to estimate) from computational execution (how to estimate it), treating this division as the central architectural decision for scalable reanalysis.
+
+\begin{table}[H]
+\centering
+\caption{Framework comparison between \textcite{xu2026scaling} and the present project.}
+\label{tab:framework_comparison}
+\small
+\begin{tabular}{>{\raggedright\arraybackslash}p{3.2cm}
+                >{\raggedright\arraybackslash}p{5.5cm}
+                >{\raggedright\arraybackslash}p{5.5cm}}
+\toprule
+\textbf{Dimension} & \textbf{\textcite{xu2026scaling}} & \textbf{Present project} \\
+\midrule
+Scope & 92 IV studies (215 specifications) & 56 DiD studies \\[4pt]
+Estimators & 2SLS + first-stage F-stat & TWFE, CS-DID (NT/NYT), Sun-Abraham, Gardner, Bacon \\[4pt]
+Pipeline stages & 7 (Profiler, Librarian, Janitor, Runner, Skeptic, Journalist, QC) & 3 (Profiler, Analyst, Reporter) \\[4pt]
+Interface contract & Structured extraction fields & \texttt{metadata.json} (30+ fields) \\[4pt]
+Execution layer & Custom Stata/R scripts & Single fixed R template \\[4pt]
+Knowledge base & Not explicitly described & \texttt{failure\_patterns.md} (28 patterns) \\[4pt]
+Human-in-the-loop & Final QC stage & Profiler decisions and failure diagnosis \\[4pt]
+Calibration & 67 manually verified studies & 11 articles with prior manual reanalysis \\[4pt]
+Primary challenge & Volume (92 articles) & Heterogeneity (56 articles, each with unique data structure) \\
+\bottomrule
+\end{tabular}
+\end{table}

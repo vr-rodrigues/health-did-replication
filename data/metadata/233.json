@@ -1,0 +1,84 @@
+{
+  "id": "233",
+  "title": "The Impact of Water and Sanitation Regulation on Municipal Investment in Brazil",
+  "author_label": "Kresch (2020)",
+  "group_label": "unica_controles",
+  "data": {
+    "file": "data/raw/233/Stata/dta/ws_data.dta",
+    "format": "dta",
+    "sample_filter": "balance2001 == 1"
+  },
+  "variables": {
+    "outcome": "invest_total",
+    "unit_id": "code",
+    "time": "year",
+    "cluster": "company",
+    "treatment_twfe": "muni_companyxlaw",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "pop_log",
+      "gdp_share_state",
+      "gdp_share_brazil",
+      "gdp_log",
+      "taxes_share_state",
+      "taxes_share_brazil",
+      "taxes_log",
+      "ag_area",
+      "ag_harvest",
+      "ag_value",
+      "livestock",
+      "temper",
+      "precip",
+      "baseinvestTT"
+    ],
+    "cs_controls": [],
+    "cs_cluster": "code",
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "single",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 4,
+    "event_post": 6,
+    "run_gardner": true
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df <- df %>% dplyr::filter(!is.na(scope) & scope != '' & scope != ' ')",
+      "df$muni_company <- ifelse(df$scope == 'Local', 1L, 0L)",
+      "df$law <- ifelse(df$year > 2005, 1L, 0L)",
+      "df$muni_companyxlaw <- df$muni_company * df$law",
+      "df$invest_total <- df$invest_total / 1000",
+      "df <- df %>% dplyr::group_by(code, year) %>% dplyr::slice(1) %>% dplyr::ungroup()",
+      "bal_tbl <- df %>% dplyr::group_by(code) %>% dplyr::summarise(n_yr=dplyr::n(), .groups='drop') %>% dplyr::mutate(balance2001 = ifelse(n_yr==12, 1L, 0L))",
+      "df <- df %>% dplyr::left_join(bal_tbl %>% dplyr::select(code, balance2001), by='code')",
+      "df <- df %>% dplyr::filter(state != 'MT' & state != 'DF')",
+      "first_scope <- df %>% dplyr::arrange(code, year) %>% dplyr::group_by(code) %>% dplyr::slice(1) %>% dplyr::ungroup() %>% dplyr::select(code, first_scope=scope)",
+      "df <- df %>% dplyr::left_join(first_scope, by='code')",
+      "df$gvar_CS <- ifelse(df$first_scope == 'Local', 2006, 0)",
+      "df$pop_log <- log(df$muni_pop)",
+      "df$gdp_log <- log(df$gdp / df$muni_pop)",
+      "df$taxes_log <- log(df$taxes / df$muni_pop)",
+      "df$time_trend <- df$year - 2000",
+      "base_inv <- df %>% dplyr::arrange(code, year) %>% dplyr::group_by(code) %>% dplyr::slice(1) %>% dplyr::ungroup() %>% dplyr::select(code, base_invest=invest_total)",
+      "df <- df %>% dplyr::left_join(base_inv, by='code')",
+      "df$baseinvestTT <- df$base_invest * df$time_trend",
+      "df$base_invest <- NULL",
+      "state_codes <- c(RO=110000, AC=120000, AM=130000, RR=140000, PA=150000, AP=160000, TO=170000, MA=210000, PI=220000, CE=230000, RN=240000, PB=250000, PE=260000, AL=270000, SE=280000, BA=290000, MG=310000, ES=320000, RJ=330000, SP=350000, PR=410000, SC=420000, RS=430000, MS=500000, GO=520000)",
+      "df$company <- df$code",
+      "for(st in names(state_codes)) df$company[df$state == st & df$first_scope == 'Regional'] <- state_codes[[st]]"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": 2868,
+    "se_twfe": 1319
+  },
+  "notes": "EVENT STUDY REVIEWED. All 4 estimators agree on growing positive effect (1500→6000). Slight pre-trend drift but consistent across estimators. Kresch (2020). Table 3 Col 1 (invest_total/1000). Stata: reghdfe invest_total muni_companyxlaw controls if balance2001==1, absorb(code year) vce(cluster company). Single cohort: all Local municipalities treated in 2006 (law=year>2005). Controls: pop_log, gdp_*, taxes_*, ag vars, climate, baseinvestTT. Company cluster: code for Local, state-level code for Regional. 103 municipalities change scope over time — use first_scope for time-invariant gvar_CS and company. CS-NT uses cs_cluster=code (unit-level) because company-level bootstrap clustering inflates SEs 10x (25 state-level Regional clusters vs 124 individual Local clusters → asymmetric cluster structure)."
+}

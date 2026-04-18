@@ -1,0 +1,57 @@
+{
+  "id": "125",
+  "title": "How Effective are Public Policies to Increase Health Insurance Coverage Among Young Adults?",
+  "author_label": "Levine, McKnight & Heep (2011)",
+  "group_label": "escalonada_controles",
+  "data": {
+    "file": "data/raw/125/AEJPol_2009_0099_data/maindata.dta",
+    "format": "dta",
+    "sample_filter": "a_age >= 19 & a_age <= 24 & year >= 2000 & !is.na(law)"
+  },
+  "variables": {
+    "outcome": "insured",
+    "unit_id": "stfips",
+    "time": "year",
+    "cluster": "stfips",
+    "treatment_twfe": "law",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "married",
+      "student",
+      "female",
+      "ur",
+      "povratio",
+      "povratio2"
+    ],
+    "cs_controls": [],
+    "additional_fes": [
+      "a_age"
+    ]
+  },
+  "panel_setup": {
+    "data_structure": "repeated_cross_section",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 4,
+    "event_post": 4,
+    "bjs_gvar": "",
+    "bjs_aggregate_to_panel": true
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "gvar_tbl <- df %>% dplyr::filter(law==1) %>% dplyr::group_by(stfips) %>% dplyr::summarise(first_law=min(year),.groups='drop')",
+      "df <- df %>% dplyr::left_join(gvar_tbl, by='stfips') %>% dplyr::mutate(gvar_CS = ifelse(!is.na(first_law), as.numeric(first_law), 0))"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": -0.0005,
+    "se_twfe": 0.007
+  },
+  "notes": "Levine, McKnight & Heep (2011). Table 5 Panel A Row 1 Col 2 (DD Full Sample). Stata: xi: reg insured law i.stfips i.year i.a_age married student female ur povratio povratio2 if a_age>=19 & a_age<=24 & year>=2000, cluster(stfips). UNWEIGHTED (paper footnote 23). Outcome: insured = privhi|pubhi (any insurance). Treatment = state parental coverage law (staggered, 20 states treated 2000-2008). Massachusetts excluded. Target: -0.0005 (SE 0.007). N=127106. NOTE: Use original event study (with binning) as point estimate. Sensitivity (CS-NT/CS-NYT +/- married+student+female) reserved for binning chapter discussion. EVENT STUDY REVIEWED: All 5 estimators (TWFE, CS-NT, CS-NYT, SA, Gardner) show null results — estimates bounce ±0.01-0.02, all CIs include zero at every horizon. No pre-trends, no effect. The +1865% ratio is meaningless (both ≈0)."
+}

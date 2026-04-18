@@ -1,0 +1,47 @@
+{
+  "id": "432",
+  "title": "Learning about an Infrequent Event: Evidence from Flood Insurance Take-Up in the United States",
+  "author_label": "Gallagher (2014)",
+  "group_label": "escalonada_sem_controles",
+  "data": {
+    "file": "data/raw/432/data/gallagher_aeja_paper_data/panel_1990_2007.dta",
+    "format": "dta",
+    "sample_filter": "panel9007 == 1"
+  },
+  "variables": {
+    "outcome": "ln_takeup_proxy1",
+    "unit_id": "id_num",
+    "time": "year2",
+    "cluster": "st_fips",
+    "treatment_twfe": "post_hit",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "additional_fes": [
+      "st_fips^year2"
+    ]
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": false
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "run_bacon": true,
+    "run_sa": true,
+    "run_gardner": true,
+    "has_event_study": true,
+    "event_pre": 10,
+    "event_post": 11
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$gvar_CS <- ifelse(!is.na(df$hit1year), as.numeric(df$hit1year), 0)",
+      "df$post_hit <- as.integer(!is.na(df$hit1year) & df$year2 >= df$hit1year)"
+    ]
+  },
+  "original_result": {},
+  "notes": "Gallagher (2014), AEJ: Applied Economics. Outcome selection: Rule (i) declared preference — equation (1) is described as 'the main estimating equation' (p.214). Outcome: ln_takeup_proxy1 = log(flood insurance policies per capita + 1). Figure 2 event study on 1990-2007 panel. Collapse = 1: paper reports ONLY event study coefficients (no static ATT), so we construct post_hit = 1{year2 >= hit1year} for static TWFE. Unit = NFIP community (id_num, N=10841). Treatment = first 'hit' by a PDD flood. hit1year = calendar year of first hit (NA for 3927 never-hit communities). 18 staggered cohorts (1990-2007), 6914 treated communities, 3927 never-treated. FEs: community + state*year (st_fips^year2, 864 categories). No time-varying controls. Cluster: state (st_fips, 48 states). IDIOSYNCRASY — REPEATED EVENTS: The paper's Figure 2 uses hityear_* variables that encode event-time dummies relative to ALL PDD floods, not just the first. 55% of treated communities (3822/6914) are hit >1 time (distribution: 1 hit=3092, 2=2278, 3=992, 4=385, 5+=163). This means hityear_p5 = 1 whenever a community is 5 years after ANY flood, not just the first. Standard staggered DiD (first-hit i(rel_time_binned)) gives systematically HIGHER post-treatment coefficients because all subsequent flood effects are absorbed into the first-hit timing. TWFE ES coefficients: first-hit t=0: 0.090, repeated-event t=0: 0.078 (Fig 2 match). At late horizons the gap grows: first-hit t=10: 0.094, repeated-event t=10: 0.024 (4x ratio). ES SCRIPT: es432_script.R uses raw hityear_* variables for TWFE ES (exact Figure 2 match) and first-hit for CS/SA/Gardner (standard staggered DiD). This mismatch is documented: the TWFE reflects the paper's specification while CS/SA/Gardner apply standard modern DiD methodology. The do-file uses pre-demeaned variables (_dmn suffix) because Stata areg absorbs only one FE set. In fixest, raw hityear_* + | id_num + st_fips^year2 gives EXACT match (all 22 coefficients identical to 5 decimal places). Panel: 195138 rows, balanced (10841 x 18 years). gvar_CS uses as.numeric() per Pattern 43; never-treated = 0. base_period = 'universal' per Pattern 26."
+}

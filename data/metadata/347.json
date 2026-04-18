@@ -1,0 +1,65 @@
+{
+  "id": 347,
+  "author_label": "Courtemanche et al. (2025)",
+  "group_label": "escalonada_controles",
+  "title": "Chain Restaurant Calorie Posting Laws, Obesity, and Consumer Welfare",
+  "journal": "Journal of the European Economic Association",
+  "data": {
+    "file": "data/raw/347/JEEA_Replication_Package/BRFSS/Data/",
+    "format": "dta",
+    "sample_filter": "(dccsa==1 | nyccsa==1 | seacsa==1 | philcsa==1 | albanymsa==1 | cd==1) & excluded!=1",
+    "data_structure": "repeated_cross_section"
+  },
+  "variables": {
+    "outcome": "bmi",
+    "unit_id": "fips",
+    "time": "tt",
+    "treatment_twfe": "law_enacted",
+    "gvar_cs": "gvar_yr",
+    "cluster": "fips",
+    "weight": "swt",
+    "twfe_controls": [
+      "female",
+      "i(age)",
+      "black",
+      "hispanic",
+      "other",
+      "married",
+      "hsgrad",
+      "somecol",
+      "colgrad",
+      "pd",
+      "unem",
+      "med_inc"
+    ],
+    "cs_controls": [],
+    "additional_fes": [
+      "fips[tt]"
+    ]
+  },
+  "panel_setup": {
+    "data_structure": "repeated_cross_section",
+    "treatment_timing": "staggered"
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "run_sa": true,
+    "run_bacon": true,
+    "has_event_study": true,
+    "event_pre": 7,
+    "event_post": 4,
+    "legacy_analysis": true,
+    "legacy_reason": "Requires Stata-based preprocessing (brfss_clean.do appends 19 BRFSS annual .dta files 1994-2012 with per-year BMI variable renaming, merges laws.dta + med_inc_updated.dta + unem_popdens.dta). Implemented in a custom R script (analysis_347.R). Template would need to rebuild brfss_clean_bmi.dta from scratch. Bundled results.csv (TWFE=-0.174 matching paper Table 3) retained."
+  },
+  "preprocessing": {
+    "construct_vars": []
+  },
+  "original_result": {
+    "beta_twfe": -0.174,
+    "se_twfe": 0.081,
+    "source": "Table 3, Column 1 (BMI, calorie posting laws). areg with county FE + monthly time FE + county-specific linear trends. N=594,364.",
+    "n": 594364
+  },
+  "notes": "CUSTOM SCRIPT (analysis_347.R). Data prep replicates brfss_clean.do: appends 19 BRFSS annual files (1994-2012), cleans BMI (different variable names per year: _bmi/_bmi2/_bmi3/_bmi4/_bmi5), constructs FIPS from state*1000+county, merges laws.dta + med_inc + unem_popdens. Sample: MSA counties around treated areas (DC/NYC/Seattle/Philadelphia/Albany CSAs + New England census division). Excludes CA, MA, NJ, ME, OR, Nassau Co NY, Davidson Co TN. TWFE EXACT MATCH: R=-0.1744 vs paper=-0.174. Monthly time (tt=(year-2001)*12+mo+84) with county-specific linear trends (fips[tt] in fixest). 89 counties, 26 treated. 4 yearly cohorts: 2008 (NYC), 2009 (Seattle+Westchester), 2010 (Philadelphia+Albany+Montgomery+Schenectady+Suffolk), 2011 (Vermont 14 counties). CS-DID uses yearly county-level panel (balanced, 44 of 89 counties); CS-NT=-0.448, CS-NYT=-0.439 — both ~2.5x TWFE magnitude, suggesting TWFE attenuation. Small cohort 2009 (2 treated counties after balancing → 1 with full panel) flagged by did package. Event study uses yearly relative time [-7, +4]."
+}

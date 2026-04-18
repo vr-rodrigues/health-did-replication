@@ -1,0 +1,8 @@
+* text=auto eol=lf
+*.R text eol=lf
+*.sh text eol=lf
+*.tex text eol=lf
+*.md text eol=lf
+*.pdf binary
+*.dta binary
+*.csv text eol=lf

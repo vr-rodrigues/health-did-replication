@@ -1,0 +1,706 @@
+%======================================================================
+%  health_did_replication — Working paper (NBER/co-author version)
+%  Self-contained: all chapter content is inlined below. Appendices live
+%  as sibling .tex files at the project root and are \included after the
+%  references.
+%======================================================================
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{microtype}
+\usepackage{lmodern}
+
+%---- Page layout ------------------------------------------------------
+\usepackage[a4paper,
+            inner=2.4cm, outer=2.4cm,
+            top=2.4cm, bottom=2.5cm,
+            includefoot]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parindent}{1.3em}
+\setlength{\parskip}{0pt}
+
+%---- Math, graphics, tables ------------------------------------------
+\usepackage{amsmath,mathtools,amssymb,bm}
+\DeclareMathOperator{\var}{Var}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{rotating}
+\usepackage{pdflscape}
+\usepackage{lscape}
+
+%---- Typography of section headings ----------------------------------
+\usepackage[explicit]{titlesec}
+\titleformat{\section}
+  {\normalfont\large\bfseries}
+  {\thesection}{0.8em}{#1}
+\titleformat{\subsection}
+  {\normalfont\normalsize\bfseries}
+  {\thesubsection}{0.8em}{#1}
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\itshape}
+  {\thesubsubsection}{0.8em}{#1}
+\titlespacing*{\section}{0pt}{2.4ex plus .7ex minus .2ex}{1.0ex}
+\titlespacing*{\subsection}{0pt}{2.0ex plus .5ex minus .2ex}{0.7ex}
+\titlespacing*{\subsubsection}{0pt}{1.6ex plus .4ex minus .2ex}{0.5ex}
+
+\captionsetup{font=small,labelfont=bf,justification=justified,
+              singlelinecheck=false,margin=0pt}
+\captionsetup[table]{font=small,labelfont=bf,justification=centering,
+                     singlelinecheck=false,margin=0pt}
+
+%---- Misc utilities ---------------------------------------------------
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue!60!black,
+            citecolor=blue!60!black,urlcolor=blue!60!black}
+
+%---- Bibliography -----------------------------------------------------
+\usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex}
+\addbibresource{example.bib}
+\usepackage[autostyle=true]{csquotes}
+
+%---- Title ------------------------------------------------------------
+\title{Do Health Policy Conclusions Survive Modern DiD?\
+       Re-estimating 56 TWFE Studies}
+\author{Victor Rangel\thanks{Insper, Master in Public Policy.
+       Email: \texttt{victorrangelrodrigues@gmail.com}. This paper is based on
+       the author's Master's dissertation (Insper, 2026), supervised by
+       Cristine Pinto and Pedro H.~C. Sant'Anna.} \[0.2em]
+       \emph{(co-author TBA)}}
+\date{This version: \today}
+
+\hypersetup{pdftitle={Do Health Policy Conclusions Survive Modern DiD?},
+            pdfauthor={Victor Rangel}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\noindent Two-way fixed-effects (TWFE) difference-in-differences has been the
+default estimator in applied health-policy research for decades, yet recent
+theory shows it can implicitly weight cohort--time effects in ways that conflict
+with the causal parameter. We ask whether the conclusions of 56 published
+health-economics papers that used TWFE survive reestimation with modern
+heterogeneity-robust estimators (Callaway--Sant'Anna, Sun--Abraham,
+Borusyak--Jaravel--Spiess, Goodman-Bacon, and the Rambachan--Roth HonestDiD
+sensitivity framework). We replace only the estimator and keep each paper's
+original specification. The sign of the effect is preserved in 48 of the 56
+cases and reverses in 8. The costs of legacy TWFE designs in
+this literature are concentrated in precision and magnitude rather than in
+directional conclusions: standard errors rise by roughly 42\% on average, 12
+articles lose conventional statistical significance, and the point estimate
+moves by more than 20\% in the majority of staggered-adoption designs. Bacon
+decompositions show that treated-versus-treated comparisons account for a
+substantial share of the identifying variation under staggered TWFE, consistent
+with the mechanism emphasized by the theory literature. HonestDiD sensitivity
+further shows that robustness to parallel-trends violations is limited under
+both TWFE and CS-DID. We release a reproducible metadata-driven pipeline and
+the regenerated results for the 56 papers under CC-BY-4.0, compliant with the
+AEA Data and Code Availability Policy 1.0.
+
+\medskip
+\noindent\textbf{Keywords:} difference-in-differences, TWFE, heterogeneous
+treatment effects, Callaway--Sant'Anna, Sun--Abraham, Borusyak--Jaravel--Spiess,
+HonestDiD, replication, health economics.
+
+\smallskip
+\noindent\textbf{JEL codes:} C21, C23, I18.
+\end{abstract}
+
+\clearpage
+
+%======================================================================
+
+%======================================================================
+
+%======================================================================
+
+%======================================================================
+
+%======================================================================
+
+%======================================================================
+
+%======================================================================
+
+%======================================================================
+
+%======================================================================
+%  MAIN TEXT (chapters 1-5 of the dissertation, inlined)
+%======================================================================
+
+\section{Introduction}
+\label{Chapter1}
+
+Difference-in-Differences (DiD) has become one of the most widely used tools in applied microeconomics, largely because it offers an intuitive research design and can be implemented with \emph{two-way fixed effects} (TWFE) regressions \citep{imbens2009recent, athey2017state, currie2020technology, goldsmith2024tracking}. In settings with staggered adoption and treatment-effect heterogeneity, however, TWFE may fail to recover the causal parameter of interest and may instead combine comparisons in problematic ways, including through negative weights \citep{goodman2021difference, roth2023s}. Recent work has responded with a set of estimators designed for these settings, including \textcite{callaway2021difference, sun2021estimating, borusyak2024revisiting,dechaisemartin2020twfe,gardner2022two,wooldridge2025two}.
+
+\textcite{baker2025difference} provide a general organizing framework that shifts attention away from familiar regressions and toward target parameters, identifying assumptions, and estimation strategies matched to the design. Their framework clarifies the structure of modern DiD designs, especially in settings with staggered treatment timing, alternative control groups, and nontrivial weighting. But much of the applied literature still absorbs this critique through a narrower lens. In practice, the discussion often collapses to negative weights alone, even though the empirical fragilities extend well beyond that margin.
+
+This dissertation takes that gap between methodological guidance and applied practice as its starting point. In applied work, disagreement between TWFE and modern estimators is often shaped by a broader set of decisions, including the choice of control group, support at long horizons in event studies, dynamic contamination, the treatment of extreme horizons through \emph{binning}, the use of covariates and the move from unconditional to conditional parallel trends, the aggregation of dynamic effects, and implementation differences across software packages. The theoretical literature has clarified each of these issues. What remains less developed is how they appear jointly in published empirical work, how often they matter in practice, and which margins deserve priority when researchers read or implement a DiD design.
+
+The dissertation addresses two questions. First, do conclusions from published DiD studies estimated with TWFE survive re-estimation with modern estimators? Second, which empirical margins account for the differences when they do not? I answer these questions through a large-scale reanalysis of 56 published articles that use DiD, have viable replication packages, and can be re-estimated with modern estimators. The analysis focuses on \emph{health economics}, where DiD has become increasingly common over the past decade \citep{goldsmith2024tracking}. The reanalysis uses AI support for screening, locating replication packages, and standardizing repetitive tasks, always under manual supervision. Chapter~\ref{Chapter3} discusses this workflow in detail and relates it to recent work on scalability in replication and reanalysis \parencite{xu2026scaling}.
+
+The central result is that the literature does not collapse, but it often weakens and frequently shifts in ways that matter for interpretation. In roughly 86\% of cases, the sign of the effect is preserved under re-estimation, and nearly half also preserve statistical significance. At the same time, significance losses are common, magnitude changes are often large, and a substantial share of the differences come from margins other than negative weights alone. HonestDiD \citep{rambachan2023more} leads to a similar conclusion. Replacing TWFE with a heterogeneity-robust estimator may improve the interpretation of the estimand, but it does not rescue designs whose conclusions are fragile to modest departures from parallel trends. The practical implication is that modern estimators often change the strength of the evidence and sometimes its interpretation, even when they do not overturn the sign of the estimated effect.
+
+The dissertation extends the reanalysis agenda developed in Finance and Accounting \parencite{baker2022much}, Political Science \parencite{chiu2023and}, and the broader reproducibility literature \parencite{brodeur2026reproducibility} to the \emph{health economics} literature that relies on DiD. It also shifts attention away from negative weights as the sole practical concern and toward a wider set of empirical margins that shape reanalysis results. The evidence from these re-estimations yields practical lessons for applied DiD work, not by proposing a new methodological framework, but by documenting where applied implementations most often drift away from the intended estimand, the intended comparison, or the available empirical support.
+
+The rest of the dissertation proceeds as follows. Section~\ref{Chapter2} reviews the methodological and reanalysis literatures that motivate the exercise. Section~\ref{Chapter3} describes the sample construction, the reanalysis protocol, the metrics used to measure empirical change, and the role of AI support in screening, locating replication packages, and standardizing parts of the workflow. Section~\ref{Chapter4} presents the main results, organized around the core lessons of the reanalysis and the empirical mechanisms behind the observed changes. Section~\ref{Chapter5} concludes.
+
+
+\section{Related Literature}
+\label{Chapter2}
+
+\subsection{Classical TWFE approach and its problems}
+
+Recent work on DiD begins from a now well-established point. With multiple periods, staggered adoption, and heterogeneous treatment effects, the \emph{two-way fixed effects} (TWFE) estimator no longer admits the canonical \(2\times 2\) interpretation. In its most common form,
+\begin{equation}
+Y_{it} = \alpha_i + \lambda_t + \beta D_{it} + \varepsilon_{it},
+\label{eq:twfe_static}
+\end{equation}
+where \(Y_{it}\) is the outcome of interest, \(\alpha_i\) and \(\lambda_t\) are unit and period fixed effects, and \(D_{it}\) indicates treatment. In the \(2\times 2\) case, under parallel trends and no anticipation, \(\beta\) coincides with the usual DiD estimand. In staggered settings, that interpretation breaks down. The main insight of the recent literature is that this is not only a weighting problem. It also concerns which comparisons identify the effect, how dynamic specifications should be interpreted, and how covariates enter the design.
+
+\textcite{goodman2021difference} show that, in the canonical staggered-adoption TWFE design without covariates, the coefficient can be written as a weighted average of admissible \(2\times 2\) DiD estimators:
+\begin{equation}
+\hat{\beta}^{TWFE}
+=
+\sum_{j} \omega_j \hat{\beta}^{2\times 2}_j,
+\qquad
+\sum_j \omega_j = 1.
+\label{eq:bacon_generic_short}
+\end{equation}
+The main implication is that TWFE combines multiple cohort-time comparisons rather than recovering a single ATT-type parameter.\footnote{In \textcite{goodman2021difference}, the relevant comparisons include treated-versus-never-treated and earlier-treated-versus-later-treated \(2\times 2\) designs. The notation \(\omega_j\) in equation~\eqref{eq:bacon_generic_short} is used here as a compact generic label for the Goodman-Bacon weights. A related insight appears in \textcite{de2020two}, who study a broader two-way fixed-effects setting. Under common trends, they show that the TWFE estimand can be expressed as a weighted sum of group-period treatment effects,
+\[
+\beta^{fe}
+=
+\sum_{(g,t):D_{g,t}=1}
+\frac{N_{g,t}}{N_1}
+w_{g,t}\Delta_{g,t},
+\]
+with weights that sum to one but may be negative. This formulation makes transparent why already-treated units can enter the counterfactual in ways that distort the estimand when treatment effects vary across groups or over time.} Once treatment effects vary across cohorts or over exposure time, some of those comparisons become difficult to interpret as clean causal contrasts. The coefficient may then depart from the effect researchers intend to estimate, sometimes by a great deal.
+
+
+
+A parallel problem arises in dynamic \emph{event-study} specifications:
+\begin{equation}
+Y_{it}
+=
+\alpha_i + \lambda_t
++ \sum_{\ell \neq -1} \mu_{\ell}\mathbf{1}\{t-E_i=\ell\}
++ u_{it},
+\label{eq:twfe_event_study_short}
+\end{equation}
+where \(E_i\) denotes the treatment adoption period and \(\ell=t-E_i\) is event time. A common interpretation is that \(\mu_\ell\) measures the average treatment effect at horizon \(\ell\). \textcite{sun2021estimating} show that this interpretation generally breaks down under staggered adoption with heterogeneous treatment effects across cohorts.\footnote{Formally, \textcite{sun2021estimating} show that the TWFE event-study coefficient at relative time \(\ell\) can be written as a weighted sum of cohort-specific average treatment effects on the treated,
+\[
+\mu_{\ell}
+=
+\sum_e \sum_{\ell'} \omega^{\ell}_{e,\ell'}\, CATT_{e,\ell'},
+\]
+where \(CATT_{e,\ell'}\) denotes the average effect for cohort \(e\) at relative period \(\ell'\). The key point is that the coefficient for horizon \(\ell\) generally loads not only on \(CATT_{e,\ell}\), but also on effects from other relative periods \(\ell' \neq \ell\). Their interaction-weighted estimator removes this contamination by averaging \(CATT_{e,\ell}\) only across cohorts that identify the same horizon.} A given lead or lag can mix effects from other relative periods instead of isolating the dynamic effect at that horizon. This matters because applied work routinely uses lead coefficients to assess pre-trends and lag coefficients to describe timing and persistence. Under treatment-effect heterogeneity, those coefficients may misstate both the credibility of the design and the shape of the treatment profile they are supposed to recover.
+
+
+Recent work has reoriented the discussion toward designs that identify treatment effects at the group-time level before aggregation. In \textcite{callaway2021difference}, the basic object is the group-time average treatment effect,
+\begin{equation}
+ATT(g,t)
+=
+\mathbb{E}\!\left[ Y_t(g)-Y_t(0)\mid G_g=1 \right],
+\label{eq:att_gt_short}
+\end{equation}
+where \(G_g\) denotes the group first treated in period \(g\). The key contribution lies in the identification strategy. Treatment effects are first defined for each \((g,t)\) cell and only afterward aggregated into summary parameters. This makes the comparison group explicit. In practice, this appears in the distinction between \emph{never-treated} and \emph{not-yet-treated} controls,\footnote{\textcite{callaway2021difference} consider two alternative conditional parallel trends assumptions. With never-treated controls,
+\[
+E[Y_t(0)-Y_{t-1}(0)\mid X,G_g=1]
+=
+E[Y_t(0)-Y_{t-1}(0)\mid X,C=1].
+\]
+With not-yet-treated controls,
+\[
+E[Y_t(0)-Y_{t-1}(0)\mid X,G_g=1]
+=
+E[Y_t(0)-Y_{t-1}(0)\mid X,D_s=0,G_g=0],
+\]
+for periods such that \(t\ge g-\delta\) and \(t+\delta\le s<\bar g\). In addition, identification requires overlap: \(P(G_g=1)>\varepsilon\) and \(p_{g,t}(X)<1-\varepsilon\) almost surely, where \(p_{g,t}(X)\) is the generalized propensity score.} which correspond to different versions of the parallel trends assumption. The modern literature has made clear that this choice is part of the identification strategy. It determines which untreated outcomes are used to construct the counterfactual and, for that reason, changes the assumptions behind the estimate.
+
+Even with more interpretable estimators, identification still depends on some version of parallel trends. Applied work often evaluates that assumption through pre-trend tests in dynamic specifications. \textcite{roth2022pretest} show why this practice is weaker than it often appears. Failure to reject pre-trends may simply reflect low power, and conditioning the analysis on passing that test induces pre-test bias. \textcite{rambachan2023more} propose a different approach, replacing the pass-or-fail logic with explicit sensitivity analysis. Rather than treat exact parallel trends as something established by insignificant leads, they ask how conclusions change under bounded deviations from that benchmark. This shift is important for the broader literature because it moves credibility assessment away from mechanical hypothesis testing and toward transparent robustness to plausible violations.
+
+Covariate choices are also part of identification. In modern DiD designs, adding controls replaces an unconditional parallel trends assumption with a conditional one, so the design begins to depend on which covariates enter and how they enter. In \textcite{callaway2021difference}, this conditioning is built around pre-treatment covariates, and \(ATT(g,t)\) can be implemented through outcome regression, inverse probability weighting, or doubly robust estimands.\footnote{In \textcite{callaway2021difference}, the relevant conditioning variables are pre-treatment covariates. This includes time-invariant characteristics and pre-treatment summaries of time-varying variables, but excludes post-treatment covariates that may themselves be affected by treatment.} This is conceptually different from the familiar practice of adding controls to a TWFE regression and interpreting the result as a more flexible version of the same estimand.
+
+The distinction becomes sharper once one considers time-varying covariates. As emphasized by \textcite{caetano2022difference}, if treatment can affect these covariates, conditioning on their realized post-treatment values may amount to conditioning on mediators or selection variables rather than on untreated characteristics. Even when treatment does not affect them directly, \textcite{caetano_callaway2024_hiddenlinearity} and {\textcite{wooldridge2025two} show that standard TWFE implementations can still impose additional and often opaque restrictions. After removing unit fixed effects, the regression may condition only on changes in time-varying covariates, while time-invariant covariates disappear from the transformed specification altogether. The lesson from this literature is that conditioning choices alter the maintained assumptions behind the design and can affect interpretation in ways that are easy to miss in routine empirical practice.
+
+Implementation details can also matter in finite samples. In principle, differences across modern DiD estimators should reflect differences in identification, aggregation, or target parameters. In practice, numerical choices such as balancing rules, support restrictions, and first-step estimation can also affect results, especially in highly unbalanced panels or designs with weak overlap. This point belongs in the literature review because it clarifies that disagreements across estimates need not always reflect purely conceptual differences. Some arise because distinct commands operationalize the same estimand differently in finite samples.\footnote{For corroborating evidence from an external software audit, see Scott Cunningham, ``Claude Code 31: Apple-to-Apple Audit of Six Callaway and Sant'Anna packages,'' \emph{Scott's Mixtape Substack}, March 12, 2026, together with the accompanying slide deck posted on his website. Because this evidence comes from an audit note and slides rather than a peer-reviewed methodological article, it is better treated as supporting implementation evidence than as a canonical reference in the methodological literature.}
+
+\subsection{Reanalyses, robustness, and reproducibility}
+
+The literature closest to this dissertation includes both the papers that diagnose TWFE problems and the papers that revisit published empirical findings after those problems became clear. \textcite{baker2022much} connect the new staggered-DiD theory to applications in finance and accounting. Their contribution is useful less for its scale than for showing in applied settings that the recent methodological critique is empirically consequential. Alternative estimators can change interpretation, magnitude, and dynamic profiles, including in cases where specification choices such as \emph{binning} affect the estimated path.
+
+\textcite{chiu2023and} extend this reanalysis literature to political science. They replicate and reanalyze 49 studies published in the \emph{American Political Science Review}, \emph{American Journal of Political Science}, and \emph{The Journal of Politics} that use TWFE for causal inference in observational panel settings. Their findings are not limited to treatment-effect heterogeneity. In many cases, heterogeneity-robust estimators remain qualitatively close to TWFE, though some applications show sign reversals or losses of precision. The more important result concerns identification. Only a subset of studies presents direct evidence against parallel trends, but many more are too underpowered to rule out violations large enough to alter the practical meaning of the estimate. This shifts the focus of reanalysis toward identification and uncertainty, rather than a simple exercise in replacing one coefficient with another.
+
+\textcite{brodeur2026reproducibility} place these concerns within the wider literature on reproducibility and robustness in economics and political science. They reanalyze 110 recent papers published in top journals with mandatory data and code sharing policies, distinguishing computational reproducibility from robustness to alternative analytical decisions. They report high reproducibility rates and show that many significant findings remain significant after reanalysis, although the sample is selective and likely reflects an upper bound on empirical robustness in recent research. The value of this work for the present exercise is less about DiD specifically than about what systematic reanalysis can reveal regarding empirical credibility, fragility, and the conditions under which published findings survive alternative but reasonable analytical choices.
+
+These literatures define the space this dissertation enters. The methodological work shows why conventional TWFE estimates can become difficult to interpret in staggered settings, why dynamic profiles and pre-trend tests require more careful reading, and why covariates and implementation choices are part of the design itself. The reanalysis literature shows that these issues have practical consequences. Revisiting published estimates can change both statistical conclusions and the credibility of the underlying design. This dissertation conducts a focused reanalysis of a specific applied domain using modern DiD estimators, and the goal is to assess whether published results change and to trace those changes to identifiable margins of design and implementation.
+
+\section{Empirical Design}
+\label{Chapter3}
+
+\subsection{Sample, protocol, and scope}
+
+The reanalysis draws on \textit{health economics} articles published between 2000 and 2025 in 17 general-interest and field journals. From 8,171 candidate articles retrieved from OpenAlex, an LLM-based screen of abstracts flags 1,884 as likely \emph{DiD} studies. We then search for replication materials, consolidate records across sources, deduplicate by DOI, and manually review 431 located cases for eligibility. The final sample contains 56 articles that use \emph{DiD} as the main empirical strategy and provide a full replication package, allowing the main specification to be re-estimated under a common protocol. Table~\ref{tab:sample_pipeline} summarizes the selection process and Appendix~\ref{AppendixD} documents each stage of the collection pipeline in detail.
+
+Of the 56 reanalyzed articles, 32 use staggered adoption and 24 one-time adoption. Thirty-eight use panel data and 18 use \emph{repeated cross-sections} (RCS), and 50 have an estimable dynamic \emph{event study}. Table~\ref{tab:sample_detailed} cross-tabulates adoption type and data structure. These dimensions determine estimator coverage and the construction of the counterfactual. The sample covers topics such as vaccination, insurance regulation, opioids, pollution, maternal and child health, tax credits, and epidemics. Table~\ref{tab:journal_final} reports the journal distribution, and Appendix~\ref{AppendixB} lists the reanalyzed studies.
+
+
+\begin{table}[!htbp]
+\centering
+\caption{Sample construction pipeline}
+\label{tab:sample_pipeline}
+\begin{threeparttable}
+\small
+\begin{tabular}{p{.6cm} p{4cm} p{4.2cm} p{1.2cm} p{2.5cm}}
+\toprule
+\textbf{Step} & \textbf{Procedure} & \textbf{Retention criterion} & \textbf{$N$} & \textbf{Note} \\
+\midrule
+1 & Candidate articles in the search universe & Selected journals, 2000--2025 & 8,171 & 17 journals \\
+\midrule
+2 & Identification of \emph{DiD} strategy & Article uses \emph{DiD} as the main empirical strategy & 1,884 & Automated AI-based classification \\
+\midrule
+3 & Location and manual screening of materials & Article with replication material located and eligible for individual review & 431 & Individual review of the 431 candidates \\
+\midrule
+4 & Completed reanalysis & Main specification re-estimable under the standardized protocol & 56 & Final sample \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: $N$ is the number of articles retained at the end of each stage. Step~1 is the total number of candidate articles downloaded via OpenAlex from the selected journals, including all articles from the health journals and articles with health-related keywords in the remaining journals. Step~2 applies an AI-assisted classifier that assesses whether the \emph{abstract} describes a \emph{DiD} strategy. Step~3 consolidates the five search sources described in the text and deduplicates by DOI. Step~4 involves human supervision: assessment of package quality, identification of the main specification, and exclusion if necessary.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+
+
+\input{Tables/table_3_2_sample_detailed.tex}
+
+\input{Tables/table_3_3_journal_final.tex}
+
+The unit of analysis is the article's main specification. For each study, we preserve the central empirical result and re-estimate it with alternative econometric tools. Doing so requires a consistent rule to select one outcome and one main specification per article, while avoiding case-by-case discretion. Selection follows a simple hierarchy. We first prioritize specifications explicitly described by the authors as main, preferred, or baseline. If more than one candidate remains, we choose the one estimated on the largest number of observations. In the event of a tie, we apply three tie-breakers, in this order: preference for more aggregated variables, then for specifications with fewer time-varying covariates, and, only as a last resort, a documented random selection. When the article reports only a dynamic event study, with no directly comparable static ATT, we re-estimate a collapsed version with a single post-treatment indicator while preserving the sample, controls, fixed effects, and clustering level of the original study. All decisions are recorded in an auditable log described in Appendix~\ref{AppendixA}.
+
+\subsection{Estimators and coverage}
+
+We re-estimate each article's main specification with different econometric tools. We reproduce the \emph{two-way fixed effects} (\emph{TWFE}) model as the baseline estimator, keeping the basic structure of the original article whenever possible. We do not audit the authors' code line by line. The goal is to reconstruct the original result in a standardized environment and compare it to modern estimators.
+
+Our primary alternative is the estimator of \textcite{callaway2021difference} with dynamic agreggation. We use it because it accommodates treatment-effect heterogeneity under staggered adoption, makes the comparison group explicit, and allows versions with covariates and dynamic paths comparable to the \emph{event studies} used in the literature. Whenever the design allows, we estimate two CS-DID versions, one with a \emph{never-treated} comparison group and another with a \emph{not-yet-treated} group. We also estimate, when applicable, Sun and Abraham and Gardner (\texttt{did2s}).\footnote{The choice of \texttt{did2s} as an additional estimator mainly reflects operational convenience and broad compatibility with the designs observed in the sample, including \emph{repeated cross-sections}.} These estimators serve as cross-checks rather than replacements for the main benchmark. They indicate whether the main results survive different ways of handling heterogeneity, aggregation, and counterfactual construction.
+
+Not all estimators are used in every part of the reanalysis, and not all articles have an estimable pre-treatment path. In this dissertation, the static benchmark is based on TWFE, CS-NT, and CS-NYT, with CS-DID serving as the main modern DiD reference. Gardner and Sun \& Abraham are used in the dynamic analysis as robustness checks for event-study profiles, following a methodological choice of this dissertation rather than a limitation of those estimators. Appendix~\ref{AppendixB} presents the individual results, event studies, and sensitivity analyses for each of the 56 articles. Table~\ref{tab:estimator_coverage} summarizes estimator coverage under this protocol.
+
+\input{Tables/table_3_4_estimator_coverage.tex}
+
+
+\subsection{AI-assisted estimation and calibration protocol}
+
+Reanalyzing 56 articles required a workflow that could handle heterogeneous replication packages without changing the estimation layer across studies. We built a semi-automated protocol adapted from the separation between substantive judgment and standardized execution emphasized by \textcite{xu2026scaling}. The workflow has three stages, illustrated in Figure~\ref{fig:ai_workflow}. A profiling stage reads the article PDF and replication code to extract a structured specification file. An estimation stage feeds this specification into a fixed template that runs all applicable estimators, producing point estimates and event-study outputs. A reporting stage assembles the results into a standardized comparison with the original finding. The estimation template is the same for every article, and differences across studies enter only through the specification file and through documented preprocessing choices. Appendix~\ref{AppendixC} documents the full architecture, the metadata contract, and all pipeline stages in detail\footnote{The structured specification files, estimation scripts, outputs, and protocol-revision logs are available in the replication package.}.
+
+We developed the protocol through a supervised calibration exercise based on 10 articles previously analyzed by hand. For each of these articles, the semi-automated workflow was asked to reconstruct the design from scratch under the standardized execution rules, without relying on the original hand-coded implementation. The resulting estimates were then compared against the manual benchmark. Any discrepancy triggered a diagnostic review, followed by revisions to the protocol until the automated reconstruction matched the benchmark sufficiently closely. This process produced a catalog of 28 recurring implementation problems and their corresponding resolution rules.\footnote{Examples include Stata date encodings, missing standard errors in plotting routines, silent dropping of horizons in event-study implementations, singular matrices in small-cohort CS-DID estimation, contamination of the never-treated comparison group by late-treated units, and differences between cumulative and marginal event-study aggregation across software. The full catalog is documented in Appendix~\ref{AppendixC}.} Once the workflow reliably reproduced the calibration set, it was extended to the remaining 46 articles in the sample. The researcher reviewed each specification before execution, inspected each event-study output, and approved all decisions involving sample restrictions, treatment timing, controls, and cross-estimator comparability. When an article required preprocessing beyond the default rules, that adjustment was encoded through standardized specification fields and documented for replication.\footnote{These cases included, for example, composite treatment indicators, time-varying treatment within units, and individual-level repeated cross-sections requiring aggregation.}
+
+
+\begin{figure}[!htbp]
+\centering
+
+\begin{tikzpicture}[
+  node distance=1.6cm,
+  every node/.style={font=\small},
+  box/.style={
+    draw,
+    rectangle,
+    minimum width=6.2cm,
+    minimum height=1.1cm,
+    text width=5.8cm,
+    align=center
+  },
+  doublebox/.style={
+    box,
+    double,
+    double distance=1.5pt
+  },
+  arrow/.style={
+    thick,
+    -{Stealth[length=2.5mm]}
+  },
+  label/.style={
+    font=\footnotesize,
+    inner sep=1pt
+  }
+]
+
+% --- Main flow ---
+\node[box] (manual)
+  {Manual analysis of 10 calibration articles};
+
+\node[box, below=of manual] (profiler)
+  {LLM extracts structured specifications\\from PDF and replication code};
+
+\node[box, below=of profiler] (analyst)
+  {Fixed estimation template runs estimators\\(TWFE, CS, SA, Gardner)};
+
+\node[box, below=of analyst] (compare)
+  {Compare with manual benchmark};
+
+\node[box, below=2.4cm of compare] (expand)
+  {Apply calibrated pipeline\\to 45 new articles};
+
+\node[doublebox, below=of expand] (review)
+  {Human review of specifications,\\event studies, and results};
+
+% --- Side box ---
+\node[doublebox, right=2.5cm of compare, minimum width=4.2cm, text width=3.8cm]
+  (knowledge) {Diagnose failure,\\update protocol log};
+
+% --- Main vertical arrows ---
+\draw[arrow] (manual)  -- (profiler);
+\draw[arrow] (profiler) -- (analyst);
+\draw[arrow] (analyst) -- (compare);
+\draw[arrow] (expand)  -- (review);
+
+% --- Match arrow (compare → expand) with label ---
+\draw[arrow] (compare) -- (expand)
+  node[label, midway, left] {match};
+
+% --- Mismatch arrow (compare → knowledge) ---
+\draw[arrow] (compare) -- (knowledge)
+  node[label, midway, above] {mismatch};
+
+% --- Loop arrow (knowledge → profiler) ---
+\draw[arrow] (knowledge.north) |- ([xshift=3pt]profiler.east)
+  node[label, pos=0.25, right, text width=2cm, align=left]
+  {revise \\protocol\\(28 patterns)};
+
+\end{tikzpicture}
+
+\caption{Calibration and expansion workflow for AI-assisted reanalysis}
+\label{fig:ai_workflow}
+\end{figure}
+
+
+\section{Lessons from the reanalysis}
+\label{Chapter4}
+
+\subsection{Lesson 1. The literature does not collapse, but it weakens}
+
+Replacing TWFE with modern DiD estimators does not overturn the earlier literature. Across the 56 reestimated articles, the sign of the estimated effect is preserved in 48 cases and reverses in only 8. The main differences appear elsewhere. Losses of statistical significance are more common than gains, and changes in magnitude are often large. Table~\ref{tab:ch3_aggregate_concordance} summarizes this pattern. The empirical divergence between estimators comes less from reversing the direction of the result than from rescaling effects and weakening precision.
+
+Figures~\ref{fig:ch3_aggregate_scatter} and \ref{fig:ch3_aggregate_variation} reinforce the same point. In the scatter plot, most articles remain close to the 45-degree line, which is consistent with the high rate of sign concordance. At the same time, the dispersion is far from trivial. The magnitude plot shows that many articles remain in a moderate range, but also that the tails are large enough to matter for interpretation.
+
+This matters because the relevant empirical margin is often magnitude, not sign alone. In policy evaluation, the question is usually not just whether an estimated effect is positive or negative, but whether it is large enough to justify adoption once costs and budget constraints are taken into account. In health economics, this logic is often expressed in net-benefit terms, and the same reasoning extends more broadly to welfare analysis \parencite{johannesson1993decision,stinnett1998net,claxton1999irrelevance,hendren2020unified,finkelstein2020welfare}. A policy may remain beneficial only if the estimated gain clears a threshold set by cost-effectiveness or fiscal trade-offs.\footnote{A standard formulation is net health benefit, \(\text{NHB}(\lambda)=\lambda \Delta E-\Delta C\), where \(\Delta E\) is the health gain, \(\Delta C\) is the policy cost, and \(\lambda\) is the social value of an additional unit of health. The policy is adopted when \(\text{NHB}(\lambda)>0\), or equivalently when \(\Delta E>\Delta C/\lambda\). With estimated effects, the same logic applies to \(\widehat{\Delta E}_j\), where \(j\in\{\text{TWFE},\text{CS}\}\). Two estimates can  have the same sign and still imply different decisions whenever the relevant threshold lies between them.} For that reason, a reanalysis that leaves the sign unchanged can still alter the policy conclusion. When 30.2\% of articles change by more than 50\% in magnitude and 20.8\% change by more than 100\%, an estimate may remain positive or negative in the same direction and still no longer justify the same decision.
+
+
+% =========================================================
+% TABLE 4.1
+% =========================================================
+\input{Tables/table_4_1_aggregate_concordance.tex}
+
+
+
+
+% =========================================================
+% FIGURE 4.1
+% =========================================================
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\textwidth]{Figures/agregado/agregado_dynamic_v3.pdf}
+\caption[Aggregate comparison between TWFE and CS-DID]{Aggregate comparison between TWFE and CS-DID across the 56 reestimated articles. Each point is the main result of one article. Both axes are scaled by the reported TWFE standard error, so the horizontal axis is the TWFE z-score and the vertical axis places the CS-DID estimate on the same scale. The 45-degree dashed line marks perfect agreement. Points are classified by whether both estimates are significant and agree in sign (Concordant), the TWFE estimate is significant but CS-DID is not (Significance loss), the reverse (Significance gain), or neither is significant (Both insignificant). Sign reversals are shown separately. The upper-left inset displays the distribution of the ratio of point estimates (CS-DID / TWFE), with median close to 1. The lower-right inset shows the ratio of standard errors (CS-DID SE / TWFE SE), with median 1.42, reflecting precision loss under heterogeneity-robust estimation.}
+\label{fig:ch3_aggregate_scatter}
+\end{figure}
+
+% =========================================================
+% FIGURE 4.2
+% =========================================================
+%\begin{figure}[htbp]
+%\centering
+%\includegraphics[width=1\textwidth]{Figures/agregado/density_z_dynamic.pdf}
+%\caption{Distribution of article-level z-scores under TWFE and the CS-DID dynamic aggregate.}
+%\label{fig:ch3_aggregate_zdensity}
+%\end{figure}
+
+% =========================================================
+% FIGURE 4.3
+% =========================================================
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1.05\textwidth]{Figures/agregado/variacao_pct_dynamic.pdf}
+\caption{Proportional change in article-level estimates when moving from TWFE to the CS-DID dynamic aggregate.}
+\label{fig:ch3_aggregate_variation}
+\end{figure}
+
+
+
+
+\newpage
+\subsection{Lesson 2. Divergence is concentrated in staggered designs}
+
+Divergence is concentrated in staggered-adoption designs. Part of the aggregate stability in the sample comes from articles with one-time adoption, where the gap between TWFE and estimators built for heterogeneous treatment effects is usually smaller. Once treatment timing varies across units, each adoption date defines a distinct treatment group, new control-group choices enter the design, and the final estimate becomes an aggregation across cohort--time effects. Under those conditions, disagreement across estimators becomes much more common, as Table~\ref{tab:ch3_timing_heterogeneity} shows clearly.
+
+The source of this divergence is well understood by the modern DiD literature. In one-time adoption designs, the identifying comparison often remains close to a transparent treated-versus-untreated contrast. In staggered designs, however, the estimate is built from multiple cohort--time comparisons, which opens the door to treated-versus-treated comparisons, alternative control-group definitions, changing composition across event time, and implicit weighting across heterogeneous effects. Table~\ref{tab:bacon_summary} makes this concrete: in the staggered subsample, treated-versus-treated comparisons account for a substantial share of the identifying variation in many articles, and negative weights are common. Once that happens, the TWFE coefficient no longer maps cleanly to a single causal contrast, and the link between the regression coefficient and the estimand of interest becomes weaker. Staggered TWFE estimates are not always invalid. But when estimators diverge, the difference usually comes from the design itself: the control group, the weighting structure, and the aggregation rule.
+
+
+% =========================================================
+% TABLE 4.2
+% =========================================================
+\input{Tables/table_4_2_timing_heterogeneity.tex}
+
+
+\input{Tables/table_4_3_bacon_summary.tex}
+
+
+
+\newpage
+\subsection{Lesson 3. Dynamic reanalysis often changes the story about timing, persistence, and design credibility}
+
+Dynamic specifications matter because they are the main tool for assessing timing, including whether effects appear immediately or with delay, whether they persist or fade, and whether the pre-treatment path supports the identifying assumptions. Figure~\ref{fig:ch3_eventstudy_panel} presents six cases that illustrate the main patterns revealed by dynamic reanalysis. The results are:
+
+{\small
+\begin{description}[style=unboxed,leftmargin=1.4em,labelsep=0.3em,font=\normalfont]
+    \item[\textbf{\textcite{dranove2021dose}}:] TWFE, CS-NT, and CS-NYT trace nearly the same post-treatment decline. Confidence intervals widen at longer horizons, but the substantive interpretation remains unchanged.
+
+    \item[\textbf{\textcite{carpenter2019direct}}:] The main difference comes from the control group. TWFE tracks CS-NT closely, while CS-NYT is systematically smaller in the post-treatment periods, suggesting a weaker effect under the broader comparison.
+
+    \item[\textbf{\textcite{lawler2023effect}}:] The disagreement concerns persistence at longer horizons. All estimators show a positive short-run effect, but the CS profiles weaken at the end of the event window while TWFE remains more persistently positive.
+
+    \item[\textbf{\textcite{cao2023mitigating}}:] The robust profile is substantially stronger. TWFE turns negative after treatment, but both CS estimators become much more negative at longer horizons, implying a larger long-run effect.
+
+    \item[\textbf{\textcite{bosch2014tradeoffs}}:] The disagreement again concerns persistence. TWFE becomes increasingly negative over time, whereas the CS estimates show a smaller post-treatment decline that largely fades at longer horizons.
+
+    \item[\textbf{\textcite{brodeur2025shootings}}:] The main message is diagnostic, but not because the estimators diverge sharply. All three specifications display sizeable lead coefficients before treatment and a negative post-treatment path, so the concern about design credibility is common across estimators rather than revealed only by the robust re-estimation.
+\end{description}
+}
+
+In some applications, the robust profile remains close to the original one. In others, re-estimation changes the inferred persistence of the effect, the role of control-group choice, or the interpretation of the pre-treatment path. Taken together, these cases show that event studies remain central for evaluating timing in staggered-adoption settings, but their interpretation depends on which untreated units define the comparison, how much support remains at longer horizons, and whether the apparent diagnostic problem is estimator-specific or shared across specifications.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1.05\textwidth]{Figures/agregado/panel_es_6cases.pdf}
+\caption{Six patterns of dynamic divergence between TWFE and modern DiD estimators. The panels report \textcite{dranove2021dose, carpenter2019direct, lawler2023effect, cao2023mitigating, bosch2014tradeoffs, brodeur2025shootings}.}
+\label{fig:ch3_eventstudy_panel}
+\end{figure}
+
+
+
+
+\newpage
+\subsection{Lesson 4. Dynamic contamination, long tails, and binning}
+\label{sec:binning}
+
+Long-horizon coefficients are the weakest part of a dynamic DiD design. In staggered-adoption settings, they are identified from a thinner and changing set of group--time comparisons, which makes support weaker in the tails and long-run effects harder to interpret. A common applied response is endpoint binning. Instead of estimating a separate coefficient for each distant lead or lag, the specification pools all periods below $-K_{\text{pre}}$ and above $K_{\text{post}}$ into far-pre and far-post indicators. This helps keep the event study estimable, but it also changes the estimand. The far-post coefficient is no longer tied to a single horizon. It becomes a summary of multiple post-treatment periods whose effects may differ, and its interpretation is shaped by contamination across periods, implicit weighting within the bin, and compositional change across horizons.\footnote{For contamination in TWFE event studies, see \textcite{sun2021estimating}. For weighting distortions induced by binning, see \textcite{borusyak2023did_imputation}. For horizon-specific compositional change in staggered designs, see \textcite{callaway2021difference}. For compositional changes in repeated cross-sections, see \textcite{sant2026difference}.}
+
+\subsubsection{An illustrative case: Lawler \& Yewell (2023)}
+
+\textcite{lawler2023effect} study the effect of Baby-Friendly Hospital designation on breastfeeding initiation using a repeated cross-section of U.S.\ birth records, with county and birth-year fixed effects, an event window of $[-4,+4]$, and endpoint bins $F_5$ ($e \leq -5$) and $L_4$ ($e \geq 4$). This is a common applied specification when distant horizons are pooled into endpoint bins. Figure~\ref{fig:panel_binning_76} shows four diagnostics.
+
+Panel~(a) shows that both TWFE and CS-NYT detect a positive post-treatment effect, but the TWFE profile is systematically larger, especially at the far-post endpoint. Panel~(b) shows that this long-run coefficient is sensitive to how distant horizons are handled. Replacing the binned TWFE with an unbinned version reduces the estimate at $t=+4$ from $+0.046$ to $+0.028$, while the CS-NYT estimate at the same horizon is smaller still. Panel~(c) shows why the endpoint coefficient is not really about $e=4$ alone. The Sun--Abraham decomposition assigns substantial weight to remote post-treatment horizons and non-zero weight to pre-treatment periods. Panel~(d) reaches the same conclusion from a different diagnostic. As the specification absorbs more distant periods into the far-post bin, the coefficient rises from about $+0.029$ to $+0.046$.
+
+This case brings the three margins together in a single application. The far-post estimate is not a direct reading of persistence at one horizon. It reflects contamination, implicit within-bin weighting, and the changing composition of the observations that identify the tail. Even when the overall event study looks orderly, the tail is usually the weakest part of the profile.
+
+\clearpage
+\begin{landscape}
+\thispagestyle{plain}
+\centering
+\includegraphics[width=1\linewidth]{Figures/agregado/panel_binning_76.pdf}
+\captionof{figure}{Binning diagnostics for \textcite{lawler2023effect}. (a)~Standard event study comparing TWFE and CS-NYT. (b)~Sensitivity of TWFE to binning: the binned specification (full sample, $L_4 = \{e \geq 4\}$) yields a coefficient 64\% larger than the unbinned specification (sample restricted to $[-8, +8]$). Shaded region indicates the original event window. (c)~Sun \& Abraham (2021) weight decomposition: the binned TWFE places substantial weight on remote horizons far beyond $e = 4$. (d)~Progressive binning: the $L_4$ coefficient grows from $+0.029$ at $k = 0$ to $+0.046$ at $k = 16$ as more periods are absorbed into endpoint bins.}
+\label{fig:panel_binning_76}
+\end{landscape}
+\clearpage
+
+\subsubsection{Prevalence across the sample}
+
+\textcite{lawler2023effect} is not an isolated case. Table~\ref{tab:progbin_sensitivity} applies a progressive-binning exercise to 21 articles with dynamic event studies and sufficient variation in treatment timing. It compares the far-post coefficient when the endpoint bin contains only the terminal horizon with the coefficient obtained after progressively absorbing all available distant horizons. The direction of the change varies across articles, so the issue is not a single bias with a fixed sign. The magnitude, however, is often substantial. In the full sample, the median absolute change is 34\%, and 16 of 21 articles move by more than 20\%. Even among the 12 cases where the coefficient at $k=0$ is statistically significant, the median absolute change remains 22\%.
+
+The recurring pattern is instability in the tail. Long-horizon coefficients often change under reasonable regroupings of distant periods. Endpoint bins remain a practical way to keep dynamic specifications estimable, but their coefficients should be read as weaker evidence on persistence than shorter-horizon estimates. In TWFE, the tail is where cross-period contamination and implicit within-bin weighting are often most severe. In heterogeneity-robust estimators, the analogous difficulty is event-time imbalance, because the set of contributing groups thins out as the horizon lengthens.
+
+\input{Tables/table_4_4_progbin_sensitivity.tex}
+
+
+
+
+
+\newpage
+\subsection{Lesson 5. Robustness to heterogeneity does not imply robustness to parallel-trends violations}
+
+Robustness to treatment-effect heterogeneity and robustness to violations of parallel trends are different issues. Replacing TWFE with an estimator that is robust to heterogeneous effects can change magnitudes, standard errors, and significance, but it does not repair a design built on a weak counterfactual path. A heterogeneity-robust estimator can improve the mapping between the estimate and the causal parameter, but it does not make the identifying counterfactual more credible. Table~\ref{tab:ch3_honestdid} shows that HonestDiD robustness remains limited under both estimators.
+
+In both the first post-treatment period and the peak post-treatment effect, the median breakdown value is zero, and the share of articles with $\bar M = 0$ remains high. The exact values differ somewhat across TWFE and CS-DID, but the overall pattern is the same. Strong robustness to departures from exact parallel trends is uncommon in this sample, and switching estimators rarely changes that conclusion. This distinction is central to the design-based interpretation of DiD. Choosing a heterogeneity-robust estimator can improve the interpretability of the estimand, but it does not answer whether the identifying counterfactual is reliable.Recent work has emphasized this point directly. Estimator choice and design credibility are related, but separate, questions \parencite{baker2025difference}. In this sample, sensitivity to parallel-trends violations usually survives the move from TWFE to CS-DID.
+
+% =========================================================
+% TABLE 4.3
+% =========================================================
+\input{Tables/table_4_5_honestdid.tex}
+
+
+
+\newpage
+\subsection{Lesson 6. In staggered designs, the control group is part of the identification strategy}
+
+In staggered-adoption designs, the counterfactual is not fixed. Choosing between \emph{never-treated} (NT) and \emph{not-yet-treated} (NYT) changes the comparison group and the identifying parallel-trends assumption. This choice is part of the design itself. As \textcite{baker2025difference} emphasize, the same group--time effect can be constructed with either control group, but the two approaches rely on different untreated outcome paths. The key question is which path is more credible in the application.
+
+Figure~\ref{fig:nt_nyt_examples} shows this clearly. In some applications, NT and NYT rely on similar comparisons and generate nearly identical dynamic profiles. In others, the never-treated group is thin and the NYT pool shrinks quickly as treatment spreads, so the two estimators rely on visibly different counterfactuals. The divergence in those cases comes from identification. Similar estimates under NT and NYT are reassuring, but they do not make the control-group choice irrelevant. Different estimates show that the design is being identified from different counterfactual strategies. In staggered designs, the control group is part of the design because it determines which parallel-trends assumption the reader is being asked to accept.
+
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}[b]{\textwidth}
+  \centering
+  \includegraphics[width=0.8\textwidth]{Figures/event_study/id_228_event_study.pdf}
+  \caption{\textcite{sarmiento2023air}: 469 of 588 stations are never-treated (80\%). The NT and NYT control groups are nearly identical, and the trajectories overlap at every horizon.}
+  \label{fig:nt_nyt_sarmiento}
+\end{subfigure}
+
+\vspace{0.4cm}
+
+\begin{subfigure}[b]{\textwidth}
+  \centering
+  \includegraphics[width=0.8\textwidth]{Figures/event_study/id_79_event_study.pdf}
+  \caption{\textcite{carpenter2019direct}: only 5 of 51 states are never-treated (10\%). The NYT pool shrinks sharply over the rollout, and the dynamic profiles begin to diverge at longer horizons.}
+  \label{fig:nt_nyt_carpenter}
+\end{subfigure}
+\caption{Event study estimates under alternative control groups. Panel~(a) shows a case where a large never-treated pool makes NT and NYT nearly interchangeable. Panel~(b) shows how a small never-treated pool and a shrinking NYT pool can generate different trajectories.}
+\label{fig:nt_nyt_examples}
+\end{figure}
+
+
+
+
+\newpage
+\subsection{Lesson 7. Covariates in DiD belong to the design}
+
+Many original articles estimate TWFE with covariates or additional fixed effects, while the corresponding CS-DID replication is estimated unconditionally.\footnote{Among the 56 reanalyzed articles, 38 include covariates or additional fixed effects in the original TWFE specification. Only 3 of those 38 are re-estimated with covariates in CS-DID. In the remaining cases, the CS-DID replication is unconditional.} Figure~\ref{fig:density_covariates} summarizes the comparison between the original controlled TWFE estimates and the unconditional CS-DID replications. The correlation between the scaled coefficients is high, and the median ratio of point estimates is close to one. This comparison shows how much the original controls were changing the identifying comparison. In much of the sample, removing them in the modern replication leaves the estimate largely unchanged.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{Figures/agregado/density_covariates_zscore.pdf}
+\caption{Density of scaled coefficients (estimate\,/\,TWFE SE) for articles whose original TWFE specification includes covariates or additional fixed effects. Grey: original TWFE with controls; blue: unconditional CS-DID replication.}
+\label{fig:density_covariates}
+\end{figure}
+
+In DiD, covariates belong to the design when they help justify \emph{conditional} parallel trends. When covariates are used, they should be tied to a clear identification argument. When removing them leaves the estimate roughly intact, they are probably not doing much to support that identifying comparison.
+
+An important distinction is between baseline and time-varying covariates. Baseline covariates can strengthen the design when untreated trends differ systematically across observable groups and conditioning on pre-treatment characteristics makes the comparison more credible. Time-varying covariates are different. Once they enter the specification, the identifying comparison is conditioned on variables that evolve over time and may themselves be related to treatment or to its mechanisms, which can complicate identification \parencite{caetano_callaway2024_hiddenlinearity,caetano2022difference}.
+
+Figure~\ref{fig:csdid_controls_133} illustrates a case where covariates do matter. \textcite{hoynes2015income} study the effect of the EITC on low birth weight using repeated cross-sections of U.S.\ birth records. In the unconditional CS-DID replication, the event study shows visible pre-trend problems. Once the replication conditions on state and demographic characteristics, the pre-trends flatten and the post-treatment effect shrinks sharply. This is best read as a case where covariates change the comparison in a way that makes the design more credible.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{Figures/agregado/panel_csdid_controls_133.pdf}
+\caption{CS-DID event study for \textcite{hoynes2015income}: effect of the EITC on low birth weight. Panel~(a): unconditional; panel~(b): conditional on state fixed effects and demographic controls using a doubly robust estimator.}
+\label{fig:csdid_controls_133}
+\end{figure}
+
+
+
+
+
+
+
+
+
+\newpage
+\subsection{Lesson 8. Geographic conditioning opens a different design margin in CS-DID}
+
+Geographic conditioning creates a distinct source of divergence between TWFE and CS-DID. In the usual TWFE specification with unit and time fixed effects, time-invariant geographic dummies are absorbed by the unit effects. Researchers who want to account for geographic heterogeneity usually rely on interacted fixed effects, such as state-by-time or region-by-time terms. In CS-DID, geography can enter directly as a covariate in the nuisance models. This makes geographic conditioning a more explicit design choice.
+
+CS-DID makes this easier, but it can also create new problems. In the doubly robust estimator of \citet{sant2020doubly}, these controls enter the propensity score model. When geography is finely partitioned and some cells contain few treated or control observations, the estimator can become unstable. The relevant empirical question is whether the estimate still changes once overlap is restored.
+
+Figure~\ref{fig:graduated_sensitivity} implements a graduated sensitivity exercise. It starts from baseline conditioning, then adds coarser and finer geographic controls, and finally re-estimates the state-conditioned specification after restricting the sample to states with minimum treated and control support. Four patterns emerge. Some cases show attenuation that remains after the overlap restriction, which is consistent with geography absorbing relevant confounding variation. Others collapse under full state conditioning and return once weak-support states are removed, which is more consistent with overfitting than with substantive correction. A third group remains stable across specifications, suggesting that geographic conditioning is not first-order. A fourth group becomes hard to interpret because the overlap-restricted sample is too selective.
+
+Geographic conditioning is informative when there is a clear geographic identification concern or when the original design already relies on differential geographic trends, but only when support remains credible. Otherwise, a richer conditioning set can produce an estimate that is less stable and less informative than the baseline result.
+
+\clearpage
+\begin{landscape}
+\thispagestyle{plain}
+\centering
+\includegraphics[width=1\linewidth]{Figures/agregado/panel_graduated_sensitivity.pdf}
+\captionof{figure}{Graduated geographic sensitivity analysis for four representative articles. Each panel shows CS-DID ATT estimates under progressively finer geographic controls. Grey dots: baseline and regional dummies; red dots: state dummies on the full sample; blue dots: state dummies restricted to states with at least 5 treated and 5 control units. ``FAILURE'' indicates numerical collapse of the propensity score model.}
+\label{fig:graduated_sensitivity}
+\end{landscape}
+\clearpage
+
+\newpage
+\subsection{Lesson 9. Aggregation choice in CS-DID can change the result}
+In CS-DID, the comparison with TWFE depends not only on the underlying \(ATT(g,t)\), but also on how those effects are aggregated.\footnote{The three main aggregation schemes are group, simple, and dynamic. The first averages within cohorts and then across cohorts. The second averages directly across all group-time cells. The third averages across cohorts at each event-time horizon and then collapses the post-treatment profile into a single effect.} Table~\ref{tab:ch3_aggte_comparison} shows that this choice matters empirically. Across the 52 articles available under all three rules, 12 change classification when the aggregation rule changes. Dynamic aggregation yields the highest concordance with TWFE, while group and simple aggregation generate more reversals and more cases of divergence. 
+
+Changing the aggregation rule changes the empirical object being compared with TWFE. In some applications, the effect is small. In others, it is enough to alter the substantive classification of the result. Therefore, aggregation is part of the estimand, and a CS-DID estimate is not fully defined unless the aggregation rule is stated.
+
+% =========================================================
+% TABLE aggte comparison
+% =========================================================
+\input{Tables/table_4_6_aggte_comparison.tex}
+
+
+
+
+\newpage
+\subsection{Lesson 10. Software implementation can change the result}
+
+Software implementation is another source of divergence in applied DiD because different implementations can imply different effective samples when the panel is incomplete. In R, researchers can impose full balancing, keeping only units observed in all periods, or allow an unbalanced panel and use all available observations. Stata's \texttt{csdid2}, by contrast, applies a pair-balanced rule, retaining units observed in the base period and in the current period for each \(\mathrm{ATT}(g,t)\).\footnote{One other mechanical difference can be neutralized by explicit option choices. R defaults to a varying base period ($t-1$), whereas Stata defaults to a universal one ($g-1$). The reanalysis standardized all estimates to a universal base period.} These procedures coincide in complete panels, but not when missingness is substantial.
+
+Figure~\ref{fig:sensitivity_210} shows the consequence in \textcite{li2025shortened}. The fully balanced R specification and the pair-balanced Stata implementation both produce positive post-treatment effects. The unbalanced R specification, however, produces a mostly negative post-treatment profile and a visible pre-treatment dip. In this case, the balancing rule changes the qualitative conclusion. Implementation choices should be treated as part of the empirical design. When missingness is nontrivial, researchers should report the fill rate and the balancing rule, because both affect the sample behind the estimate.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{Figures/sensitivity/event_study_sensitivity_210.pdf}
+\caption{CS-DID with not-yet-treated controls under three balancing rules for \textcite{li2025shortened}. ``Balanced (R)'' keeps only units observed in all periods; ``Unbalanced (R)'' uses all available observations; ``Stata \texttt{csdid2}'' balances each \((g,t)\) comparison separately.}
+\label{fig:sensitivity_210}
+\end{figure}
+\newpage
+\subsection{Toward an applied guide to DiD}
+
+\textcite{baker2025difference} offer a general framework for thinking about DiD designs. Their emphasis is on forward engineering: starting from the causal parameter, stating the identifying assumptions, choosing an estimator that matches them, and then assessing robustness. Their framework clarifies the conceptual structure of modern DiD designs and disciplines how applied researchers should think about specification choice. The contribution of this chapter is narrower. It does not propose a parallel framework. It shows where that structure most often becomes opaque in applied work and where empirical disagreements across estimators tend to arise.
+
+Papers become easier to interpret when they report the estimand before the coefficient. Readers need to know which treatment effect is being targeted, for which treated units, over which post-treatment periods, and under which weighting or aggregation rule. In staggered settings, they also need to know which untreated units serve as controls and why those comparisons make parallel trends plausible. Without those objects, the same regression equation can correspond to different empirical questions.
+
+Event studies should be reported as part of design assessment, not treated as a ritual. If dynamic effects are central to the argument, the paper should state the reference period, the event-time window, and the treatment of endpoint periods or bins. This matters in all designs, because conditioning choices can affect the dynamic profile. It matters even more in staggered designs, where long-horizon coefficients are exposed to contamination, changing support, and shifting group composition.
+
+Robustness to heterogeneity and robustness to parallel-trends violations remain separate problems. Replacing TWFE with a heterogeneity-robust estimator may improve the mapping between the estimate and the estimand, but it does not settle whether the counterfactual trend is credible. Sensitivity to departures from parallel trends, the role of covariates, and the consequences of alternative control groups or geographic conditioning all belong to that identification question. These checks complement modern estimation, but they do not become unnecessary once the estimator changes.
+
+Covariates and should be justified as part of identification. The relevant question is whether those covariates clarify why conditional parallel trends is more plausible, not whether the specification contains many of them. That includes the distinction between baseline and time-varying covariates. It also includes geographic conditioning. In the traditional use of TWFE, time-invariant geographic controls are absorbed by the fixed effects and often disappear from the specification. In CS-DID, geography can enter directly through the conditioning set, which makes this margin of analysis more explicit but can also create overlap problems.
+
+Implementation choices often matter because they alter the effective sample. Aggregation rules, balancing rules, sample structure in repeated cross-sections, and software defaults are not minor coding details once they change which observations identify the effect. Reporting those features clearly makes disagreements across estimators easier to diagnose. Leaving them implicit makes even technically sophisticated designs harder to read.
+
+The applied lesson of the reanalysis is narrower than a general design framework, but it is also closer to what applied work actually needs. The key question is whether the empirical implementation keeps the causal target, the identifying comparison, and the available support aligned. If the causal target, the identifying comparison, and the available support are not aligned, using a different estimator will not fix the underlying design problem.
+
+
+\section{Conclusion}
+\label{Chapter5}
+
+This dissertation reassessed 56 \emph{health economics} studies under a common replication and re-estimation protocol to examine how results change when TWFE is replaced by modern DiD estimators. The literature remains broadly recognizable, but many conclusions become less secure. In this sample, changes rarely take the form of sign reversal. They appear more often as changes in magnitude, weaker dynamic profiles, loss of precision, and greater sensitivity to design choices than the original articles suggested.
+
+The contribution of this dissertation is empirical and comparative. Re-estimating a defined applied literature under a common protocol makes it possible to distinguish between results that remain substantively stable and results that weaken once identification choices are made explicit. It also sharpens how the recent critique of TWFE should be read in practice. In this sample, divergence is not driven mainly by negative weights. It more often reflects differences in control-group choice, support, dynamic aggregation, and the treatment of covariates. For applied work, the relevant question is whether the article's conclusion survives once those margins are made explicit under alternative estimators.
+
+The exercise has clear limits. The sample is restricted to studies with usable replication materials and does not represent the full DiD literature. The analysis uses the data and code environments provided by the original authors and may therefore inherit limitations from those replication packages. The sample is concentrated in \emph{health economics}, with many studies set in the United States, which limits generalization across fields and institutional settings. Some replications also required adaptations to make the original specifications compatible with a standardized implementation in \emph{R}. The scope of the dissertation is therefore specific. It provides an auditable and comparable reassessment of a defined sample.
+
+These limits also point to natural extensions. The same protocol can be applied to literatures outside \emph{health economics}, to settings with different data structures, and to designs outside the present sample, including \emph{triple-DiD} and non-absorbing treatments.
+
+%  REFERENCES
+%======================================================================
+
+\printbibliography[heading=bibintoc,title={References}]
+
+%======================================================================
+%  APPENDICES (sibling .tex files at the project root)
+%======================================================================
+
+\appendix
+\input{AppendixA}
+\input{AppendixB}
+\input{AppendixC}
+\input{AppendixD}
+
+\end{document}

@@ -1,0 +1,2 @@
+"estimator","vcov_type","n_pre","n_post","rm_first_Mbar","rm_avg_Mbar","rm_peak_Mbar","att_first","att_avg","att_peak"
+"TWFE","full",2,4,0.5,2,2,3.01726560048461,20.8424487633651,39.384069837757

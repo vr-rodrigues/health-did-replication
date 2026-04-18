@@ -1,0 +1,91 @@
+{
+  "id": "401",
+  "title": "Signing Up New Fathers: Do Paternity Establishment Initiatives Increase Marriage, Parental Investment, and Child Well-Being?",
+  "author_label": "Rossin-Slater (2017)",
+  "group_label": "escalonada_controles",
+  "data": {
+    "file": "data/raw/401/programs_data/cps_css_final.dta",
+    "format": "dta",
+    "sample_filter": "!is.na(pwsupwgt)"
+  },
+  "variables": {
+    "outcome": "married_tobiodad",
+    "unit_id": "state",
+    "time": "child_biryear",
+    "cluster": "state",
+    "weight": "pwsupwgt",
+    "treatment_twfe": "any_hosp_pat",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "momage1",
+      "momage2",
+      "momage3",
+      "momage4",
+      "momeduc1",
+      "momeduc2",
+      "momeduc3",
+      "momwhite",
+      "momblack",
+      "momhispanic",
+      "ch_male",
+      "totkids1",
+      "totkids2",
+      "d_childage1",
+      "d_childage2",
+      "d_childage3",
+      "d_childage4",
+      "d_childage5",
+      "unemp_rate_lag1",
+      "pov_rate_lag1",
+      "state_minwage_lag1",
+      "pct_welfare_recp_lag1",
+      "welfare_ben_4per_lag1",
+      "gov_dem_lag1",
+      "frac_statehouse_dem_lag1",
+      "pct_medicaid_lag1",
+      "pct_wic_lag1",
+      "wage_withhold",
+      "new_hires",
+      "license_revoke",
+      "joint_custody",
+      "log_CS_exp_lag",
+      "waiver",
+      "tanf",
+      "eitc"
+    ],
+    "cs_controls": [],
+    "cs_base_period": "universal",
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "repeated_cross_section",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nyt": true,
+    "run_sa": false,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 5,
+    "event_post": 5,
+    "bjs_gvar": "gvar_CS"
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$gvar_CS <- as.numeric(df$child_biryear - df$hosp_pat)",
+      "df$totkids1 <- as.integer(df$totkids == 1)",
+      "df$totkids2 <- as.integer(df$totkids >= 2)",
+      "df$d_childage1 <- as.integer(df$child_age == 1)",
+      "df$d_childage2 <- as.integer(df$child_age == 2)",
+      "df$d_childage3 <- as.integer(df$child_age == 3)",
+      "df$d_childage4 <- as.integer(df$child_age == 4)",
+      "df$d_childage5 <- as.integer(df$child_age == 5)"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": -0.0281,
+    "se_twfe": 0.0088
+  },
+  "notes": "All-eventually-treated: 44 states, year_init 1990-1999 (8 staggered cohorts). No CS-NT (no never-treated). SA disabled (Pattern 36, CONFIRMED: SA tested and produced CIs ±300 for effects ±0.03; cohorts 1990 and 1993 have 1 state each → 13+ collinear interactions, VCOV not PSD). Table 3 col 5 coefficient = -0.0281 (SE 0.0088) — includes state-specific linear time trends (tt_state_*) NOT replicated here; our estimate will be closer to col 4 (without trends). RCS: each obs is a mother-child pair. 9622 obs dropped for missing pwsupwgt. Event study window [-5, +5], reference hosp_pat=-2. Outcome selection: married_tobiodad is the declared primary outcome (Table 3), aggregate indicator, preferred over subcategories (never_mar, divorced, married_tonewguy)."
+}

@@ -1,0 +1,79 @@
+{
+  "id": "44",
+  "title": "The Trade-Offs of Welfare Policies in Labor Markets with Informal Jobs: The Case of the Seguro Popular Program in Mexico",
+  "author_label": "Bosch, Campos-Vazquez (2014)",
+  "group_label": "escalonada_controles",
+  "data": {
+    "file": "data/raw/44/analysis_data.csv",
+    "format": "csv",
+    "sample_filter": "is.finite(p3)"
+  },
+  "variables": {
+    "outcome": "p3",
+    "unit_id": "cvemun",
+    "time": "mydate",
+    "cluster": "cvemun",
+    "weight": "pob2000",
+    "treatment_twfe": "post_SP",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "log_pop",
+      "x_t_insured",
+      "x_t_urban",
+      "x_t_unm",
+      "x_t_inf",
+      "x_t_p50",
+      "x_t_age1",
+      "x_t_age2",
+      "x_t_gender",
+      "x_t_yrschl",
+      "x_t_industry1",
+      "x_t_industry2",
+      "x_t_industry3",
+      "x_t_industry4",
+      "x_t_industry5",
+      "x_t_industry6",
+      "x_t_industry7",
+      "x_t_industry8",
+      "x_t_industry9",
+      "x_t_industry10",
+      "x_t_industry11",
+      "x_t_industry12",
+      "x_t_industry13",
+      "x_t_industry14",
+      "x_t_industry15"
+    ],
+    "cs_controls": [],
+    "additional_fes": [
+      "ent[mydate]",
+      "ent[mydate2]",
+      "ent[mydate3]"
+    ]
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": false
+  },
+  "analysis": {
+    "run_csdid_nt": false,
+    "run_csdid_nyt": true,
+    "run_bacon": false,
+    "run_sa": false,
+    "run_gardner": true,
+    "has_event_study": true,
+    "event_pre": 4,
+    "event_post": 4,
+    "bjs_gvar": "",
+    "bjs_aggregate_to_panel": false
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$p3 <- log(df$pat_size_6_50)",
+      "df$mydate2 <- df$mydate^2",
+      "df$mydate3 <- df$mydate^3"
+    ]
+  },
+  "original_result": {},
+  "notes": "EVENT STUDY REVIEWED. Bosch & Campos-Vazquez (2014). Outcome: p3 = log(pat_size_6_50) = log(employers 6-50), matching Figure 4 Panel D and event study. Collapse=1 (paper reports only distributed lag event-study, no static ATT). Stata: xtreg p3 TbL12x TbL8x Tbx Tb4x Tb8x Tb12x Tb16 log_pop x_t_* i.ent*mydate i.ent*mydate2 i.ent*mydate3 _Ix* [aw=pob2000], fe robust cluster(cvemun). State cubic trends NOW INCLUDED via ent[mydate]+ent[mydate2]+ent[mydate3]. Staggered rollout of Seguro Popular across 1392 Mexican municipalities (2002Q4-2010Q1). ALL units eventually treated — no never-treated, CS-NYT only. SA disabled (Pattern 36, CONFIRMED: SA tested and produced CIs ±2e8 for effects ±0.01; last cohort gvar=200 has ~1 municipality; 29+ collinear interactions; VCOV not PSD). Event study via custom script (es44_script.R): replicates Figure 4 Panel D distributed lag blocks."
+}

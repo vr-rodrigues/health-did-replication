@@ -1,0 +1,66 @@
+{
+  "id": "133",
+  "title": "Income, the Earned Income Tax Credit, and Infant Health",
+  "author_label": "Hoynes et al. (2015)",
+  "group_label": "unica_controles",
+  "data": {
+    "file": "data/raw/133/id_21.dta",
+    "format": "dta",
+    "sample_filter": "effective >= 1991 & effective <= 1998 & dmeducgrp <= 2 & marital == 2"
+  },
+  "variables": {
+    "outcome": "lowbirth",
+    "unit_id": "stateres",
+    "time": "effective",
+    "cluster": "stateres",
+    "weight": "cellnum",
+    "treatment_twfe": "Post_avg",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "treat1",
+      "after",
+      "other",
+      "black",
+      "age2",
+      "age3",
+      "high",
+      "racemiss",
+      "hispanic",
+      "hispanicmiss"
+    ],
+    "cs_controls": [],
+    "additional_fes": [
+      "parvar"
+    ]
+  },
+  "panel_setup": {
+    "data_structure": "repeated_cross_section",
+    "treatment_timing": "single",
+    "allow_unbalanced": false
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 3,
+    "event_post": 4,
+    "bjs_gvar": ""
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$cell_id <- df$parvar * 100L + as.integer(df$stateres)",
+      "df$lowbirth <- df$lowbirth * 100",
+      "df$after <- as.integer(df$effective >= 1994 & df$effective <= 1998)",
+      "df$Post_avg <- df$treat1 * df$after",
+      "df$gvar_CS <- ifelse(df$parvar >= 2, 1994, 0)"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": -0.3549,
+    "se_twfe": 0.0746,
+    "att_csdid_nt": -0.1799,
+    "se_csdid_nt": 0.1274
+  },
+  "notes": "TWO SEPARATE EVENT STUDY PDFs — event_study_script.R produces: (a) event_study_com_controles.pdf and (b) event_study_sem_controles.pdf. MATCHES: TWFE exact; SA exact for both (single cohort → SA=TWFE with SA FEs); CS-NT exact for BOTH variants. APPROXIMATIONS: BJS ~5-12% gap (aggregation). CS-NT KEY FIX: racemiss=0 for ALL parvar==1 (control) units → must exclude from xformla in att_gt(dr) — Stata drops it silently, R fails. Use xformla=~stateres_f + other + black + age2 + age3 + high + hispanic + hispanicmiss (no racemiss). base_period='universal' required to match Stata long2 pre-period estimates. Stata csdid2 uses method=dripw when i.stateres added; R equivalent: est_method='dr'. BJS: cell_id=parvar*100+stateres (1632 aggregated rows), did_imputation R has no 'controls' argument — pass via first_stage = ~ctrl | cell_id + effective. Data: id_21.dta, filter effective 1991-1998 + dmeducgrp<=2 + marital==2. _I* interaction vars precomputed in data; include with backtick quoting in feols formula."
+}

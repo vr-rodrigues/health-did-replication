@@ -1,0 +1,347 @@
+\section{Article Collection Pipeline}
+\label{AppendixD}
+
+This appendix documents the search, classification, and filtering process that produced the final sample of 56 articles. The pipeline combined bibliographic retrieval from OpenAlex, LLM-based classification of abstracts, automated replication package search across five repositories, and manual eligibility review. Figure~\ref{fig:collection_pipeline} summarizes the overall flow.
+
+\subsection{Bibliographic Retrieval}
+
+The initial download covered all articles published between 2000 and 2025 in 17 journals\footnote{The journal set comprises the top five general-interest economics journals (\emph{AER}, \emph{Econometrica}, \emph{QJE}, \emph{JPE}, and \emph{Restud}) together with leading health economics and related field journals: \emph{Journal of Health Economics}, \emph{Health Economics}, \emph{American Journal of Health Economics}, \emph{Journal of Human Resources}, \emph{Review of Economics and Statistics}, \emph{Journal of Public Economics}, \emph{Journal of Labor Economics}, \emph{Journal of Development Economics}, \emph{AEJ: Applied Economics}, \emph{AEJ: Economic Policy}, \emph{Journal of the European Economic Association}, and \emph{The Economic Journal}.}. For health economics journals (\emph{Journal of Health Economics}, \emph{Health Economics}, \emph{American Journal of Health Economics}), every article was retrieved. For general-interest and applied journals, a set of 20 health-related keywords filtered titles and abstracts before download.\footnote{Keywords included terms such as ``health,'' ``hospital,'' ``mortality,'' ``insurance,'' ``vaccination,'' ``Medicaid,'' ``Medicare,'' ``pharmaceutical,'' ``epidemic,'' and ``pollution,'' among others.} The \emph{Journal of Development Economics} was searched separately using its ISSN, with Mendeley Data cross-referenced through DataCite to resolve dataset-to-article DOI links. In total, the retrieval produced 8,171 candidate articles across all journals.
+
+\subsection{DiD Classification}
+
+The classification stage identified which of the 8,171 candidates used difference-in-differences as the main empirical strategy. An early version of the pipeline relied on keyword matching against approximately 40 DiD-related phrases (``difference-in-differences,'' ``parallel trends,'' ``staggered adoption,'' ``event study,'' and variants). This approach suffered from both false positives (papers mentioning DiD in passing) and false negatives (papers using DiD without standard terminology, such as Medicaid expansion studies comparing expanding and non-expanding states).
+
+The pipeline was therefore rebuilt around an LLM classifier (Claude Haiku, Anthropic 2025). Each abstract was evaluated against a structured prompt that defined DiD as requiring a before-and-after comparison combined with a treated-versus-control contrast under the parallel trends assumption. The prompt also listed explicit exclusion criteria (randomized controlled trials, regression discontinuity, synthetic control as the primary method). The classifier returned a binary judgment, a confidence level, and a short rationale for each article, and processed all candidates in batches with checkpointing every 100 articles.
+
+After the initial classification, a second pass re-examined the 707 abstracts classified as non-DiD using a more aggressive prompt designed to catch implicit DiD designs, such as studies exploiting variation in timing of policy adoption without using standard DiD terminology. This reclassification recovered 47 additional articles. A validation check against the 28 articles previously identified through manual search confirmed 100\% recall among articles with available replication packages. The classification stage flagged 1,884 articles as likely DiD studies.
+
+\subsection{Replication Package Search}
+
+For each DiD-classified article, the pipeline searched for replication materials using a six-method priority sequence. DataCite reverse DOI lookup came first, followed by CrossRef linked relations, DataCite title search, Harvard Dataverse API (title similarity threshold above 0.65 with author surname validation), Zenodo API (same threshold), and Mendeley Data API. Figshare was excluded because its results typically contained supplementary materials rather than estimation code.
+
+A separate ICPSR-focused search used four strategies (DataCite reverse DOI filtered to ICPSR, CrossRef relations filtered to ICPSR, DataCite title search filtered by ICPSR publisher, and direct OpenICPSR web search) with a lower similarity threshold of 0.50 when author surnames matched. Links pointing to ICPSR sub-archives that store source data rather than replication code (NAHDAP, NACJD) were identified and removed. All candidate links were verified, and two were replaced with correct Dataverse URLs after manual inspection.
+
+After consolidation and DOI-based deduplication across all search sources, 431 articles had at least one located replication package.
+
+\subsection{Manual Review and Final Sample}
+
+The 431 articles with replication materials entered manual review. Eligibility required that the replication package contain estimation code and data sufficient to re-run the main specification, that DiD be the primary identification strategy (not a robustness check), and that the article fall within health economics. Articles were excluded when replication data were restricted or unavailable for download, when the DiD specification could not be isolated from the provided code, or when the paper turned out to address a topic outside health economics despite passing the keyword and LLM filters.
+
+The review yielded 56 articles that met all criteria. Of these, 11 had been previously reanalyzed by hand and served as the calibration set described in Section~\ref{sec:calibration}. The remaining 45 were processed through the semi-automated estimation pipeline described in Appendix~\ref{AppendixC}.
+
+\subsection{Search Sources}
+
+The 431 reviewed articles came from six complementary search strategies, each designed to catch papers that earlier strategies missed.
+
+\begin{enumerate}
+  \item \textbf{Keyword search.} The initial OpenAlex query used four DiD phrases and a concept-based filter (OpenAlex concept C33880087), producing 977 raw results. After health classification and replication search, this source contributed the largest share of the final sample.
+
+  \item \textbf{False-negative analysis.} A second-pass search added approximately 40 additional DiD-related phrases in two confidence tiers (high-confidence terms such as ``double difference'' and ``DD estimator,'' and medium-confidence terms such as ``two-way fixed effects'' and ``Callaway and Sant'Anna''). Articles already found by DOI were excluded.
+
+  \item \textbf{ICPSR-focused search.} A dedicated search targeted the ICPSR ecosystem, where many AEA-journal replication packages are hosted. This stage contributed 6 additional articles after filtering out sub-archive source-data links.
+
+  \item \textbf{Broad health retrieval with LLM classification.} All 7,626 health-related articles from the 17 journals were downloaded and classified with the LLM prompt described above. This source contributed 326 DiD articles with replication packages.
+
+  \item \textbf{Full general search.} Two rounds downloaded every article (without health keyword filters) from all 17 journals and applied dual LLM classification (both health and DiD). Round~1 covered Top~5 and AEJ journals (11,708 articles classified, 42 health-DiD with replication). Round~2 covered the remaining 7 journals (12,098 articles, 35 health-DiD with replication).
+
+  \item \textbf{Journal of Development Economics.} A dedicated search downloaded all JDE articles and cross-referenced Mendeley Data datasets through DataCite DOI resolution, producing 239 health papers of which 35 were classified as DiD.
+\end{enumerate}
+
+Across all six sources, after deduplication by DOI, 431 unique articles had located replication materials and entered the manual review stage.
+
+
+\clearpage
+\begin{landscape}
+\begin{figure}[p]
+\centering
+\vspace*{0.5cm}
+
+\begin{tikzpicture}[
+  node distance=1.1cm,
+  every node/.style={font=\small},
+  box/.style={
+    draw,
+    rectangle,
+    minimum width=5.8cm,
+    minimum height=0.9cm,
+    text width=5.4cm,
+    align=center
+  },
+  sidebox/.style={
+    draw, dashed,
+    rectangle,
+    minimum width=3.4cm,
+    minimum height=0.8cm,
+    text width=3.1cm,
+    align=center,
+    font=\footnotesize
+  },
+  arrow/.style={
+    thick,
+    -{Stealth[length=2.5mm]}
+  },
+  lbl/.style={
+    font=\footnotesize,
+    inner sep=1pt
+  }
+]
+
+% --- Main flow ---
+\node[box] (openalex)
+  {OpenAlex retrieval from 17 journals (2000--2025)};
+
+\node[box, below=of openalex] (llm)
+  {LLM abstract classification (health + DiD)};
+
+\node[box, below=of llm] (repl)
+  {Replication package search\\(DataCite, CrossRef, Dataverse,
+   Zenodo, Mendeley, ICPSR)};
+
+\node[box, below=of repl] (dedup)
+  {DOI-based deduplication across all search rounds};
+
+\node[box, below=of dedup] (review)
+  {Manual eligibility review};
+
+\node[box, below=of review] (final)
+  {Final sample};
+
+% --- Side annotations (right) ---
+\node[lbl, right=1.8cm of openalex]  (n1)
+  {\textit{8,171 candidates}};
+
+\node[lbl, right=1.8cm of llm]  (n2)
+  {\textit{1,884 flagged as DiD}};
+
+\node[lbl, right=1.8cm of dedup]  (n3)
+  {\textit{431 with replication located}};
+
+\node[lbl, right=1.8cm of final]  (n4)
+  {\textbf{56 articles}};
+
+% --- Left annotation: reclassification ---
+\node[sidebox, left=1.8cm of llm] (reclass)
+  {Reclassification pass\\(+47 implicit DiD)};
+
+% --- Arrows ---
+\draw[arrow] (openalex) -- (llm);
+\draw[arrow] (llm) -- (repl);
+\draw[arrow] (repl) -- (dedup);
+\draw[arrow] (dedup) -- (review);
+\draw[arrow] (review) -- (final);
+
+% --- Side arrows ---
+\draw[dotted] (openalex.east) -- (n1.west);
+\draw[dotted] (llm.east) -- (n2.west);
+\draw[dotted] (dedup.east) -- (n3.west);
+\draw[dotted] (final.east) -- (n4.west);
+
+% --- Reclassification arrow ---
+\draw[arrow] (reclass.east) -- (llm.west);
+
+\end{tikzpicture}
+
+\caption{Article collection pipeline from bibliographic
+         retrieval to final sample}
+\label{fig:collection_pipeline}
+\end{figure}
+\end{landscape}
+
+
+\subsection{LLM Classification Prompts}
+
+All classification was performed with Claude Haiku (\texttt{claude-haiku-4-5-20251001}, Anthropic 2025). Four prompts were used at different stages of the pipeline. The DiD classification prompt (Prompt~1) was used in the initial keyword-based search. The dual health and DiD prompt (Prompt~2) was used in the full general search, where both dimensions had to be evaluated simultaneously for articles outside health journals. The aggressive reclassification prompt (Prompt~3) re-examined abstracts initially classified as non-DiD, with the explicit instruction to prefer false positives over false negatives. The health verification prompt (Prompt~4) classified articles by health topic only, and was the only prompt run with temperature set to zero.
+
+\subsubsection*{Prompt 1: DiD classification (initial search)}
+
+\begin{tcolorbox}[colback=gray!5, colframe=gray!60, breakable]
+\tiny
+\begin{verbatim}
+SYSTEM:
+You are an econometrics methodology classifier. Your task is to read an academic economics abstract
+and determine whether the paper uses a Difference-in-Differences (DiD) research design.
+
+DiD is a causal inference method that compares changes in outcomes over time between a group affected
+by a treatment/policy (treated group) and a group not affected (control group). Key features:
+- Compares BEFORE vs AFTER a policy/intervention
+- Between TREATED vs CONTROL groups
+- The "parallel trends" assumption: absent treatment, both groups would have followed similar trajectories
+
+Papers may describe DiD without using the exact term. Look for:
+- Exploiting variation in TIMING of policy adoption across states/regions/countries
+- Comparing outcomes pre/post reform between affected vs unaffected groups
+- Staggered rollout/implementation of programs
+- Two-way fixed effects (unit + time) with a treatment indicator
+- Event study designs around policy changes
+- "Natural experiment" involving differential exposure over time
+
+Papers that are NOT DiD:
+- Pure RCTs (randomized controlled trials) with no pre/post comparison
+- Regression discontinuity designs (RDD) as the main method
+- Pure instrumental variables (IV) approaches
+- Structural/theoretical models without empirical quasi-experimental design
+- Cross-sectional comparisons without time variation
+- Meta-analyses or literature reviews
+- Methodology/econometric theory papers (about estimators, not applying them)
+
+Respond with EXACTLY this JSON format:
+{"is_did": true/false, "confidence": "high"/"medium"/"low", "rationale": "Brief 1-sentence explanation"}
+
+USER:
+Title: {title} | Journal: {journal} | Year: {year}
+Abstract: {abstract}
+Is this paper using a Difference-in-Differences methodology?
+\end{verbatim}
+\end{tcolorbox}
+
+
+\subsubsection*{Prompt 2: Dual health and DiD classification (full general search)}
+
+\begin{tcolorbox}[colback=gray!5, colframe=gray!60, breakable]
+\tiny
+\begin{verbatim}
+SYSTEM:
+You are a research classifier for economics papers. You must make TWO independent judgments:
+
+## Judgment 1: Is this paper about HEALTH economics?
+A paper is "health" if its PRIMARY outcome, intervention, or market falls into ANY of these categories:
+
+INCLUDED -- Health outcomes: Mortality, life expectancy, cause-specific death rates; Morbidity, disease
+incidence or prevalence, hospitalization; Birth outcomes: birth weight, prematurity, infant mortality,
+fertility as health outcome; Mental health: depression, anxiety, suicide, psychological well-being;
+Disability, functional limitations, self-reported health status; Substance use: smoking, alcohol, drug use.
+
+INCLUDED -- Health care system and markets: Hospitals, clinics, emergency departments, nursing homes,
+long-term care; Physicians, nurses, health care workforce; Health insurance: public (Medicaid, Medicare,
+NHS, universal coverage) or private; Health care costs, medical spending, out-of-pocket expenses;
+Pharmaceutical markets: drug pricing, prescriptions, generics.
+
+INCLUDED -- Health behaviors and public health: Vaccination, immunization programs; Nutrition, obesity,
+food policy with health framing; Tobacco/alcohol/drug policy when health is outcome; Environmental health
+(pollution, water, air quality) when health outcomes are measured; Occupational health, workplace injuries.
+
+INCLUDED -- Health policy and regulation: Health care reform, insurance mandates, provider regulation;
+Certificate of need laws, scope of practice laws; Public health interventions: sanitation, disease control,
+maternal health programs; Health information: report cards, quality disclosure.
+
+EXCLUDED -- NOT health even if superficially related: Labor supply, wages, employment (unless OUTCOME is
+health); Education outcomes; Crime, incarceration; Immigration, trade, tariffs; Fertility as demographic
+outcome (not health); Poverty, welfare, income unless measuring health outcomes; Environmental regulation
+unless measuring health outcomes.
+
+DECISION RULE: The paper is "health" if at least one PRIMARY outcome or PRIMARY market/institution is
+directly about physical health, mental health, health care delivery, health insurance, or health behaviors.
+
+## Judgment 2: Is this paper using Difference-in-Differences (DiD)?
+[Same DiD criteria as Prompt 1]
+
+Respond with EXACTLY this JSON format:
+{"is_health": true/false, "is_did": true/false, "confidence": "high"/"medium"/"low",
+ "rationale": "Brief 1-sentence explanation covering both judgments"}
+
+USER:
+Title: {title} | Journal: {journal} | Year: {year}
+Abstract: {abstract}
+Classify this paper on BOTH dimensions: (1) Is it health economics? (2) Does it use DiD?
+\end{verbatim}
+\end{tcolorbox}
+
+
+\subsubsection*{Prompt 3: Aggressive DiD reclassification}
+
+\begin{tcolorbox}[colback=gray!5, colframe=gray!60, breakable]
+\tiny
+\begin{verbatim}
+SYSTEM:
+You are an expert econometrician classifying whether a research paper uses a Difference-in-Differences
+(DiD) methodology.
+
+IMPORTANT: Many papers use DiD WITHOUT explicitly saying "difference-in-differences". You must identify
+DiD from the RESEARCH DESIGN, not just keywords.
+
+A paper uses DiD if it compares changes over time between a treated group and a control group:
+
+EXPLICIT DiD signals (definite yes):
+- "difference-in-differences", "diff-in-diff", "DD", "DDD" (triple diff)
+- "two-way fixed effects" / "TWFE"
+- "parallel trends assumption"
+- "event study design" (when comparing treated vs control over time)
+- Names: Callaway-Sant'Anna, Sun-Abraham, Borusyak, de Chaisemartin, Goodman-Bacon
+
+IMPLICIT DiD signals (likely yes -- probe further):
+- "exploiting variation in timing/adoption/implementation"
+- "staggered rollout/adoption/introduction"
+- "before and after" + "comparison/control group"
+- "reform/policy/law introduced in some states but not others"
+- "natural experiment" + "panel data" or "fixed effects"
+- "causal effect" + "policy change" + "unit and time fixed effects"
+- Medicaid/Medicare expansion studies comparing expanding vs non-expanding states
+- Insurance mandate studies comparing states that adopted vs didn't
+- Hospital/provider studies comparing affected vs unaffected facilities over time
+
+NOT DiD (even if they sound causal):
+- Pure RCTs / random assignment (unless combined with DiD)
+- Pure regression discontinuity (RD/RDD) without a DiD component
+- Instrumental variables (IV/2SLS) as the PRIMARY method
+- Structural models / general equilibrium models
+- Cross-sectional comparisons (no time dimension)
+- Simple before-after without a control group
+- Meta-analyses / systematic reviews; Bunching/kink designs
+
+When uncertain, lean toward YES (we prefer false positives over false negatives).
+
+Respond with EXACTLY this JSON format:
+{"is_did": true/false, "confidence": "high"/"medium"/"low", "rationale": "brief explanation of why"}
+
+USER:
+Title: {title}
+Abstract: {abstract}
+Does it use a DiD methodology? Remember: many papers use DiD without saying "difference-in-differences".
+Look for the research design pattern (treated vs control, before vs after, with panel data or RCS).
+\end{verbatim}
+\end{tcolorbox}
+
+
+\subsubsection*{Prompt 4: Health topic verification (temperature = 0)}
+
+\begin{tcolorbox}[colback=gray!5, colframe=gray!60, breakable]
+\tiny
+\begin{verbatim}
+SYSTEM:
+You are a research topic classifier. Determine if this economics paper is about HEALTH ECONOMICS.
+
+HEALTH ECONOMICS INCLUDES:
+- Health insurance (public or private: Medicare, Medicaid, ACA, NHS)
+- Hospitals, clinics, healthcare providers, physicians, nurses
+- Mortality, morbidity, diseases, epidemiology, pandemics (COVID, HIV)
+- Pharmaceutical industry, drugs (prescription, opioids), FDA regulation
+- Mental health, depression, suicide, substance abuse, addiction
+- Public health interventions, vaccination, sanitation, water quality
+- Nutrition, food safety, obesity, food stamps/SNAP (when health outcomes measured)
+- Pollution and environment WHEN health outcomes are the focus (mortality, illness, birth outcomes)
+- Disability, workplace injuries, occupational health
+- Reproductive health, maternal health, infant health, birth outcomes
+- Aging, elderly care, long-term care, nursing homes
+- Health behaviors: smoking, alcohol, exercise, risky behavior
+
+HEALTH ECONOMICS EXCLUDES:
+- Education (without health component)
+- Labor markets (wages, employment) without health outcomes
+- Crime, violence (unless health outcomes like injuries/deaths)
+- Migration, immigration (without health focus)
+- Trade, finance, macroeconomics
+- Housing, urban economics (without health focus)
+- General welfare/poverty programs (unless health outcomes measured)
+- "Health of the economy", "fiscal health" -- metaphorical use
+- Environmental economics focused on costs/damages, not health outcomes
+- Insurance that is NOT health insurance (deposit, crop, unemployment)
+
+Respond with EXACTLY this JSON:
+{"is_health": true/false, "rationale": "Brief 1-sentence explanation"}
+
+USER:
+Title: {title} | Journal: {journal} | Year: {year}
+Abstract: {abstract}
+Is this paper about health economics?
+\end{verbatim}
+\end{tcolorbox}

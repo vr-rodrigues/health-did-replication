@@ -1,0 +1,61 @@
+{
+  "id": 359,
+  "author_label": "Anderson, Charles, Olivares, Rees (2019)",
+  "group_label": "escalonada_controles",
+  "title": "Was the First Public Health Campaign Successful?",
+  "journal": "American Economic Journal: Applied Economics",
+  "data": {
+    "file": "data/raw/359/data/Data-file-for-table-replications.dta",
+    "format": "dta",
+    "sample_filter": "!is.na(ln_tb_lungs)",
+    "data_structure": "repeated_cross_section"
+  },
+  "variables": {
+    "outcome": "ln_tb_lungs",
+    "unit_id": "state_city_id",
+    "time": "year",
+    "treatment_twfe": "city_reporting_required",
+    "gvar_cs": "gvar_CS",
+    "cluster": "state_fips",
+    "weight": "population_imp",
+    "twfe_controls": [
+      "per_female",
+      "per_black",
+      "per_foreign",
+      "per_under18",
+      "per_literate",
+      "city_reporting_required_missing",
+      "missing_demographics"
+    ],
+    "cs_controls": [],
+    "additional_fes": [
+      "state_city_id[year]"
+    ]
+  },
+  "panel_setup": {
+    "data_structure": "repeated_cross_section",
+    "treatment_timing": "staggered"
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "run_sa": true,
+    "run_bacon": true,
+    "has_event_study": true,
+    "event_pre": 5,
+    "event_post": 5
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "gvar_tbl <- df %>% dplyr::filter(city_reporting_required == 1) %>% dplyr::group_by(state_city_id) %>% dplyr::summarise(first_yr = min(year), .groups = 'drop')",
+      "df <- df %>% dplyr::left_join(gvar_tbl, by = 'state_city_id') %>% dplyr::mutate(gvar_CS = ifelse(!is.na(first_yr), as.integer(first_yr), 0L))"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": -0.036,
+    "se_twfe": 0.035,
+    "source": "Table 3B, Column 1 (ln_tb_lungs, city_reporting_required only, full controls + city-specific trends). population-weighted. cluster(state_fips). N=7,439.",
+    "n": 7439
+  },
+  "notes": "Anti-TB public health campaign 1900-1917. 548 cities (91 treated, 457 never-treated). 16 staggered cohorts (1900-1917). Unbalanced panel (53% fill rate). city-specific linear trends via state_city_id[year] in fixest. Population weights (population_imp). Clustering at state level (42 states). Missing indicator method for covariates. Table 3B col 1 uses only city_reporting_required (not all 13 treatments). gvar_CS derived as first year city_reporting_required==1 per state_city_id."
+}

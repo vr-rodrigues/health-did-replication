@@ -1,0 +1,48 @@
+{
+  "id": "267",
+  "title": "Maternal Mortality and Women's Political Power",
+  "author_label": "Bhalotra, Clarke, Gomes, Venkataramani (2022)",
+  "group_label": "escalonada_sem_controles",
+  "data": {
+    "file": "data/raw/267/data/worldwide_quotas.dta",
+    "format": "dta",
+    "sample_filter": "year >= 1990 & !is.na(womparl) & !is.na(lnMMRt1)"
+  },
+  "variables": {
+    "outcome": "lnMMRt1",
+    "unit_id": "ccode",
+    "time": "year",
+    "cluster": "ccode",
+    "treatment_twfe": "quotaRes",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "cs_cluster": "ccode",
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "run_bacon": true,
+    "has_event_study": true,
+    "event_pre": 5,
+    "event_post": 5,
+    "run_sa": true,
+    "run_gardner": true
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$gvar_CS <- ifelse(df$resCountry == 1 & !is.na(df$quotayear), df$quotayear, 0)"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": -0.082,
+    "se_twfe": 0.051
+  },
+  "notes": "EVENT STUDY REVIEWED. Bhalotra, Clarke, Gomes, Venkataramani (2022) JEEA. Table from quotaDifDif.tex, Col 4 (lnMMRt1, no controls). Stata: xtreg lnMMRt1 i.year quotaRes, fe cluster(ccode). 178 countries, 26 years (1990-2015). 22 reserved-seat quota countries with staggered adoption 1989-2013. Outcome: ln(Maternal Mortality Ratio). Treatment: quotaRes (binary reserved seats indicator). No controls in baseline. Paper also uses did_multiplegt_dc and HonestDiD. Uganda adopted 1989 (pre-sample start). Panel unbalanced: 119/178 have all 26 years. EVENT STUDY (5 estimators): All estimators agree on gradual negative effect growing from h=0 (-0.012) to h=5 (-0.09 to -0.15). Pre-trends flat across all. CS-NT/CS-NYT run on balanced panel (119 countries, att_gt segfaults on unbalanced with 13 cohorts). CS-NT overall=-0.169, CS-NYT=-0.170. SA most conservative at late horizons (-0.089 at h=5); Gardner largest (-0.147 at h=5). TWFE attenuation confirmed by Bacon: early adopters negative, late adopters positive. VCOV warning on SA (few treated clusters). Controls (lnGDP, democracy) tested — pre-trends already flat in baseline, no improvement needed. Scripts: event_study_267.R (TWFE+SA+Gardner), cs_only_267.R (CS-NT+CS-NYT on balanced panel), plot_final_267.R (combined 5-estimator plot)."
+}

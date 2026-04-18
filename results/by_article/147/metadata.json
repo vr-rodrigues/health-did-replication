@@ -1,0 +1,55 @@
+{
+  "id": "147",
+  "title": "Environmental Regulations, Air and Water Pollution, and Infant Mortality in India",
+  "author_label": "Greenstone, Hanna (2014)",
+  "group_label": "escalonada_controles",
+  "data": {
+    "file": "data/raw/147/analysis_data.csv",
+    "format": "csv"
+  },
+  "variables": {
+    "outcome": "e_spm_mean",
+    "unit_id": "city_id",
+    "time": "year",
+    "cluster": "city_id",
+    "weight": "pop_urban",
+    "treatment_twfe": "catconvpolicy",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "scaprange",
+      "scappolicy",
+      "tauSCL",
+      "tauSCR",
+      "catrange",
+      "tauCATL",
+      "tauCATR",
+      "lit_urban",
+      "mean_ctrl"
+    ],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 4,
+    "event_post": 4,
+    "bjs_gvar": "",
+    "bjs_aggregate_to_panel": false
+  },
+  "preprocessing": {
+    "construct_vars": []
+  },
+  "original_result": {
+    "beta_twfe": 8.01,
+    "se_twfe": 12.59
+  },
+  "notes": "EVENT STUDY REVIEWED. Pre-trends problematic: CS-NT/CS-NYT/SA show large negative values at h=-4,-5 (-40 to -60). Post-treatment positive but oscillating across estimators. Greenstone & Hanna (2014). Stata: xi: reg e_spm_mean scaprange scappolicy tauSCL tauSCR catrange catconvpolicy tauCATL tauCATR lit_urban mean i.city i.year [aw=pop_urban], cluster(city). Main outcome=SPM air pollution. Treatment=catalytic converter policy (staggered by city). catconvpolicy = post-adoption * within-event-window[-7,9]. Regression jointly controls for SCAP policy. Sample restricted to cities with >=3yr pre+post for BOTH policies. N=1172 (150 missing lit_urban/mean auto-dropped). Data built via build_analysis_data.R from combined.dta. tauSCR and tauCATR dropped for collinearity with city+year FEs. SE difference (R:11.93 vs Stata:12.59) due to feols singleton removal. CS-DID does NOT control for SCAP — results differ from TWFE by design. | Outcome selection: Rule (ii) largest N. Main DiD finding is energy poverty (SPM) with full county-year panel (N~45k). Mortality analysis uses a 2-step approach with only N=16 counties as units, too small for standard DiD. Audit confirmed."
+}

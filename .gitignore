@@ -1,0 +1,58 @@
+# Raw data (too large, served via junction — local only)
+data/raw/*
+!data/raw/.gitkeep
+
+# LaTeX build artefacts
+overleaf/*.aux
+overleaf/*.log
+overleaf/*.out
+overleaf/*.synctex*
+overleaf/*.toc
+overleaf/*.bbl
+overleaf/*.blg
+overleaf/*.fdb_latexmk
+overleaf/*.fls
+health_did_replication/*.aux
+health_did_replication/*.log
+health_did_replication/*.out
+health_did_replication/*.synctex*
+health_did_replication/*.toc
+health_did_replication/*.bbl
+health_did_replication/*.blg
+
+# R/RStudio
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+*.Rproj
+Rplots.pdf
+
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+~$*
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Credentials (paranoid — nothing should ever land here, but just in case)
+.env
+.env.*
+credentials.*
+secrets.*
+*.pem
+*.key
+
+# Temp / diagnostic artefacts the audit would flag
+code/audit/_tmp_*.R
+
+# Claude Code agent state
+.claude/
+
+# Scratch/diagnostic files at root
+1.96

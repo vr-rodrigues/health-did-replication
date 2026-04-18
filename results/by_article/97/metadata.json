@@ -1,0 +1,66 @@
+{
+  "id": "97",
+  "title": "Urban Water Disinfection and Mortality Decline in Lower-Income Countries",
+  "author_label": "Bhalotra et al. (2021)",
+  "group_label": "unica_sem_controles",
+  "data": {
+    "file": "data/raw/97/Working-Datasets/analysisfile_8595.dta",
+    "format": "dta",
+    "sample_filter": "treated2 >= 1 & rur < 1 & small_city == 1"
+  },
+  "variables": {
+    "outcome": "ins_rate_under5",
+    "unit_id": "mun_reg",
+    "time": "year_reg",
+    "cluster": "mun_reg",
+    "treatment_twfe": "treated_post",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "treated_post_year",
+      "treated_year",
+      "treated",
+      "post",
+      "y",
+      "post_year"
+    ],
+    "twfe_es_controls": [],
+    "cs_controls": [],
+    "cs_base_period": "universal",
+    "additional_fes": [
+      "treated2"
+    ]
+  },
+  "panel_setup": {
+    "data_structure": "repeated_cross_section",
+    "treatment_timing": "single",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 6,
+    "event_post": 4,
+    "bjs_gvar": "gvar_BJS"
+  },
+  "preprocessing": {
+    "composite_twfe": "additive_2",
+    "composite_vars": [
+      "treated_post",
+      "treated_post_year"
+    ],
+    "construct_vars": [
+      "df$treated_did <- df$treated2 - 1",
+      "df$gvar_CS <- ifelse(df$treated_did == 1, 1991, 0)",
+      "df$gvar_BJS <- ifelse(df$treated_did == 1, 1991, NA_real_)"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": -0.3031,
+    "se_twfe": 0.0691,
+    "att_csdid_nt": -0.3517,
+    "se_csdid_nt": 0.0387
+  },
+  "notes": "DATA STRUCTURE: Each mun_reg appears TWICE per year_reg — treated2=1 (pre-reform cohort, never-treated in CS) and treated2=2 (post-reform cohort, treated in CS). (mun_reg, year_reg) is NOT unique; (mun_reg, year_reg, treated2) IS unique. 1413 unique mun_reg × 2 cohorts = 2826 composite units × 11 years. EVENT STUDY: Template's i(rel_time_binned) approach fails — when treated2 is in the FE, all event-study dummies are dropped due to collinearity (9999 bin for never-treated = treated2=1 is perfectly predicted by treated2 FE). SOLUTION: Dedicated script results/97/event_study_script.R uses explicit F_*/L_* binary dummies + fe(mun_reg + treated2 + year_reg). TWFE matches Stata exactly. CS-NT: Composite unit_cs_bjs = mun_reg*10 + treated2 + base_period='universal' — exact match for pre and post. SA = TWFE (single cohort, mathematically equivalent). GARDNER DIVERGENCE (Pattern 47): Gardner shows a constant ~0.146 level shift vs TWFE/CS-NT/SA across ALL event-study periods (pre and post). Root cause: Gardner's first stage (Gardner 2021, Section 3) estimates FEs only from untreated observations. In this dual-cohort structure, post-1991 year FEs are estimated exclusively from treated2=1 (never-treated cohort), while TWFE estimates year FEs jointly from both cohorts with treatment dummies absorbing the effect. The treated2 FE is also estimated from an asymmetric sample (all 11 years for cohort 1, only 6 pre-treatment years for cohort 2). If there is any cohort-specific time trend not captured by the additive treated2+year_reg structure (confirmed by non-zero pre-trends: +0.11 to +0.34), the first-stage counterfactual is systematically shifted. The dynamics are identical (differences between periods match perfectly), only the level differs. This is not a Gardner failure per se but a sensitivity of the two-stage approach to non-standard data structures where 'group' encompasses multiple dimensions with asymmetric untreated samples."
+}

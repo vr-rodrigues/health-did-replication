@@ -1,0 +1,49 @@
+{
+  "id": "262",
+  "title": "Imposing Policy on Reluctant Actors: The Hospital Desegregation Campaign and Black Postneonatal Mortality in the Deep South",
+  "author_label": "Anderson, Charles, Rees (2020)",
+  "group_label": "escalonada_controles",
+  "data": {
+    "file": "data/raw/262/RESTAT replication files/Data set for hospital desegregation analysis.dta",
+    "format": "dta",
+    "sample_filter": "race == 3 & balanced == 1 & no_births == 0"
+  },
+  "variables": {
+    "outcome": "post_neonatal_rate",
+    "unit_id": "state_county_fips",
+    "time": "year",
+    "cluster": "state_county_fips",
+    "weight": "births_ave",
+    "treatment_twfe": "medicare",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "hs_deg_imp",
+      "health_per_cap",
+      "emp_to_pop"
+    ],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": false
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 5,
+    "event_post": 5,
+    "run_sa": false,
+    "run_gardner": true
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$gvar_CS <- ifelse(df$medicare_any > 0, as.integer(df$medicare_any), 0)"
+    ]
+  },
+  "original_result": {},
+  "notes": "EVENT STUDY REVIEWED. SA REMOVED (Pattern 49: cohorts extremely unbalanced — 1967=85%, 1970-73<1% each → IW variance explosion, CIs ±25). Bacon: 89% timing groups (11% TvU). CS-NT=0.98, CS-NYT=1.24 (SE 5x larger, NYT pool tiny for late cohorts). All estimators null. Anderson, Charles, Rees (2020) RESTAT. Stata: xtreg post_neonatal_rate medicare hs_deg_imp health_per_cap emp_to_pop i.year [pweight=births_ave] if race==3, fe i(state_county_fips) cluster(state_county_fips). Hospital desegregation via Medicare certification in the Deep South. Staggered treatment: counties certified 1967-1973 (7 cohorts). race==3 = Black. balanced==1 restricts to balanced panel. no_births==0 excludes zero-birth counties. Weight: average births (pweight). Event study: medi_lead/lag pre-computed in data. CS also estimated in paper using csdid with notyet, method(dripw). Controls are time-varying county covariates."
+}

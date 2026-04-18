@@ -1,0 +1,53 @@
+{
+  "id": "80",
+  "title": "The Long-Run Effects of Sports Club Vouchers for Primary School Children",
+  "author_label": "Marcus et al. (2022)",
+  "group_label": "unica_controles",
+  "data": {
+    "file": "data/raw/80/Data/MSZ_main-data.dta",
+    "format": "dta",
+    "sample_filter": "bula_3rd %in% c(4, 13, 16) & target == 1 & nonmiss == 1 & year_3rd >= 2006 & year_3rd <= 2010"
+  },
+  "variables": {
+    "outcome": "sportsclub",
+    "unit_id": "cityno",
+    "time": "year_3rd",
+    "cluster": "cityno",
+    "treatment_twfe": "Post_avg",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "cs_cluster": "none",
+    "additional_fes": [
+      "bula_3rd"
+    ]
+  },
+  "panel_setup": {
+    "data_structure": "repeated_cross_section",
+    "treatment_timing": "single",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 2,
+    "event_post": 2
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$Post_avg <- df$treat",
+      "df <- as.data.frame(dplyr::group_by(df, cityno) |> dplyr::mutate(ever_tbula = max(tbula_3rd, na.rm=TRUE)))",
+      "df$gvar_CS <- ifelse(df$ever_tbula == 1, 2008, 0)",
+      "df$bula_int <- as.integer(df$bula_3rd)"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": 0.0089,
+    "se_twfe": 0.0188,
+    "att_csdid_nt": 0.0058,
+    "se_csdid_nt": 0.0118
+  },
+  "notes": "Stata: reg sportsclub Post_avg i.year_3rd i.bula_3rd i.cityno, vce(cluster cityno). CSDID: csdid2 sportsclub i.bula_3rd, gvar(gvar_CS) time(year_3rd) agg(event) cluster(cityno) long2. gvar_CS must be constant within cityno — fixed by using group_by(cityno) max of tbula_3rd. Event study: data covers 2006-2010, treatment at 2008; event_pre=2 shows event times -2,-1; event_post=2 shows 0,1,2. BJS aggregates RCS to (cityno × year_3rd) panel; bula_3rd FE lost in aggregation."
+}

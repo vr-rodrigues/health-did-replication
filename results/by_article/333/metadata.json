@@ -1,0 +1,49 @@
+{
+  "id": 333,
+  "author_label": "Clarke, Muhlrad (2021)",
+  "group_label": "unica_sem_controles",
+  "title": "Abortion laws and women's health",
+  "journal": "Journal of Health Economics",
+  "data": {
+    "file": "data/raw/333/data/Demographics_MonthXYearXState.dta",
+    "format": "dta",
+    "sample_filter": "regressiveState == 0",
+    "data_structure": "panel"
+  },
+  "variables": {
+    "outcome": "abortionRelatedPop",
+    "unit_id": "estado",
+    "time": "time",
+    "treatment_twfe": "ILE",
+    "gvar_cs": "gvar_CS",
+    "cluster": "estado",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "single"
+  },
+  "analysis": {
+    "event_pre": 36,
+    "event_post": 36,
+    "run_sa": false,
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "has_event_study": true
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$abortionRelatedPop <- df$abortionRelated / df$population * 1000",
+      "df$gvar_CS <- ifelse(df$estado == 9, 207, 0)"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": -0.064,
+    "se_twfe": 0.013,
+    "source": "Table 2, Panel A, Column 1 (no weights, no controls). SE is wild bootstrap.",
+    "n": 2496
+  },
+  "notes": "Single treated unit: estado=9 (Mexico DF) from time=207 (Mar 2007, matching Stata: timetoILE=t-207). ILE dummy in data turns on at time=205 (Jan 2007), but paper centers event study at t=207; gvar_CS=207 aligns with paper's definition. Previously gvar_CS=205 (Jan 2007) was 2 months too early. Pattern 43 fix applied: gvar_CS was integer (207L/0L) causing Inf→NA truncation inside did package — changed to numeric (207/0). 12 never-treated control states. SA disabled (single cohort). SEs in paper use wild bootstrap; template uses clustered SEs — expect SE differences. Time variable is running month index (1=Jan 1990). Stata Table 2 uses ALL years (1990-2016, N=2496) with regressiveState==0 filter (regressive states excluded). Previously year>=2001 filter caused 11% beta gap (-0.071 vs -0.064). Corrected to no year filter. Baseline spec: no controls, no weights. With controls+weights (Col 4): -0.075 (0.012). CS-DID ATT(simple)=-0.058 (gvar=207) vs TWFE=-0.064. 1716 rows with missing abortionRelated (132 per estado) dropped by att_gt. ESW weights at L_36 are ~0 (uninformative: single treated unit with 73 event-time dummies causes severe multicollinearity in weight decomposition)."
+}

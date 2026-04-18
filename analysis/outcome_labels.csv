@@ -1,0 +1,57 @@
+id,outcome,outcome_label
+9,lnpriceperpresc,Log price per prescription
+21,GT4pres,Doctor shopping (>4 prescribers)
+25,physician_cpta,Physician visits per capita
+44,p3,Employment share (firms 1--50)
+47,priv_ins_cov_supp,Private insurance coverage
+60,lnprnonmed,Log non-medical spending
+61,excel_vgood,Excellent/very good health
+65,anyhi,Any health insurance
+68,waz,Weight-for-age Z-score
+76,bf_ever,Ever breastfed
+79,P_U13TDAP,Tdap vaccination (under 13)
+80,sportsclub,Sports club membership
+97,ins_rate_under5,Insurance rate (under 5)
+125,insured,Health insurance coverage
+133,lowbirth,Low birthweight
+147,e_spm_mean,Particulate matter (SPM)
+201,carehh_k,Childcare hours (household)
+210,lnprice,Log insurance price
+213,left_school_plus1,Left school (age+1)
+228,pm10,PM10 concentration
+233,invest_total,Total investment
+234,firstbirth18,First birth before 18
+241,MME_PC,Morphine equiv. per capita
+242,lnearns_gen1_a1499,Log earnings (2nd gen.)
+253,vs_imr1y,Infant mortality (1yr)
+254,hours_nursing_ratio_i,Nursing hours ratio
+262,post_neonatal_rate,Post-neonatal mortality
+263,any_air,Any air pollution
+267,lnMMRt1,Log maternal mortality
+271,hyv_major,High-yield variety adoption
+281,smoke,Smoking prevalence
+290,mchiprate,Medicaid/CHIP enrollment
+304,census_mr_tot,Total mortality rate
+305,ln_emp_pop,Log employment-population ratio
+309,ln_acc_rateY_matt,Log accident rate
+311,access,Healthcare access
+321,log_deaths_town,Log deaths (town)
+323,coca_area_grid,Coca cultivation area
+333,abortionRelatedPop,Abortion-related per pop.
+335,new_std_ln,Log new STD cases
+337,sept_any,Any septicemia
+347,bmi,Body mass index
+358,ibp,International best practice
+359,ln_tb_lungs,Log pulmonary TB
+380,blan_mort100,Black infant mortality
+395,gfr_official,General fertility rate
+401,married_tobiodad,Married to biological father
+419,cod,Cause of death
+420,amr_eld,Age-adjusted mortality (elderly)
+432,ln_takeup_proxy1,Log insurance take-up
+433,fat_vmt,Fatalities per VMT
+437,personrem,Person-rem radiation exposure
+525,Y,Health outcome index
+744,lnm_rate,Log mortality rate
+1094,exceedquota,Exceeded pollution quota
+2303,ft90,Full-term births (>90 days)

@@ -1,0 +1,48 @@
+{
+  "id": "395",
+  "title": "The Effect of Soviet Maternity Benefits on Fertility",
+  "author_label": "Malkova (2018)",
+  "group_label": "escalonada_sem_controles",
+  "data": {
+    "file": "data/raw/395/analysis_data.csv",
+    "format": "csv",
+    "sample_filter": "Year >= 1975 & Year <= 1986"
+  },
+  "variables": {
+    "outcome": "gfr_official",
+    "unit_id": "Birthplace_code",
+    "time": "Year",
+    "cluster": "Birthplace_code",
+    "weight": "numwomen_79",
+    "treatment_twfe": "treat_post",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": false
+  },
+  "analysis": {
+    "run_csdid_nt": false,
+    "run_csdid_nyt": true,
+    "run_sa": false,
+    "run_bacon": false,
+    "run_gardner": true,
+    "has_event_study": true,
+    "event_pre": 5,
+    "event_post": 0
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$treat_post <- as.integer(df$Year >= df$gvar_CS)"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": 1.091,
+    "se_twfe": 0.409
+  },
+  "notes": "All-eventually-treated: 2 cohorts (1981 early=32 oblasts, 1982 late=50 oblasts). 82 oblasts, 12 years (1975-1986). SA disabled (Pattern 36, CONFIRMED: inverted signs). CS-NT disabled (no never-treated). Weight = numwomen_79. Event study truncated to e<=0: after 1982 ALL units treated, year FEs become contaminated (1982=3.7, 1983=9.2, 1984=7.7...), TWFE ES dummies explode (e+1=8.7, e+5=14.8) — artifact, not real effects. CS-NYT and Gardner correctly stop at e=0 (no clean control after 1982). All 3 estimators agree at e=0: TWFE=2.4, CS-NYT~2.0, Gardner=2.1. Static TWFE ATT=1.09 is reliable (identified from timing variation). Analysis data built by data/395/build_analysis_data.R."
+}

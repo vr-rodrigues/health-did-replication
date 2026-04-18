@@ -1,0 +1,68 @@
+{
+  "id": "25",
+  "title": "Provider Supply, Utilization, and Infant Health: Evidence from a Physician Distribution Policy",
+  "author_label": "Carrillo, Feres (2019)",
+  "group_label": "escalonada_controles",
+  "data": {
+    "file": "data/raw/25/data/data/physician_database.dta",
+    "format": "dta"
+  },
+  "variables": {
+    "outcome": "physician_cpta",
+    "unit_id": "codigo",
+    "time": "date",
+    "cluster": "codigo",
+    "treatment_twfe": "POLICY",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "bolsafamilia_X_date",
+      "spending_education_X_date",
+      "spending_sanitation_health_X_date",
+      "medico_preMPP_X_date",
+      "GDP_cpta_X_date",
+      "lnPopulation2010_X_date",
+      "Iliteracy_rate2010_X_date",
+      "indigenous_share2010_X_date",
+      "gini2010_X_date",
+      "unemployment_rate2010_X_date",
+      "rural_population_share2010_X_date",
+      "municipality_area_X_date",
+      "altitude_100_X_date",
+      "distance_to_capital_X_date",
+      "temperature_X_date",
+      "rainfall_X_date",
+      "amazonia_legal_X_date",
+      "semiarido_X_date"
+    ],
+    "cs_controls": [],
+    "additional_fes": "UF[date]"
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": false
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 4,
+    "event_post": 4,
+    "bjs_gvar": "",
+    "bjs_aggregate_to_panel": false
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$POLICY <- df$Treatment * df$post",
+      "gvar_tbl <- df %>% dplyr::filter(POLICY==1) %>% dplyr::group_by(codigo) %>% dplyr::summarise(first_policy=min(date),.groups='drop')",
+      "df <- df %>% dplyr::left_join(gvar_tbl, by='codigo') %>% dplyr::mutate(gvar_CS = ifelse(!is.na(first_policy), as.numeric(first_policy), 0))",
+      "for(v in c('bolsafamilia','spending_education','spending_sanitation_health','medico_preMPP','GDP_cpta','lnPopulation2010','Iliteracy_rate2010','indigenous_share2010','gini2010','unemployment_rate2010','rural_population_share2010','municipality_area','altitude_100','distance_to_capital','temperature','rainfall','amazonia_legal','semiarido')) df[[paste0(v,'_X_date')]] <- df[[v]] * df[['date']]"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": 0.116,
+    "se_twfe": 0.009
+  },
+  "notes": "EVENT STUDY REVIEWED. All 5 estimators converge beautifully. Growing effect 0→0.12. Near-perfect TWFE/CS agreement. Carrillo, Feres (2019). Table 2 Col 5. Stata: areg physician_cpta POLICY i.UF#c.date c.(bolsafamilia spending_education spending_sanitation_health)#c.date c.(medico_preMPP)#c.date c.(GDP_cpta lnPopulation2010 ...)#c.date i.date, a(codigo) cluster(codigo). ALL controls enter as var*date interactions (NOT levels). State-specific linear trends: i.UF#c.date = UF[date] in feols. 5565 municipalities, bimonthly periods. Target: 0.116 (SE 0.009). | Outcome selection: Rule (ii) largest N. Main DiD result is physician supply (Table 4-5, N~18k). Infant health outcomes (Table 6) are supplementary/null. Audit confirmed."
+}

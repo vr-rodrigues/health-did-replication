@@ -1,0 +1,67 @@
+{
+  "id": 335,
+  "author_label": "Le Moglie, Sorrenti (2022)",
+  "group_label": "unica_controles",
+  "title": "Revealing 'Mafia Inc.'? Financial Crisis, Organized Crime, and the Birth of New Enterprises",
+  "journal": "Review of Economics and Statistics",
+  "data": {
+    "file": "data/raw/335/CLEANED_DATA/final_database.dta",
+    "format": "dta",
+    "sample_filter": "year >= 2003",
+    "data_structure": "panel"
+  },
+  "variables": {
+    "outcome": "new_std_ln",
+    "unit_id": "id",
+    "time": "year",
+    "treatment_twfe": "crisis_mafia_n3_int",
+    "gvar_cs": "gvar_CS",
+    "cluster": "id",
+    "twfe_controls": [
+      "pop_urb",
+      "tourism",
+      "trial",
+      "wastes_xc",
+      "big_banks",
+      "self_emp",
+      "blood",
+      "newspapers_ln",
+      "year_7_north",
+      "year_8_north",
+      "year_9_north",
+      "year_11_north",
+      "year_12_north",
+      "year_13_north",
+      "year_14_north",
+      "year_15_north",
+      "year_16_north",
+      "year_17_north"
+    ],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "single"
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_sa": true,
+    "has_event_study": true,
+    "event_pre": 4,
+    "event_post": 7
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$gvar_CS <- ifelse(df$mafia_n3 == 1, 2007L, 0L)"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": 0.0405,
+    "se_twfe": 0.0107,
+    "source": "Table 2, Column 5 (new_std_ln, complete model with all controls + north x year interactions). Conley spatial HAC SEs (200km, 11yr). N=924.",
+    "n": 924
+  },
+  "notes": "Mafia and enterprise formation after 2007 financial crisis. 84 Italian provinces (excl. Sicily, Campania, Calabria). Treatment = mafia_n3 (top tertile of Transcrime Mafia Index). Single treatment date: 2007 (crisis onset). crisis_mafia_n3_int is pre-computed DiD interaction. Stata uses reg2hdfespatial for Conley SEs — R will use clustered SEs (coefficients identical, SEs differ). year_k_north = north indicator x year dummies (macro-region x year FEs). SA disabled (single cohort). CS-NYT not applicable (single treatment date)."
+}

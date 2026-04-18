@@ -1,0 +1,83 @@
+{
+  "id": "47",
+  "title": "Regulatory Redistribution in the Market for Health Insurance",
+  "author_label": "Clemens (2015)",
+  "group_label": "unica_controles",
+  "data": {
+    "file": "data/raw/47/replication/AEJApp2013-0169AnalysisData.dta",
+    "format": "dta",
+    "sample_filter": "workersB != 0 & childpresent != 0 & parentfirmsize != 0 & !actyear %in% c(1993, 1994, 1995) & actyear < 1998 & parentsmallfirm == 1 & !state_fips %in% c(25, 34, 21, 33)"
+  },
+  "variables": {
+    "outcome": "priv_ins_cov_supp",
+    "unit_id": "state_fips",
+    "time": "t",
+    "cluster": "state_fips",
+    "weight": "perwt",
+    "treatment_twfe": "Post_avg",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "kid",
+      "kidlt2",
+      "kidlt6",
+      "femhead",
+      "black",
+      "poverty_percent",
+      "sr2_femhead",
+      "sr3_femhead",
+      "sr4_femhead",
+      "sr2_black",
+      "sr3_black",
+      "sr4_black",
+      "sr2_pov",
+      "sr3_pov",
+      "sr4_pov"
+    ],
+    "cs_controls": [],
+    "additional_fes": [
+      "educ_category",
+      "ownershp",
+      "householdocc1990",
+      "workersB"
+    ]
+  },
+  "panel_setup": {
+    "data_structure": "repeated_cross_section",
+    "treatment_timing": "single",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 4,
+    "event_post": 1,
+    "bjs_gvar": "",
+    "bjs_aggregate_to_panel": true
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$t <- dplyr::case_when(df$actyear == 1987 ~ 1, df$actyear == 1988 ~ 2, df$actyear == 1989 ~ 3, df$actyear == 1990 ~ 4, df$actyear == 1991 ~ 5, df$actyear == 1992 ~ 6, df$actyear == 1996 ~ 7, df$actyear == 1997 ~ 8, TRUE ~ NA_real_)",
+      "df$post1 <- as.integer(df$actyear >= 1993 & df$actyear <= 1997)",
+      "df$Post_avg <- df$communityratingstate2 * df$post1",
+      "df$gvar_CS <- ifelse(!is.na(df$evercommrate) & df$evercommrate == 1, 7L, 0L)",
+      "df$sr2_femhead <- as.integer(df$superregion == 2) * df$femhead",
+      "df$sr3_femhead <- as.integer(df$superregion == 3) * df$femhead",
+      "df$sr4_femhead <- as.integer(df$superregion == 4) * df$femhead",
+      "df$sr2_black <- as.integer(df$superregion == 2) * df$black",
+      "df$sr3_black <- as.integer(df$superregion == 3) * df$black",
+      "df$sr4_black <- as.integer(df$superregion == 4) * df$black",
+      "df$sr2_pov <- as.integer(df$superregion == 2) * df$poverty_percent",
+      "df$sr3_pov <- as.integer(df$superregion == 3) * df$poverty_percent",
+      "df$sr4_pov <- as.integer(df$superregion == 4) * df$poverty_percent"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": -0.0962,
+    "se_twfe": 0.0097,
+    "att_csdid_nt": -0.1248,
+    "se_csdid_nt": 0.0148
+  },
+  "notes": "Stata TWFE: xi: reg priv_ins_cov_supp Post_avg i.actyear i.state_fips kid* i.superregion*femhead i.superregion*i.black i.superregion*poverty_percent i.educ_category i.workersB i.ownershp i.householdocc1990. Round 4 EXACT MATCH: two fixes — (1) include all 8 actyear values (1987-1992, 1996, 1997, N=127554 not 96359); (2) add femhead+black+poverty_percent main effects (xi: i.A*B generates B main effect for both continuous and i.B factor). With 6-year sample, adding main effects worsened gap; with full 8-year sample, both fixes together give exact match (0.00%). CS-NT also improved: -0.12429 vs Stata -0.12480 (0.4% gap). TWFE event study: collinear (3 treated states, single cohort) — skipped. BJS: state×year panel with first_stage controls, SEs ~0.03-0.05. Standalone script: id47_script.R."
+}

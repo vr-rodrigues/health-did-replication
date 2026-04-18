@@ -1,0 +1,109 @@
+{
+  "id": "79",
+  "title": "Direct and Spillover Effects of Middle School Vaccination Requirements",
+  "author_label": "Carpenter, Lawler (2019)",
+  "group_label": "escalonada_controles",
+  "data": {
+    "file": "data/raw/79/id_8.dta",
+    "format": "dta",
+    "sample_filter": "!is.na(Meas_newlybind)"
+  },
+  "variables": {
+    "outcome": "P_U13TDAP",
+    "unit_id": "fips",
+    "time": "year12",
+    "cluster": "fips",
+    "weight": "provwt",
+    "treatment_twfe": "TDcont_mandate",
+    "gvar_cs": "gvar_CSDID",
+    "twfe_controls": [
+      "MCV_mandate",
+      "HPV_mandate",
+      "Meas_newlybind",
+      "Varic_newlybind",
+      "Varic_new2dose",
+      "HepB_newlybind",
+      "HepA_newlybind",
+      "exemp_pb",
+      "wc_12yo",
+      "imminsure_12yo",
+      "MCV_boost",
+      "MCVed_PS",
+      "MCVed",
+      "MCV_waiver",
+      "MCV_PSmandate",
+      "HPVinsure_12yo",
+      "HPVed_parent",
+      "HPVed_stud",
+      "HPVaware",
+      "hepB_Kmandate",
+      "hepA_CCmandate",
+      "hepA_Kmandate",
+      "varic_CC_Kmandate",
+      "pcv_mandate",
+      "flu_CCmandate",
+      "rota_mandate",
+      "mumps_mandate",
+      "meas_2mandate",
+      "pert_rate_yr11",
+      "menin_rate_yr11",
+      "mdcd_upperlmt",
+      "styr_perblack",
+      "styr_perhispan",
+      "styr_perother_eth",
+      "styr_perfemale",
+      "styr_perlt21",
+      "styr_per21_64",
+      "styr_HSrate",
+      "styr_uni4rate",
+      "styr_povrate",
+      "unemp_rate",
+      "female",
+      "married",
+      "child_lt18_1",
+      "child_lt18_2",
+      "mom_ed_1",
+      "mom_ed_2",
+      "mom_ed_3",
+      "mom_agegrp_1",
+      "mom_agegrp_2",
+      "ethcat_1",
+      "ethcat_2",
+      "ethcat_3"
+    ],
+    "cs_controls": [
+      "female",
+      "married"
+    ],
+    "additional_fes": [
+      "age",
+      "fips"
+    ]
+  },
+  "panel_setup": {
+    "data_structure": "repeated_cross_section",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nyt": true,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 6,
+    "event_post": 6,
+    "gardner_controls": []
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$gvar_CSDID <- ifelse(!is.na(df$TDcont_year12), df$TDcont_year12, 0)"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": 0.135,
+    "se_twfe": 0.014,
+    "att_csdid_nt": 0.1525,
+    "se_csdid_nt": 0.0238,
+    "att_csdid_nyt": 0.0961
+  },
+  "notes": "Stata CSDID: csdid2 P_U13TDAP $individ_controls i.age i.fips [w=provwt], window(-6 5). fips = STATE dummies (51 states, NOT counties). cs_controls reduced to female+married (many controls cause singularity in att_gt). CS-NT ≈ CS-NYT in R (both ~0.095): R att_gt(panel=FALSE) distinguishes NT from NYT at ATT(g,t) cell level (62/72 cells differ), but positive and negative differences cancel in aggte(simple) aggregation — dataset-specific cancellation, not a structural bug. R NYT (~0.093) ≈ Stata NYT (0.099, ~6% diff, credible). R NT (~0.095) ≠ Stata NT (0.164) — likely due to different NT pool composition: early cohorts (MN gvar=1996, RI gvar=1999) may be in Stata's NT pool but are dropped in R as 'already treated at first period'. Stata NT has significant pre-trends (Pre_avg=-0.048, p=0.001) suggesting parallel trends failure for NT comparison; NYT is the more credible estimator (Pre_avg=-0.022, p=0.143, insignificant). See failure_patterns.md Pattern 24. BJS: Stata uses did_imputation with fe(fips year12 age); R aggregates to (fips×year12) panel via weighted.mean first — approximation (age FEs lost). Stata BJS horizons(0/6) pretrends(5). Event window: -6 to +6."
+}

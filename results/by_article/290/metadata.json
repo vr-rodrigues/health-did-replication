@@ -1,0 +1,55 @@
+{
+  "id": "290",
+  "title": "Administrative Burdens and Child Medicaid Enrollments",
+  "author_label": "Arbogast et al. (2022)",
+  "group_label": "escalonada_controles",
+  "data": {
+    "file": "data/raw/290/Data/Clean/Cleaned_Policy_Data.dta",
+    "format": "dta",
+    "sample_filter": "year >= 2014 & year <= 2020"
+  },
+  "variables": {
+    "outcome": "mchiprate",
+    "unit_id": "st",
+    "time": "newdate",
+    "cluster": "st",
+    "treatment_twfe": "Adminburden",
+    "gvar_cs": "newpolicydate",
+    "twfe_controls": [
+      "new_redetpause",
+      "MedicaidExpansion",
+      "cutoffmax",
+      "Premlevel_201",
+      "Work_Reqs",
+      "pov",
+      "ur",
+      "GSP"
+    ],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": false
+  },
+  "analysis": {
+    "run_twfe": true,
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "run_sa": true,
+    "run_bacon": true,
+    "run_gardner": true,
+    "has_event_study": true,
+    "event_pre": 5,
+    "event_post": 5,
+    "base_period": "universal"
+  },
+  "targets": {
+    "twfe_beta": -0.0172,
+    "twfe_se": 0.0072,
+    "twfe_n": 4086,
+    "csdid_att_simple": -0.031
+  },
+  "notes": "EVENT STUDY REVIEWED — Dataset reconstructed from Census API (tidycensus B01001 under-19 approx + S1701 poverty) + CMS enrollment + KFF policy data. ACS.dta (IPUMS) not redistributable; pop/totpop/pov from Census published tables. TWFE gap 6% (-0.0182 vs -0.0172) due to IPUMS perwt sums vs Census table estimates. N=4085 vs 4086 (match). Interpolation: approx(rule=1) matches Stata ipolate (no extrapolation). Paper uses aggte(type='simple'); our protocol uses aggte(type='dynamic'). 15 treated states, 12 distinct treatment cohorts, ~35 never-treated."
+}

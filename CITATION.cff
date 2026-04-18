@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: "If you use this replication package, please cite it as below."
+type: software
+title: "Replication Package: Do Health Policy Conclusions Survive Modern DiD? Re-estimating TWFE Studies"
+abstract: >
+  Replication package for a Master's dissertation that reanalyzes 56 published
+  health-economics papers that used Two-Way Fixed Effects (TWFE)
+  difference-in-differences, applying modern robust estimators: Callaway-Sant'Anna
+  (CS-DID), Sun-Abraham, Borusyak-Jaravel-Spiess (BJS imputation), Bacon
+  decomposition, and HonestDiD sensitivity analysis.
+authors:
+  - family-names: "Rangel Rodrigues"
+    given-names: "Victor"
+    email: "victorrangelrodrigues@gmail.com"
+    affiliation: "Insper"
+version: "1.0.0"
+date-released: "2026-04-18"
+license: CC-BY-4.0
+repository-code: "https://github.com/vr-rodrigues/health-did-replication"
+keywords:
+  - difference-in-differences
+  - two-way fixed effects
+  - Callaway-Sant'Anna
+  - health economics
+  - replication
+  - causal inference
+references:
+  - type: thesis
+    title: "Reanalysis of 56 health-economics DiD papers with modern estimators"
+    authors:
+      - family-names: "Rangel Rodrigues"
+        given-names: "Victor"
+    year: 2026
+    institution:
+      name: "Insper"
+    thesis-type: "Master's Thesis"
+    supervisors:
+      - family-names: "Pinto"
+        given-names: "Cristine"
+      - family-names: "Sant'Anna"
+        given-names: "Pedro H. C."

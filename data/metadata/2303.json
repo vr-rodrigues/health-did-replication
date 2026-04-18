@@ -1,0 +1,68 @@
+{
+  "result_id": 2303,
+  "author_label": "Cao & Ma (2023)",
+  "paper_title": "Mitigating agricultural fires with carrot or stick? Evidence from China",
+  "journal": "Journal of Development Economics",
+  "group_label": "escalonada_controles",
+  "data": {
+    "file": "data/raw/2303/analysis_data.csv",
+    "format": "csv"
+  },
+  "variables": {
+    "outcome": "ft90",
+    "unit_id": "id",
+    "time": "ym",
+    "cluster": "id",
+    "treatment_twfe": "tbp",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "temperature",
+      "precipitation",
+      "windspeed",
+      "humidity",
+      "winddirection1",
+      "winddirection2",
+      "winddirection3"
+    ],
+    "cs_controls": [],
+    "additional_fes": [],
+    "twfe_fe_override": "id^month + prov^year^month"
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": false
+  },
+  "analysis": {
+    "run_sa": true,
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_gardner": true,
+    "run_bacon": true,
+    "has_event_study": true,
+    "event_pre": 5,
+    "event_post": 5,
+    "base_period": "universal"
+  },
+  "preprocessing": {
+    "construct_vars": []
+  },
+  "notes": [
+    "Data prepared by results/2303/prep_data_2303.R from biomass_plant_year_month_MCD12Q1.dta + plant_weather.dta.",
+    "Outcome: ft90 — fire frequency count within 0-90 km radius of BPP (main Table 2 outcome).",
+    "Treatment: tbp = 1 if biomass power plant is operational in year-month. Binary, absorbing, staggered.",
+    "Time variable: ym = (year-2001)*12 + month. Monthly data 2001m1 to 2019m12 (228 periods).",
+    "gvar_CS: entry month of BPP operation (125 unique cohorts). Never-treated = 0 (487 plants).",
+    "954 total plants: 467 treated (operational by 2019), 487 never-treated.",
+    "TWFE FE override: id^month (plant×calendar month) + prov^year^month (province×year×month).",
+    "Paper uses Conley spatial SE (600km bandwidth). Template uses cluster by plant id.",
+    "Table 2 Col 3: paper reports -4.863 (1.780 Conley). R TWFE: -4.836 (1.495 cluster). Coefficient ~0.6% gap.",
+    "CS-DID uses simple unit+time FEs (no interaction FEs). Weather controls NOT in cs_controls (Pattern 42).",
+    "SA uses sunab(gvar_CS, ym). Gardner uses did2s with same FE structure.",
+    "Event study: es_2303.R replicates Fig. 4 (k=10) with TWFE, CS-NT, SA, Gardner.",
+    "Event study uses YEARLY event time: year_month = first treated year per (id, month) pair.",
+    "Paper uses did_imputation (Borusyak 2022). Gardner replicates this; pre-trends flat (~0).",
+    "CS-NT diverges at late horizons (Pattern 38: shrinking not-yet-treated control).",
+    "TWFE and SA converge well; all estimators confirm significant negative post-treatment effect."
+  ]
+}

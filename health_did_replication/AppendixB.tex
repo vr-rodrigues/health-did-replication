@@ -1,0 +1,1833 @@
+\section{Fichas individuais dos artigos replicados}
+\label{AppendixB}
+
+Este apêndice apresenta, para cada um dos 56 artigos da amostra, uma ficha-resumo com os resultados da reanálise. Cada página contém: (i)~uma ficha com estimativas, metadados e justificativa da seleção do \emph{outcome} conforme o protocolo do Capítulo~\ref{Chapter2}; (ii)~o \emph{event study} dinâmico com todos os estimadores aplicáveis; e (iii)~a análise de sensibilidade HonestDiD. Artigos sem figuras disponíveis são agrupados nas últimas páginas.
+
+% ===== Article ID 9 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{dranove2021dose}} \hfill \textit{ID 9}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{lnpriceperpresc} (Log price per prescription)\\
+    \textbf{Design:} Staggered, Panel, with Controls\\
+    \textbf{Controls:} exp\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.1763$ & $0.0484$ & *** \\
+      CS-NT & $-0.1985$ & $0.0516$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (8 pre, 9 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.75, CS-NT = 1.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_9_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_9_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 21 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{buchmueller2018effect}} \hfill \textit{ID 21}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{GT4pres} (Doctor shopping (>4 prescribers))\\
+    \textbf{Design:} Staggered, Panel, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.0019$ & $0.0008$ & ** \\
+      CS-NT & $-0.0033$ & $0.0009$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (4 pre, 2 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_21_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_21_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 25 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{carrillo2019provider}} \hfill \textit{ID 25}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{physician\_cpta} (Physician visits per capita)\\
+    \textbf{Design:} Staggered, Panel, with Controls\\
+    \textbf{Controls:} 18 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.1159$ & $0.0086$ & *** \\
+      CS-NT & $0.1144$ & $0.0064$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (4 pre, 4 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 1.75, CS-NT = 1.50
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_25_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_25_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 44 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{bosch2014tradeoffs}} \hfill \textit{ID 44}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{p3} (Employment share (firms 1--50))\\
+    \textbf{Design:} Staggered, Panel, with Controls\\
+    \textbf{Controls:} 25 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.0066$ & $0.0040$ & * \\
+      CS-NYT & $0.0030$ & $0.0016$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign $\neq$, both insig.\\
+    \textbf{ES:} Yes (4 pre, 4 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.25, CS-NYT = 0.50
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_44_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_44_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 47 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{clemens2015regulatory}} \hfill \textit{ID 47}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{priv\_ins\_cov\_supp} (Private insurance coverage)\\
+    \textbf{Design:} Single Timing, Repeated Cross-Section, with Controls\\
+    \textbf{Controls:} 15 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.0962$ & $0.0097$ & *** \\
+      CS-NT & $-0.1243$ & $0.0169$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (4 pre, 1 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 1.75, CS-NT = 1.25
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_47_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_47_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 60 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{schmitt2018multimarket}} \hfill \textit{ID 60}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{lnprnonmed} (Log non-medical spending)\\
+    \textbf{Design:} Staggered, Panel, with Controls\\
+    \textbf{Controls:} 6 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.0702$ & $0.0172$ & *** \\
+      CS-NT & $0.0594$ & $0.0231$ & ** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (4 pre, 4 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_60_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_60_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 65 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{akosaantwi2013effects}} \hfill \textit{ID 65}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{anyhi} (Any health insurance)\\
+    \textbf{Design:} Single Timing, Repeated Cross-Section, with Controls\\
+    \textbf{Controls:} 12 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.0317$ & $0.0076$ & *** \\
+      CS-NT & $0.0248$ & $0.0303$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig.\\
+    \textbf{ES:} Yes (6 pre, 6 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_65_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_65_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 76 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{lawler2023effect}} \hfill \textit{ID 76}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{bf\_ever} (Ever breastfed)\\
+    \textbf{Design:} Staggered, Repeated Cross-Section, with Controls\\
+    \textbf{Controls:} 21 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.0383$ & $0.0095$ & *** \\
+      CS-NYT & $0.0262$ & $0.0158$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig.\\
+    \textbf{ES:} Yes (4 pre, 4 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.50, CS-NYT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_76_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_76_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 79 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{carpenter2019direct}} \hfill \textit{ID 79}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{P\_U13TDAP} (Tdap vaccination (under 13))\\
+    \textbf{Design:} Staggered, Repeated Cross-Section, with Controls\\
+    \textbf{Controls:} 53 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.1350$ & $0.0140$ & *** \\
+      CS-NYT & $0.0899$ & $0.0277$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (6 pre, 6 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.25, CS-NYT = 0.25
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_79_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_79_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 80 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{marcus2022long}} \hfill \textit{ID 80}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{sportsclub} (Sports club membership)\\
+    \textbf{Design:} Single Timing, Repeated Cross-Section, with Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.0089$ & $0.0187$ &  \\
+      CS-NT & $0.0126$ & $0.0257$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, both insig.\\
+    \textbf{ES:} Yes (2 pre, 2 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = ---, CS-NT = ---
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_80_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+
+% ===== Article ID 97 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{bhalotra2021urban}} \hfill \textit{ID 97}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{ins\_rate\_under5} (Under-5 mortality rate, arcsinh)\\
+    \textbf{Design:} Single Timing, Repeated Cross-Section, No Controls
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.3031$ & $0.0691$ & *** \\
+      CS-NT & $-0.3518$ & $0.0386$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (6 pre, 4 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.50, CS-NT = 0.25
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_97_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_97_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 125 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{levine2011effective}} \hfill \textit{ID 125}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{insured} (Health insurance coverage)\\
+    \textbf{Design:} Staggered, Repeated Cross-Section, with Controls\\
+    \textbf{Controls:} 6 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.0005$ & $0.0065$ &  \\
+      CS-NT & $-0.0055$ & $0.0070$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, both insig.\\
+    \textbf{ES:} Yes (4 pre, 4 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_125_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_125_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 133 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{hoynes2015income}} \hfill \textit{ID 133}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{lowbirth} (Low birthweight)\\
+    \textbf{Design:} Single Timing, Repeated Cross-Section, with Controls\\
+    \textbf{Controls:} 10 controls\\
+    \textit{``Main Estimates''}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.3868$ & $0.0826$ & *** \\
+      CS-NT & $-0.4030$ & $0.0991$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (3 pre, 4 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.25, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_133_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_133_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 147 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{greenstone2014environmental}} \hfill \textit{ID 147}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{e\_spm\_mean} (Particulate matter (SPM))\\
+    \textbf{Design:} Staggered, Panel, with Controls\\
+    \textbf{Controls:} 9 controls\\
+    \textit{``preferred econometric specification''}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $8.0148$ & $11.9258$ &  \\
+      CS-NT & $9.4416$ & $21.5687$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, both insig.\\
+    \textbf{ES:} Yes (4 pre, 4 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_147_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_147_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 201 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{maclean2025paid}} \hfill \textit{ID 201}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{carehh\_k} (Childcare hours (household))\\
+    \textbf{Design:} Staggered, Repeated Cross-Section, with Controls\\
+    \textbf{Controls:} 19 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $4.6086$ & $1.7990$ & ** \\
+      CS-NT & $12.0415$ & $3.9885$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (7 pre, 7 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_201_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_201_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 210 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{li2025shortened}} \hfill \textit{ID 210}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{lnprice} (Log insurance price)\\
+    \textbf{Design:} Staggered, Panel, with Controls\\
+    \textbf{Controls:} 9 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.0185$ & $0.0057$ & *** \\
+      CS-NYT & $0.0160$ & $0.0365$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig.\\
+    \textbf{ES:} Yes (11 pre, 12 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.50, CS-NYT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_210_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_210_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 213 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{estrada2024dismissal}} \hfill \textit{ID 213}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{left\_school\_plus1} (Left school (age+1))\\
+    \textbf{Design:} Single Timing, Repeated Cross-Section, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.0372$ & $0.0103$ & *** \\
+      CS-NT & $-0.0299$ & $0.0143$ & ** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (3 pre, 3 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_213_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_213_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 228 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{sarmiento2023air}} \hfill \textit{ID 228}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{pm10} (PM10 concentration)\\
+    \textbf{Design:} Staggered, Panel, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-1.2396$ & $0.3274$ & *** \\
+      CS-NT & $-1.9543$ & $0.3521$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (5 pre, 5 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.25, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_228_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_228_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 233 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{kresch2020buck}} \hfill \textit{ID 233}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{invest\_total} (Total investment)\\
+    \textbf{Design:} Single Timing, Panel, with Controls\\
+    \textbf{Controls:} 14 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $2868.3173$ & $1254.2605$ & ** \\
+      CS-NT & $367.5040$ & $209.1000$ & * \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig.\\
+    \textbf{ES:} Yes (4 pre, 6 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.50
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_233_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_233_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 234 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{myers2017power}} \hfill \textit{ID 234}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{firstbirth18} (First birth before 18)\\
+    \textbf{Design:} Staggered, Panel, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.0033$ & $0.0087$ &  \\
+      CS-NT & $-0.0048$ & $0.0331$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, both insig.\\
+    \textbf{ES:} Yes (5 pre, 5 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_234_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_234_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 241 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{soliman2025disrupting}} \hfill \textit{ID 241}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{MME\_PC} (Morphine equiv. per capita)\\
+    \textbf{Design:} Staggered, Panel, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-33.6515$ & $6.4859$ & *** \\
+      CS-NT & $-70.0381$ & $12.4244$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (2 pre, 3 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.75, CS-NT = 0.75
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_241_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_241_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 242 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{moorthy2025bluecollar}} \hfill \textit{ID 242}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{lnearns\_gen1\_a1499} (Log earnings (2nd gen.))\\
+    \textbf{Design:} Staggered, Panel, with Controls\\
+    \textbf{Controls:} 7 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.0194$ & $0.0076$ & ** \\
+      CS-NT & $0.0182$ & $0.0086$ & ** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (5 pre, 5 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.25, CS-NT = 0.25
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_242_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_242_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 253 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{bancalari2024unintended}} \hfill \textit{ID 253}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{vs\_imr1y} (Infant mortality (1yr))\\
+    \textbf{Design:} Staggered, Panel, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.7373$ & $0.4159$ & * \\
+      CS-NT & $3.0501$ & $0.8779$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, CS sig./TWFE insig.\\
+    \textbf{ES:} Yes (6 pre, 7 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_253_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_253_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 254 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{gandhi2025alleviating}} \hfill \textit{ID 254}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{hours\_nursing\_ratio\_i} (Nursing hours ratio)\\
+    \textbf{Design:} Single Timing, Panel, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $5.4913$ & $0.5808$ & *** \\
+      CS-NT & $5.6929$ & $0.9154$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (7 pre, 4 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = ---, CS-NT = ---
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_254_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_254_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 262 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{anderson2024imposing}} \hfill \textit{ID 262}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{post\_neonatal\_rate} (Post-neonatal mortality)\\
+    \textbf{Design:} Staggered, Panel, with Controls\\
+    \textbf{Controls:} hs\_deg\_imp, health\_per\_cap, emp\_to\_pop\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $1.2210$ & $0.8879$ &  \\
+      CS-NT & $0.9801$ & $0.3726$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, CS sig./TWFE insig.\\
+    \textbf{ES:} Yes (5 pre, 5 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_262_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_262_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 263 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{axbard2024informed}} \hfill \textit{ID 263}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{any\_air} (Any air pollution)\\
+    \textbf{Design:} Single Timing, Panel, with Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.0033$ & $0.0006$ & *** \\
+      CS-NT & $0.0026$ & $0.0036$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig.\\
+    \textbf{ES:} Yes (4 pre, 4 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.25
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_263_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_263_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 267 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{bhalotra2023maternal}} \hfill \textit{ID 267}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{lnMMRt1} (Log maternal mortality)\\
+    \textbf{Design:} Staggered, Panel, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.0821$ & $0.0507$ &  \\
+      CS-NT & $-0.1692$ & $0.0719$ & ** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, CS sig./TWFE insig.\\
+    \textbf{ES:} Yes (5 pre, 5 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_267_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_267_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 271 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{sekhri2024curse}} \hfill \textit{ID 271}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{hyv\_major} (High-yield variety adoption)\\
+    \textbf{Design:} Single Timing, Panel, with Controls\\
+    \textbf{Controls:} pr, at\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $67.8101$ & $11.8621$ & *** \\
+      CS-NT & $69.7518$ & $11.9703$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (5 pre, 5 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 2.00, CS-NT = ---
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_271_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{6pt}
+{\footnotesize\noindent\textit{Note:} HonestDiD sensitivity plot omitted. Single treatment cohort: \texttt{att\_gt()} with universal base period cannot estimate pre-treatment placebo ATTs (returns SE\,=\,NA), making the sensitivity analysis infeasible for CS-DID. TWFE breakdown $\bar{M}_{\text{peak}}$ = 2.00; with a single cohort, TWFE and CS-DID are equivalent (no treatment-timing heterogeneity).\par}
+
+% ===== Article ID 281 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{steffens2025smoking}} \hfill \textit{ID 281}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{smoke} (Smoking prevalence)\\
+    \textbf{Design:} Single Timing, Panel, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.0024$ & $0.0055$ &  \\
+      CS-NT & $-0.0002$ & $0.0015$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign $\neq$, both insig.\\
+    \textbf{ES:} Yes (4 pre, 4 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_281_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_281_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 290 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{arbogast2024burdens}} \hfill \textit{ID 290}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{mchiprate} (Medicaid/CHIP enrollment)\\
+    \textbf{Design:} Staggered, Panel, with Controls\\
+    \textbf{Controls:} 8 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.0182$ & $0.0070$ & *** \\
+      CS-NT & $-0.0333$ & $0.0059$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (5 pre, 5 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.25, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_290_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_290_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 305 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{brodeur2025shootings}} \hfill \textit{ID 305}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{ln\_emp\_pop} (Log employment-population ratio)\\
+    \textbf{Design:} Staggered, Panel, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-1.3479$ & $0.5229$ & *** \\
+      CS-NT & $-0.9231$ & $1.0253$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig.\\
+    \textbf{ES:} Yes (5 pre, 5 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_305_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_305_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 309 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{johnson2024legal}} \hfill \textit{ID 309}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{ln\_acc\_rateY\_matt} (Log accident rate)\\
+    \textbf{Design:} Staggered, Panel, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.1367$ & $0.0461$ & *** \\
+      CS-NT & $-0.2012$ & $0.0454$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (5 pre, 5 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.25, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_309_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_309_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 311 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{galasso2024licensing}} \hfill \textit{ID 311}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{access} (Healthcare access)\\
+    \textbf{Design:} Staggered, Panel, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.6625$ & $0.0504$ & *** \\
+      CS-NT & $0.6732$ & $0.1134$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (5 pre, 5 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.50, CS-NT = 0.75
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_311_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_311_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 321 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{xu2023bureaucratic}} \hfill \textit{ID 321}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{log\_deaths\_town} (Log deaths (town))\\
+    \textbf{Design:} Single Timing, Panel, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.1424$ & $0.0410$ & *** \\
+      CS-NT & $-0.1355$ & $0.0723$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig.\\
+    \textbf{ES:} Yes (4 pre, 3 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.75, CS-NT = 0.50
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_321_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_321_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 323 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{prem2023rise}} \hfill \textit{ID 323}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{coca\_area\_grid} (Coca cultivation area)\\
+    \textbf{Design:} Single Timing, Panel, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.6427$ & $0.1992$ & *** \\
+      CS-NT & $0.5988$ & $0.2149$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (2 pre, 4 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 1.25, CS-NT = 1.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_323_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_323_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 333 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{clarke2021abortion}} \hfill \textit{ID 333}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{abortionRelatedPop} (Abortion-related per pop.)\\
+    \textbf{Design:} Single Timing, Panel, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.0636$ & $0.0126$ & *** \\
+      CS-NT & $-0.0578$ & $0.0134$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (36 pre, 36 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.25, CS-NT = 0.25
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_333_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_333_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 335 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{lemoglie2022mafia}} \hfill \textit{ID 335}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{new\_std\_ln} (Log new enterprises per 100k pop.)\\
+    \textbf{Design:} Single Timing, Panel, with Controls\\
+    \textbf{Controls:} 18 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.0405$ & $0.0127$ & *** \\
+      CS-NT & $0.0464$ & $0.0179$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (4 pre, 7 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_335_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_335_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 347 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{courtemanche2025calorie}} \hfill \textit{ID 347}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{bmi} (Body mass index)\\
+    \textbf{Design:} Staggered, Repeated Cross-Section, with Controls\\
+    \textbf{Controls:} 12 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.1744$ & $0.0808$ & ** \\
+      CS-NT & $-0.4480$ & $0.0991$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (7 pre, 4 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_347_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_347_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 359 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{anderson2019tuberculosis}} \hfill \textit{ID 359}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{ln\_tb\_lungs} (Log pulmonary TB)\\
+    \textbf{Design:} Staggered, Repeated Cross-Section, with Controls\\
+    \textbf{Controls:} 7 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.0363$ & $0.0333$ &  \\
+      CS-NT & $-0.0155$ & $0.0735$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, both insig.\\
+    \textbf{ES:} Yes (5 pre, 5 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_359_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_359_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 380 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{kuziemko2018managed}} \hfill \textit{ID 380}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{blan\_mort100} (Black infant mortality)\\
+    \textbf{Design:} Staggered, Panel, with Controls\\
+    \textbf{Controls:} 4 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.0683$ & $0.0733$ &  \\
+      CS-NT & $0.0325$ & $0.3334$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, both insig.\\
+    \textbf{ES:} Yes (5 pre, 5 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_380_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_380_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 395 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{malkova2018maternity}} \hfill \textit{ID 395}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{gfr\_official} (General fertility rate)\\
+    \textbf{Design:} Staggered, Panel, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $1.0908$ & $0.4086$ & *** \\
+      CS-NYT & $1.9679$ & $0.5260$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (5 pre, 0 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NYT = 1.50
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_395_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_395_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 401 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{rossinslater2017signing}} \hfill \textit{ID 401}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{married\_tobiodad} (Married to biological father)\\
+    \textbf{Design:} Staggered, Repeated Cross-Section, with Controls\\
+    \textbf{Controls:} 35 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.0285$ & $0.0076$ & *** \\
+      CS-NYT & $-0.0033$ & $0.0197$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig.\\
+    \textbf{ES:} Yes (5 pre, 5 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NYT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_401_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_401_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 419 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{kahn2015water}} \hfill \textit{ID 419}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{cod} (Cause of death)\\
+    \textbf{Design:} Single Timing, Panel, with Controls\\
+    \textbf{Controls:} 4 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-2.0122$ & $1.0225$ & ** \\
+      CS-NT & $-1.4114$ & $0.8349$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig.\\
+    \textbf{ES:} Yes (2 pre, 4 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = ---, CS-NT = ---
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_419_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+
+% ===== Article ID 420 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{bailey2015war}} \hfill \textit{ID 420}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{amr\_eld} (Age-adjusted mortality (elderly))\\
+    \textbf{Design:} Staggered, Panel, with Controls\\
+    \textbf{Controls:} 9 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-53.2074$ & $14.8372$ & *** \\
+      CS-NT & $-58.9946$ & $20.8106$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (6 pre, 10 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.25, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_420_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_420_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 432 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{gallagher2014learning}} \hfill \textit{ID 432}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{ln\_takeup\_proxy1} (Log insurance take-up)\\
+    \textbf{Design:} Staggered, Panel, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.1095$ & $0.0163$ & *** \\
+      CS-NT & $0.1280$ & $0.0243$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (10 pre, 11 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.75, CS-NT = 1.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_432_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_432_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 433 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{deangelo2014life}} \hfill \textit{ID 433}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{fat\_vmt} (Fatalities per VMT)\\
+    \textbf{Design:} Single Timing, Panel, with Controls\\
+    \textbf{Controls:} 4 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.7000$ & $0.1329$ & *** \\
+      CS-NT & $0.6979$ & $0.3434$ & ** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (6 pre, 6 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.25, CS-NT = 0.25
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_433_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_433_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 437 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{hausman2014corporate}} \hfill \textit{ID 437}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{personrem} (Person-rem radiation exposure)\\
+    \textbf{Design:} Staggered, Panel, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-42.2450$ & $66.0979$ &  \\
+      CS-NT & $40.4471$ & $64.7318$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign $\neq$, both insig.\\
+    \textbf{ES:} Yes (5 pre, 5 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_437_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_437_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 744 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{jayachandran2010modern}} \hfill \textit{ID 744}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{lnm\_rate} (Log mortality rate)\\
+    \textbf{Design:} Single Timing, Panel, with Controls\\
+    \textbf{Controls:} treatedXyear\_c, treated, year\_c\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.2811$ & $0.1076$ & *** \\
+      CS-NT & $-0.3332$ & $0.0259$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} Yes (12 pre, 6 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 1.00, CS-NT = 0.75
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_744_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_744_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 1094 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{fisman2017distortionary}} \hfill \textit{ID 1094}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{exceedquota} (Exceeded pollution quota)\\
+    \textbf{Design:} Staggered, Panel, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.0465$ & $0.0409$ &  \\
+      CS-NT & $-0.0259$ & $0.0362$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, both insig.\\
+    \textbf{ES:} Yes (4 pre, 4 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.00
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_1094_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_1094_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Article ID 2303 =====
+\clearpage
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{cao2023mitigating}} \hfill \textit{ID 2303}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{ft90} (Fire count within 0--90\,km)\\
+    \textbf{Design:} Staggered, Panel, with Controls\\
+    \textbf{Controls:} 7 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-4.8365$ & $1.4953$ & *** \\
+      CS-NT & $-6.5677$ & $6.6126$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig.\\
+    \textbf{ES:} Yes (5 pre, 5 post)\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = 0.00, CS-NT = 0.25
+  \end{minipage}
+\end{tcolorbox}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/event_study/id_2303_event_study.pdf}\\[-2pt]
+{\centering\footnotesize Event study: all estimators\par}
+\vspace{4pt}
+\noindent\centering
+\includegraphics[width=0.7\textwidth]{Figures/honestdid/id_2303_honest_did_v3.pdf}\\[-2pt]
+{\centering\footnotesize HonestDiD: sensitivity to parallel trends violations\par}
+
+% ===== Card-only articles (no figures) =====
+\clearpage
+\subsection*{Artigos sem \emph{event study} ou HonestDiD disponível}
+\addcontentsline{toc}{section}{Artigos sem event study ou HonestDiD}
+
+% --- Article ID 61 ---
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{evans2014giving}} \hfill \textit{ID 61}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{excel\_vgood} (Excellent/very good health)\\
+    \textbf{Design:} Single Timing, Repeated Cross-Section, with Controls\\
+    \textbf{Controls:} twoplus\_kids, eitc\_expand
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.0103$ & $0.0079$ &  \\
+      CS-NT & $0.0065$ & $0.0137$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, both insig.\\
+    \textbf{ES:} No\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = ---, CS-NT = ---
+  \end{minipage}
+\end{tcolorbox}
+\vspace{6pt}
+
+% --- Article ID 68 ---
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{tanaka2014abolishing}} \hfill \textit{ID 68}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{waz} (Weight-for-age Z-score)\\
+    \textbf{Design:} Single Timing, Repeated Cross-Section, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.5216$ & $0.2353$ & ** \\
+      CS-NT & $0.5216$ & $0.3871$ &  \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig.\\
+    \textbf{ES:} No\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = ---, CS-NT = ---
+  \end{minipage}
+\end{tcolorbox}
+\vspace{6pt}
+
+% --- Article ID 304 ---
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{arthi2022recessions}} \hfill \textit{ID 304}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{census\_mr\_tot} (Total mortality rate)\\
+    \textbf{Design:} Single Timing, Panel, with Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $2.1935$ & $0.4635$ & *** \\
+      CS-NT & $2.2418$ & $0.4070$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} No\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = ---, CS-NT = ---
+  \end{minipage}
+\end{tcolorbox}
+\vspace{6pt}
+
+% --- Article ID 337 ---
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{cameron2021crimes}} \hfill \textit{ID 337}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{sept\_any} (Positive biological STI test)\\
+    \textbf{Design:} Single Timing, Repeated Cross-Section, No Controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $0.2726$ & $0.0316$ & *** \\
+      CS-NT & $0.2112$ & $0.0820$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} No\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = ---, CS-NT = ---
+  \end{minipage}
+\end{tcolorbox}
+\vspace{6pt}
+
+% --- Article ID 358 ---
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{bargain2019women}} \hfill \textit{ID 358}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{ibp} (International best practice)\\
+    \textbf{Design:} Single Timing, Repeated Cross-Section, with Controls\\
+    \textbf{Controls:} 30 controls\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $4.1809$ & $1.0526$ & *** \\
+      CS-NT & $4.5914$ & $0.4374$ & *** \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, Sig. \checkmark\\
+    \textbf{ES:} No\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = ---, CS-NT = ---
+  \end{minipage}
+\end{tcolorbox}
+\vspace{6pt}
+
+% --- Article ID 525 ---
+\begin{tcolorbox}[
+  colback=white, colframe=black!60, boxrule=0.4pt,
+  arc=2pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+  \footnotesize
+  \textbf{\textcite{danzer2023pensions}} \hfill \textit{ID 525}\\[2pt]
+  
+  \begin{minipage}[t]{0.45\textwidth}
+    \textbf{Outcome:} \texttt{Y} (Birth in last 12 months, binary)\\
+    \textbf{Design:} Single Timing, Repeated Cross-Section, No Controls\\
+    \textbf{Controls:} TREAT\\
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{tabular}{@{}lccc@{}}
+      & $\hat{\beta}$ & SE & \\
+      TWFE & $-0.0078$ & $0.0028$ & *** \\
+      CS-NT & $-0.0140$ & $0.0074$ & * \\
+    \end{tabular}\\[3pt]
+    \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig.\\
+    \textbf{ES:} No\\
+    \textbf{HonestDiD} $\bar{M}_{\text{peak}}$:\\
+    TWFE = ---, CS-NT = ---
+  \end{minipage}
+\end{tcolorbox}
+\vspace{6pt}
+

@@ -1,0 +1,59 @@
+{
+  "id": "210",
+  "title": "Has the Shortened Drug Distribution Chain Cut Drug Prices? Evidence from China",
+  "author_label": "Li et al. (2026)",
+  "group_label": "escalonada_controles",
+  "data": {
+    "file": "data/raw/210/Has the Shortened Drug Distribution Chain Cut Drug/drug_price.dta",
+    "format": "dta"
+  },
+  "variables": {
+    "outcome": "lnprice",
+    "unit_id": "id",
+    "time": "yearmonth",
+    "cluster": "clusterid",
+    "cs_cluster": "clusternum",
+    "treatment_twfe": "treat1",
+    "gvar_cs": "policyyearmonth1",
+    "twfe_controls": [
+      "GDPadj",
+      "old",
+      "POP",
+      "NumHos",
+      "NumPhy",
+      "NumBed",
+      "GovExp",
+      "inten",
+      "InsurExp_Urban"
+    ],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nt": false,
+    "run_csdid_nyt": true,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 11,
+    "event_post": 12,
+    "run_sa": false,
+    "run_bjs": false,
+    "bjs_gvar": "",
+    "bjs_aggregate_to_panel": false,
+    "bjs_controls": []
+  },
+  "preprocessing": {
+    "construct_vars": []
+  },
+  "original_result": {
+    "beta_twfe": 0.019,
+    "se_twfe": 0.006,
+    "att_csdid_nyt": 0.012
+  },
+  "notes": "EVENT STUDY REVIEWED — 3 custom figures created (figure1_replication, figure2_harmonized, figure3_cs_pairbalanced). All-eventually-treated. Li et al. (2026). Table 3 Col 3 (TWFE with controls). Stata: reghdfe lnprice treat1 GDPadj old POP NumHos NumPhy NumBed GovExp inten InsurExp_Urban, absorb(yearmonth id) cluster(clusterid). ALL 13 cohorts eventually treated → CS-NYT only. Stata CS: csdid lnprice, i(id) t(yearmonth) g(policyyearmonth1) cluster(clusternum) agg(simple) → 0.012. TWFE clusters at clusterid, CS at clusternum (Pattern 30). Monthly data (yearmonth as %tm 660-719). BJS: did_imputation with same controls, cluster(clusternum)."
+}

@@ -1,0 +1,65 @@
+{
+  "id": "419",
+  "title": "Water Pollution Progress at Borders: The Role of Changes in China's Political Promotion Incentives",
+  "author_label": "Kahn, Li, Zhao (2015)",
+  "group_label": "unica_controles",
+  "data": {
+    "file": "data/raw/419/Dataset/Regression_Data.dta",
+    "format": "dta",
+    "sample_filter": "is.finite(cod)"
+  },
+  "variables": {
+    "outcome": "cod",
+    "unit_id": "w",
+    "time": "year",
+    "cluster": "w",
+    "weight": {},
+    "treatment_twfe": "bypost06",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "gdpg",
+      "gdpp",
+      "temperature",
+      "lightbuffer5km"
+    ],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "single",
+    "allow_unbalanced": false,
+    "cs_allow_unbalanced": false
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_bacon": false,
+    "run_sa": false,
+    "run_gardner": true,
+    "has_event_study": true,
+    "event_pre": 2,
+    "event_post": 4,
+    "bjs_gvar": "",
+    "bjs_aggregate_to_panel": false
+  },
+  "preprocessing": {
+    "time_recode": {},
+    "composite_twfe": {},
+    "composite_vars": {},
+    "construct_vars": [
+      "df$w <- as.integer(factor(df$station))",
+      "df$post06 <- as.integer(df$year > 2005)",
+      "df$bypost06 <- df$boundary * df$post06",
+      "df$gvar_CS <- as.numeric(ifelse(df$boundary == 1, 2006, 0))"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": -2.012,
+    "se_twfe": 1.192,
+    "att_csdid_nt": {},
+    "se_csdid_nt": {},
+    "att_csdid_nyt": {}
+  },
+  "notes": "Kahn, Li, Zhao (2015). AEJ: Economic Policy. Outcome: cod = Chemical Oxygen Demand (mg/L). Single timing: 2006 policy shift (11th Five-Year Plan binding COD reduction targets). Treatment: boundary stations vs interior stations. 497 monitoring stations, 7 years (2004-2010), 3377 obs. Stata: xtivreg2 cod bypost06 gdpg gdpp temperature lightbuffer5km year_dummy*, fe cluster(w riversystem). Paper uses 2-way clustering (station + riversystem); template uses station-level only (SEs may differ). SA disabled (single cohort). CS-NYT disabled (single cohort). Event study: by05-by10 (boundary × year dummies), with 2004 as paper's reference. Template uses -1 (2005) as reference. Table 3 Col 2: beta=-2.012, SE=1.192."
+}

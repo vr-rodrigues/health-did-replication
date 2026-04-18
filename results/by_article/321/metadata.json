@@ -1,0 +1,48 @@
+{
+  "id": 321,
+  "author_label": "Xu (2023)",
+  "group_label": "unica_sem_controles",
+  "title": "Bureaucratic Representation and State Responsiveness: The 1918 Pandemic in India",
+  "journal": "Review of Economics and Statistics",
+  "data": {
+    "file": "data/raw/321/data/influenza_town_panel.dta",
+    "format": "dta",
+    "sample_filter": "!is.na(year)",
+    "data_structure": "panel"
+  },
+  "variables": {
+    "outcome": "log_deaths_town",
+    "unit_id": "cid",
+    "time": "year",
+    "treatment_twfe": "indian_dm1918_post",
+    "gvar_cs": "gvar_CS",
+    "cluster": "did",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "single"
+  },
+  "analysis": {
+    "event_pre": 4,
+    "event_post": 3,
+    "run_sa": true,
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "has_event_study": true
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$gvar_CS <- ifelse(df$indian_dm1918 == 1, 1918L, 0L)"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": -0.142,
+    "se_twfe": 0.041,
+    "source": "Table 2, Column 3 (Town + Year FEs, clustered at district)",
+    "n": 14714
+  },
+  "notes": "Single treatment timing: indian_dm1918=1 towns treated 1918-1919 (post=1). 1061 towns in 205 districts. Clustering at district level (did). SA disabled (single cohort). Event study uses biannual periods in the paper, but our template uses annual. indian_dm1918_post is pre-computed in data."
+}

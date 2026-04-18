@@ -1,0 +1,56 @@
+{
+  "result_id": 525,
+  "author_label": "Danzer & Zyska (2023)",
+  "paper_title": "Pensions and Fertility: Microeconomic Evidence",
+  "journal": "American Economic Journal: Economic Policy",
+  "group_label": "unica_sem_controles",
+  "data": {
+    "file": "data/raw/525/Pensions_and_Fertility_Micro_Evidence/out/Data_ShortRunAnalysis_women_15_44.dta",
+    "format": "dta",
+    "sample_filter": "rwb2 == 1 | uwb2 == 1"
+  },
+  "variables": {
+    "outcome": "Y",
+    "unit_id": "clustervar1",
+    "time": "syear",
+    "cluster": "clustervar1",
+    "treatment_twfe": "DID",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "TREAT"
+    ],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "rcs",
+    "treatment_timing": "single",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_sa": false,
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_gardner": true,
+    "run_bacon": false,
+    "has_event_study": false,
+    "base_period": "universal"
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$gvar_CS <- as.numeric(ifelse(df$TREAT == 1, 1992, 0))",
+      "df$row_id <- seq_len(nrow(df))"
+    ]
+  },
+  "notes": [
+    "Brazil pension reform July 1991. First post-reform PNAD is 1992.",
+    "RCS design - PNAD cross-sections. No individual panel ID.",
+    "TREAT = rural worker (rw_p5==1), control = urban worker (uwb2==1).",
+    "DID = TREAT * AFTER (pre-constructed). AFTER = syear >= 1992.",
+    "No PNAD in 1991 or 1994 - gaps in time series.",
+    "No weights used in original regressions.",
+    "Single treatment date - all treated units get treatment in 1992.",
+    "Table 3 Col 2: DID = -0.008 (SE 0.003), N = 1,442,376.",
+    "26 state clusters (clustervar1)."
+  ]
+}

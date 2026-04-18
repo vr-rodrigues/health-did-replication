@@ -1,0 +1,50 @@
+{
+  "id": 323,
+  "author_label": "Prem, Vargas, Mejia (2023)",
+  "group_label": "unica_sem_controles",
+  "title": "The Rise and Persistence of Illegal Crops: Evidence from a Naive Policy Announcement",
+  "journal": "Review of Economics and Statistics",
+  "data": {
+    "file": "data/raw/323/Paper Replication/Data/MainData.dta",
+    "format": "dta",
+    "data_structure": "panel"
+  },
+  "variables": {
+    "outcome": "coca_area_grid",
+    "unit_id": "muni_code",
+    "time": "year",
+    "treatment_twfe": "treat_post",
+    "gvar_cs": "gvar_CS",
+    "cluster": "muni_code",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "single"
+  },
+  "analysis": {
+    "event_pre": 2,
+    "event_post": 4,
+    "run_sa": false,
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "has_event_study": true
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "med_suit <- median(df$suitability, na.rm=TRUE)",
+      "df$treated <- as.integer(df$suitability > med_suit)",
+      "df$treat_post <- df$treated * as.integer(df$year >= 2014)",
+      "df$gvar_CS <- ifelse(df$treated == 1, 2014, 0)"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": 0.3,
+    "se_twfe": 0.12,
+    "source": "Table 1, Column 1 (suit_announce on coca_area_grid, continuous treatment). Binarized at median suitability for replication.",
+    "n": 8736
+  },
+  "notes": "Coca production in Colombia. Treatment = policy announcement (2014) x coca suitability. Original paper uses continuous treatment (suitability x announcement). For replication, binarized at median suitability: high-suitability municipalities (treated, gvar=2014) vs low-suitability (control, gvar=0). Single treatment date. SA disabled (single cohort). Bacon N/A (single timing = 100% TvU). HonestDiD FIXED: original batch wrongly reported CS-NT SE=NA; only reference period (t=-1) has SE=NA (normal). CS-NT HonestDiD now uses diagonal VCOV (clustered SEs from aggte). Single cohort so CS-NT ~ TWFE mechanically. First: TWFE=0.25, CS=0. Avg: TWFE=1.25, CS=1.50."
+}

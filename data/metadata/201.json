@@ -1,0 +1,77 @@
+{
+  "id": "201",
+  "title": "The effects of state paid sick leave mandates on parental childcare time",
+  "author_label": "Maclean & Pabilonia (2025)",
+  "group_label": "escalonada_controles",
+  "data": {
+    "file": "data/raw/201/extracted/files/atus.dta",
+    "format": "dta",
+    "sample_filter": "hh_child == 1"
+  },
+  "variables": {
+    "outcome": "carehh_k",
+    "unit_id": "fips",
+    "time": "time",
+    "cluster": "fips",
+    "weight": "wt06",
+    "treatment_twfe": "pslm_state_lag2",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "fam_med",
+      "pto_state",
+      "poverty",
+      "pop",
+      "female",
+      "age",
+      "age2",
+      "non_white",
+      "hisp",
+      "mar",
+      "hs",
+      "scoll",
+      "collg",
+      "grad",
+      "cohabit",
+      "hh_numkids",
+      "kids15",
+      "kids617",
+      "rural"
+    ],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "repeated_cross_section",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": true,
+    "cs_data_structure": "panel",
+    "cs_allow_unbalanced": false
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 7,
+    "event_post": 7,
+    "run_sa": true,
+    "run_bjs": false,
+    "cs_max_e": 5
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "gvar_tbl <- df %>% dplyr::filter(pslm_state_lag2 == 1) %>% dplyr::group_by(fips) %>% dplyr::summarise(first_t = min(time), .groups='drop')",
+      "df <- df %>% dplyr::left_join(gvar_tbl, by='fips') %>% dplyr::mutate(gvar_CS = ifelse(!is.na(first_t), as.numeric(first_t), 0))"
+    ],
+    "cs_construct_vars": [
+      "df$year <- as.integer(floor((df$time - 1) / 12) + 2003)",
+      "df <- df %>% dplyr::group_by(fips, year) %>% dplyr::summarise(carehh_k = weighted.mean(carehh_k, wt06, na.rm=TRUE), wt06 = sum(wt06, na.rm=TRUE), gvar_month = dplyr::first(gvar_CS), .groups='drop') %>% dplyr::mutate(gvar_CS = ifelse(gvar_month > 0, as.integer(floor((gvar_month - 1) / 12) + 2003), 0L))",
+      "df$time <- df$year"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": 4.609,
+    "se_twfe": 1.799
+  },
+  "notes": "EVENT STUDY REVIEWED. Maclean & Pabilonia (2025) JHE. IMPORTANT: Paper's MAIN estimator is Gardner (did2s), NOT TWFE. TWFE is reported only in Appendix Table 10 as one of 5 alternative estimators (Gardner, BJS, Wooldridge, Stacked DiD, TWFE). Appendix Table 10 TWFE: reghdfe carehh_k pslm_state_lag2 controls [pw=wt06], a(fips time) cl(fips). RCS data (139K obs, 78K with hh_child==1). Monthly time (239 periods), 44 states, 10 treated states (6 yearly cohorts: 2014,2017,2018,2019,2020,2022). CS-DID segfaults with monthly RCS — use yearly collapsed panel for CS: CS-NT=-1.61 (SE 4.20), CS-NYT=-1.25 (SE 4.22), both insignificant. Paper uses 'carehh_k' = primary childcare minutes per average day. SIGN REVERSAL: TWFE=+4.45** vs CS-NT=-1.61 (ns). Bacon decomposition shows cohort ~2020 (ATT=+10.12, weight=34%) drives positive TWFE — confounded with COVID lockdowns (PSL lagged 2yr → 2018 adoption activates 2020). Cohorts 2017 and 2022 show negative ATTs (-3.97 and -21.49). GARDNER DIAGNOSTIC: Gardner agrees with TWFE (both positive early post-treatment, negative at late horizons). NOT sensitive to time granularity (monthly≈yearly). IS sensitive to endpoint binning: bin at h=+7 collapses h=7(+10) with h=8-9(-41) → spurious -25 drop. h≥7 is 100% Cohort 2014 (CT, N=33) — pure noise. Cohort-specific Gardner: wildly heterogeneous (2014: +16 to -57; 2017: -3 to -18; 2020: +4 to +15 with SE~10; 2022: -6 to -15). TWFE/Gardner agreement explained by shared cohort-size weighting (Cohort 2017=40%, 2020=25% dominate), while CS uses uniform group×time weighting. Conclusion: sign reversal is real — driven by COVID-confounded Cohort 2020 dominating size-weighted estimators (TWFE, Gardner) while CS distributes weight more evenly."
+}

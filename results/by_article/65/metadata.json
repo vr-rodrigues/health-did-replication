@@ -1,0 +1,78 @@
+{
+  "id": "65",
+  "title": "Effects of Federal Policy to Insure Young Adults: Evidence from the 2010 Affordable Care Act's Dependent-Coverage Mandate",
+  "author_label": "Monheit et al. (2011)",
+  "group_label": "unica_controles",
+  "data": {
+    "file": "data/raw/65/AEJEPcode/data/depcov_dataset.dta",
+    "format": "dta"
+  },
+  "variables": {
+    "outcome": "anyhi",
+    "unit_id": "fipstate",
+    "time": "yearmonth",
+    "cluster": "fipstate",
+    "weight": "p_weight",
+    "treatment_twfe": "elig_oct10",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "elig_mar10",
+      "female",
+      "ue",
+      "hispanic",
+      "white",
+      "asian",
+      "other",
+      "student",
+      "mar",
+      "fpl_ratio",
+      "fpl_ratio_2",
+      "ue_treat"
+    ],
+    "twfe_es_controls": [
+      "female",
+      "ue",
+      "hispanic",
+      "white",
+      "asian",
+      "other",
+      "student",
+      "mar",
+      "fpl_ratio",
+      "fpl_ratio_2"
+    ],
+    "cs_controls": [],
+    "additional_fes": [
+      "age"
+    ]
+  },
+  "panel_setup": {
+    "data_structure": "repeated_cross_section",
+    "treatment_timing": "unica",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 6,
+    "event_post": 6,
+    "run_sa": true,
+    "run_gardner": true
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$yearmonth <- (df$year - 2008L) * 12L + df$month",
+      "df$fedelig <- as.integer(df$age >= 19 & df$age <= 25)",
+      "df$mar_sep10 <- as.integer(df$year == 2010 & df$month >= 3 & df$month <= 9)",
+      "df$after_oct10 <- as.integer((df$year == 2010 & df$month >= 10) | df$year >= 2011)",
+      "df$elig_mar10 <- df$mar_sep10 * df$fedelig",
+      "df$elig_oct10 <- df$after_oct10 * df$fedelig",
+      "df$ue_treat <- df$ue * df$fedelig",
+      "df$gvar_CS <- ifelse(df$fedelig == 1, 34, 0)"
+    ]
+  },
+  "original_result": {},
+  "notes": "EVENT STUDY REVIEWED. Monheit et al. (2011). Stata: xi: areg anyhi mar_sep10 after_oct10 fedelig elig_mar10 elig_oct10 age17-age25 age27-age29 trend female ue hispanic white asian other student mar fpl_ratio fpl_ratio_2 ue_treat y2009 y2010 month2-month12 st_trend_1-st_trend_55 [weight=p_weight], absorb(fipstate) cluster(fipstate). Treatment = fedelig (age 19-25) x after_oct10 (post Oct 2010). SIPP data, all ages 16-29. Template simplification: uses fipstate + yearmonth + age FEs (more saturated than Stata which uses fipstate + year + month + trend + state-specific trends). State-specific linear trends NOT included — may cause discrepancy. CS-DID: gvar_CS=34 (Oct 2010 as yearmonth) for treated (fedelig=1), 0 for never-treated."
+}

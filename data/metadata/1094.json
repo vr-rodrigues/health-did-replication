@@ -1,0 +1,55 @@
+{
+  "result_id": 1094,
+  "author_label": "Fisman & Wang (2017)",
+  "paper_title": "The Distortionary Effects of Incentives in Government: Evidence from China's Death Ceiling Program",
+  "journal": "American Economic Journal: Applied Economics",
+  "group_label": "escalonada_sem_controles",
+  "data": {
+    "file": "data/raw/1094/analysis_data.csv",
+    "format": "csv"
+  },
+  "variables": {
+    "outcome": "exceedquota",
+    "unit_id": "provinceind",
+    "time": "year",
+    "cluster": "province",
+    "cs_cluster": "province",
+    "treatment_twfe": "post",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "additional_fes": [
+      "industry"
+    ]
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_sa": true,
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_gardner": true,
+    "run_bacon": true,
+    "has_event_study": true,
+    "event_pre": 4,
+    "event_post": 4,
+    "base_period": "universal"
+  },
+  "preprocessing": {
+    "construct_vars": []
+  },
+  "notes": [
+    "Data prepared by results/1094/prep_data_1094.R from wide-format data_aej.dta.",
+    "Outcome: I(Deaths/Ceiling > 1) — binary LPM.",
+    "Treatment: NSNP law adoption, staggered across 19 provinces (2005-2012).",
+    "post = I(year > effective_year) — strict inequality, so gvar_CS = effective_year + 1.",
+    "12 truly never-treated + 4 with effective_year=2012 (treated after sample) = 16 control provinces.",
+    "Unit for panel: provinceind = province x industry (245 units). FEs: provinceind + year + industry.",
+    "Paper Table 2 Col 1: -0.051 (0.040), N=1755. R TWFE: -0.047 (0.041), N=1756.",
+    "Small N gap: Stata drops 1 obs during merge that R doesn't. 8% coefficient gap from merge/processing diffs.",
+    "Clustering at province level (31 clusters)."
+  ]
+}

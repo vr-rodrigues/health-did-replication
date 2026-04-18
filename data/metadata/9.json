@@ -1,0 +1,58 @@
+{
+  "id": "9",
+  "title": "A Dose of Managed Care: Controlling Drug Spending in Medicaid",
+  "author_label": "Dranove et al. (2021)",
+  "group_label": "escalonada_controles",
+  "data": {
+    "file": "data/raw/9/2020.01.27/Analysis_simplified/Input/state x quarter - Final.dta",
+    "format": "dta",
+    "sample_filter": "sample1 == 1"
+  },
+  "variables": {
+    "outcome": "lnpriceperpresc",
+    "unit_id": "state_r",
+    "time": "yq",
+    "cluster": "state_r",
+    "weight": "wgt",
+    "treatment_twfe": "Post_avg",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": "exp",
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": false
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "run_bacon": true,
+    "has_event_study": true,
+    "event_pre": 8,
+    "event_post": 9,
+    "bjs_gvar": "",
+    "bjs_controls": []
+  },
+  "preprocessing": {
+    "time_recode": {},
+    "composite_twfe": {},
+    "composite_vars": {},
+    "construct_vars": [
+      "df$gvar_aux <- ifelse(!is.na(df$L0) & df$L0 == 1, as.numeric(df$yq), NA_real_)",
+      "df <- as.data.frame(dplyr::group_by(df, state_r) |> dplyr::mutate(gvar_CS_raw = mean(gvar_aux, na.rm=TRUE)))",
+      "df$gvar_CS <- ifelse(is.nan(df$gvar_CS_raw) | is.na(df$gvar_CS_raw), 0, df$gvar_CS_raw)",
+      "if ('LX' %in% names(df)) df$L9 <- df$LX",
+      "l_cols <- intersect(paste0('L', 0:9), names(df)); df$Post_avg <- as.integer(rowSums(df[, l_cols, drop=FALSE], na.rm=TRUE) > 0)"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": -0.1763,
+    "se_twfe": 0.0484,
+    "att_csdid_nt": -0.2019,
+    "se_csdid_nt": 0.0412,
+    "att_csdid_nyt": -0.2084
+  },
+  "notes": "Stata: reghdfe lnpriceperpresc Post_avg exp [aw=wgt], absorb(state_r yq) cluster(state_r). Post_avg=1 iff any L0-L9==1. gvar_CS = yq when L0==1 (first treatment quarter, state-level mean). LX renamed to L9 (tail bin absorbed per original Stata code). NOTE: F1==1 was previously used (one quarter before treatment) — corrected to L0==1 for correct event study alignment. CS-NT gap (-0.214 vs Stata -0.202, 5.9%) is methodological: cs_controls=[] required — xformla=~exp in att_gt causes did v2.3.0 balanced-panel code path to drop early cohorts (205-216), leaving only cohorts 220,225. Panel is balanced (29 states × 26 quarters = 754 rows); base_period='universal' is now the mandatory default (Pattern 26 revised). BJS: first_stage=~exp causes SE explosion at tau9 (SE=0.834) — bjs_controls=[] (no first_stage) gives reasonable SEs (tau9 SE~0.164) and estimates very close to Stata (tau0=-0.063 vs -0.062, tau9=-0.262 vs -0.251)."
+}

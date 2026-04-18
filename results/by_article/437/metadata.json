@@ -1,0 +1,58 @@
+{
+  "id": "437",
+  "title": "Corporate Incentives and Nuclear Safety",
+  "author_label": "Hausman (2014)",
+  "group_label": "escalonada_sem_controles",
+  "data": {
+    "file": "data/raw/437/Dataset_AEJEP_2011_0262/safetypanel.dta",
+    "format": "dta",
+    "sample_filter": "!is.na(personrem)"
+  },
+  "variables": {
+    "outcome": "personrem",
+    "unit_id": "facility_num",
+    "time": "year",
+    "cluster": "facility_num",
+    "treatment_twfe": "divested",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": true,
+    "time_unit": "yearly"
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "run_bacon": true,
+    "run_sa": true,
+    "run_gardner": true,
+    "has_event_study": true,
+    "event_pre": 5,
+    "event_post": 5
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "# Raw data is reactor x month panel (36667 obs, 103 reactors, 1970-2009).",
+      "# Radiation regression uses facility-year panel (Stata do-file lines 958-972).",
+      "# personrem is annual plant-level (same across reactors and months within facility-year).",
+      "# Collapse to facility-year: mean(personrem, rem, divested, capacity_factor), keep first of time-invariant vars.",
+      "df <- as.data.frame(dplyr::group_by(df, facilityname, year) |> dplyr::summarize(personrem = mean(personrem, na.rm=TRUE), rem = mean(rem, na.rm=TRUE), divested = mean(divested, na.rm=TRUE), capacity_factor = mean(capacity_factor, na.rm=TRUE), ever_divested = max(ever_divested, na.rm=TRUE), year_divest = dplyr::first(na.omit(year_divest)), pwr = dplyr::first(pwr), state_name = dplyr::first(state_name), .groups='drop'))",
+      "# gvar_CS: year of divestiture for treated facilities, 0 for never-treated. Use as.numeric() per Pattern 43.",
+      "df$gvar_CS <- as.numeric(ifelse(df$ever_divested == 1 & !is.na(df$year_divest), df$year_divest, 0))",
+      "df$facility_num <- as.numeric(factor(df$facilityname))",
+      "# divested in collapsed data is fractional for the divestiture year (mean across months).",
+      "# Stata regression uses this fractional divested. Keep as-is for treatment_twfe."
+    ]
+  },
+  "original_result": {
+    "beta_twfe": -42.245,
+    "se_twfe": 66.098,
+    "table_reference": "Table 6, Column 1 (personrem, no exposure normalization)"
+  },
+  "notes": "SIGN REVERSAL DIAGNOSED (Pattern 46): CS-NT=+40.4 and CS-NYT=+38.2 vs TWFE=-42.2. Root cause: (a) massive secular decline in personrem (1200→135 over 1974-2008), (b) very long pre-treatment (25yr before earliest cohort 1999), (c) unbalanced panel (14/63 facilities have full span), (d) 3 singleton cohorts with extreme leverage. CS with universal base period mixes high-value 1970s-80s with low-value 1990s, creating composition effects. When restricting to 1990-2008, all estimators converge to near-zero. ALL estimates are statistically insignificant (SEs~60-70). TWFE=-42.245 matches Stata exactly. CS estimates are unreliable — do not include in aggregate analysis. | Hausman (2014), AEJ-EP. Nuclear plant divestiture and safety outcomes. STAGGERED DiD: 30 facilities divested 1999-2007, 33 never-divested facilities as controls. 63 facilities total, annual panel 1974-2008. | OUTCOME SELECTION: Protocol rule (i) declared preference for OLS-compatible outcome. Paper's main results (Tables 3-5) use Poisson/NB for count outcomes (initiating events, fires, escalated enforcement) -- NOT OLS-compatible for our feols template. Table 6 reports OLS regressions for radiation exposure: personrem (collective dose, person-rem), rem (average dose), and capacity-factor-normalized variants (n_personrem, n_rem). personrem chosen per rule (iii.a): aggregate measure (collective plant dose) over per-worker average (rem). personrem has N=1749 facility-year obs, same as rem. | SPECIFICATION: Stata do-file line 971: reg personrem divested R* Y*, cluster(plantid). R* = facility FEs (tab facilityname, gen(R)), Y* = year FEs (Y1-Y40 from prior tab). No controls. Cluster at facility level (plantid = facilityname encoded as integer). | DATA CONSTRUCTION: Raw data is reactor x month panel (safetypanel.dta, 36667 obs). Radiation regression collapses to facility x year: drop if rem==., then collapse (mean) personrem rem divested ... by(facilityname year ...). personrem is annual plant-level data (same across months and reactors within facility-year). Divested is binary at monthly level but becomes fractional in divestiture year after collapsing (18 obs with 0 < divested < 1). Template uses the fractional divested as treatment_twfe (matching Stata exactly). gvar_CS uses year_divest (year of divestiture) for CS-DID. | NOTE: TWFE coefficient -42.245 (SE 66.098) is not statistically significant. The paper's main finding is from Poisson regressions on count outcomes (positive effect on unsafe events). The OLS radiation result is a secondary finding. | 9 treatment cohorts (1999: 2, 2000: 7, 2001: 9, 2002: 3, 2003: 1, 2004: 1, 2005: 4, 2006: 1, 2007: 2) + 33 never-treated. Enough cohorts for SA. Event study: pre=5, post=5 matches do-file event dummies (pre_5_plus through post_5_plus, lines 1471-1514). | POTENTIAL ISSUE: The fractional divested (treatment_twfe) may cause slight differences vs binary CS-DID treatment (gvar_CS defines treatment as year >= year_divest). This is inherent to the Stata specification which collapses monthly binary to annual fractional."
+}

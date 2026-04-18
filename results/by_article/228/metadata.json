@@ -1,0 +1,42 @@
+{
+  "id": "228",
+  "title": "The Air Quality and Well-Being Effects of Low Emission Zones",
+  "author_label": "Sarmiento, Wagner & Zaklan (2023)",
+  "group_label": "escalonada_sem_controles",
+  "data": {
+    "file": "data/raw/228/yearly_raw.dta",
+    "format": "dta"
+  },
+  "variables": {
+    "outcome": "pm10",
+    "unit_id": "station_id",
+    "time": "Period",
+    "cluster": "mun_id",
+    "cs_cluster": "mun_id",
+    "treatment_twfe": "treatment",
+    "gvar_cs": "treat_cohort",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 5,
+    "event_post": 5,
+    "run_sa": true,
+    "run_gardner": true
+  },
+  "preprocessing": {
+    "construct_vars": []
+  },
+  "original_result": {},
+  "notes": "EVENT STUDY REVIEWED. Sarmiento, Wagner & Zaklan (2023) JEEM. Low emission zones in German cities reduce PM10 pollution. Staggered adoption 2008-2016. CS-DD is the paper's primary estimator (att_gt with DR, nevertreated). 588 stations, 14 years (2005-2018). Raw sample (stations inside/near LEZ). Clustering at municipality level. No covariates in CS spec (xformla=~1). Paper's TWFE uses daily data with weather controls; our TWFE is on yearly data without controls for comparability with CS-DD. EVENT STUDY (5 estimators): All converge — growing negative effect from h=0 (-0.3 to -0.9) to h=5 (-1.9 to -2.4). Pre-trends flat for TWFE/SA/Gardner; CS-NT/CS-NYT slightly noisy at far pre-periods. TWFE vs CS-NT gap (1.24 vs 1.95) is from aggte(dynamic) weighting late horizons equally. VCOV warning on SA (small cohorts 2010/2015/2016). No heterogeneity variables in data (no state/region/station_type). Script: event_study_228.R."
+}

@@ -1,0 +1,92 @@
+{
+  "id": "76",
+  "title": "The Effect of Hospital Postpartum Care Regulations on Breastfeeding and Maternal Time Allocation",
+  "author_label": "Lawler, Yewell (2023)",
+  "group_label": "escalonada_controles",
+  "data": {
+    "file": "data/raw/76/id_342.dta",
+    "format": "dta",
+    "sample_filter": "mobil == 2"
+  },
+  "variables": {
+    "outcome": "bf_ever",
+    "unit_id": "fips",
+    "time": "byear",
+    "cluster": "fips",
+    "weight": "rddwt",
+    "treatment_twfe": "Post_avg",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "WIC_ever",
+      "frstbrn",
+      "married",
+      "female",
+      "law1",
+      "law2",
+      "law3",
+      "law4",
+      "law5",
+      "mleave",
+      "mdcdexpand",
+      "unemp_rate",
+      "styr_perblack",
+      "styr_perhispan",
+      "styr_perother_eth",
+      "styr_perfemale",
+      "styr_perlt21",
+      "styr_per21_64",
+      "styr_HSrate",
+      "styr_uni4rate",
+      "styr_povrate"
+    ],
+    "cs_controls": [
+      "WIC_ever",
+      "frstbrn",
+      "married",
+      "female",
+      "childnm",
+      "mom_ed",
+      "raceeth_cat",
+      "mom_agegrp"
+    ],
+    "additional_fes": [
+      "agegrp",
+      "childnm",
+      "mom_ed",
+      "raceeth_cat",
+      "mom_agegrp"
+    ]
+  },
+  "panel_setup": {
+    "data_structure": "repeated_cross_section",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": true
+  },
+  "analysis": {
+    "run_csdid_nyt": true,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 4,
+    "event_post": 4,
+    "bjs_gvar": "",
+    "bjs_aggregate_to_panel": true
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$WIC_current <- ifelse(df$WIC_ever == 0 & is.na(df$WIC_current), 0, df$WIC_current)",
+      "df$start_month <- as.integer(format(as.Date('1960-01-01') + as.integer(df$start_ym), '%m'))",
+      "df$post6 <- as.integer(df$start_year <= df$byear)",
+      "df$post6 <- ifelse(df$start_year == df$byear & df$start_month > 6, 0L, df$post6)",
+      "df$Post_avg <- df$post6 * df$baby_babyfr",
+      "df$gvar_CS <- ifelse(!is.na(df$baby_babyfr) & df$baby_babyfr == 1, df$start_year, 0)"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": 0.0383,
+    "se_twfe": 0.0095,
+    "att_csdid_nt": 0.018,
+    "se_csdid_nt": 0.0146,
+    "att_csdid_nyt": 0.0212
+  },
+  "notes": "Stata: reg bf_ever Post_avg $individXs $stateXs $FEs [pw=rddwt], cluster(fips). individXs=WIC_ever i.childnm i.mom_ed frstbrn i.raceeth_cat married female i.mom_agegrp. CSDID: csdid2 bf_ever i.fips $individXs [w=rddwt], agg(event) long2. TWFE FIX (Round 3 final): Two-part fix. (1) MONTH FORMULA: Stata's `gen start_month = month(start_ym)` treats %tm values as %td (days since 01jan1960, NOT months). E.g., start_ym=600 (Jan 2010 as %tm) → month(600) = 8 (Aug 1961 in %td interpretation). R corrected using `as.integer(format(as.Date('1960-01-01') + as.integer(start_ym), '%m'))`. This causes January-policy states to be correctly classified as pre-period in the year of adoption under Stata logic. (2) styr_pergt64 OMITTED: feols drops a different variable than Stata when all styr_per* are included (Stata omits styr_pergt64 due to collinearity with other proportions). Explicit removal from twfe_controls gives exact match. Combined fix: R feols = 0.03832 (exact match). CSDID-NT: 0.01652 vs Stata 0.01799 (8.2% gap). Pattern 25 applied. BJS: approximation via bjs_aggregate_to_panel. EVENT STUDY (es76_script.R): TWFE ES: EXACT MATCH with Stata (all 10 periods, gaps < 0.1%). Key: m_treat=byear-start_year (no month correction), FEs=fips+byear+childnm+mom_ed+raceeth_cat+mom_agegrp (NO agegrp — only in PE not ES), styr_pergt64 omitted. CS-NT ES: large gaps (unfixable — Stata includes i.fips as covariate causing ~50 extra state FEs, R att_gt cannot include state FEs without singularity). SA ES: 5-55% gaps, VCOV near-PSD warning (cohort identification via gvar_CS differs from Stata eventstudyinteract). BJS ES: tau2(-6.8%), tau3(+5.7%) match well; tau0/tau1 differ (aggregation vs Stata individual-level)."
+}

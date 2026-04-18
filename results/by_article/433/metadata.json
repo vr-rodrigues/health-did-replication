@@ -1,0 +1,55 @@
+{
+  "id": "433",
+  "title": "Life and Death in the Fast Lane: Police Enforcement and Traffic Fatalities",
+  "author_label": "DeAngelo, Hansen (2014)",
+  "group_label": "unica_controles",
+  "data": {
+    "file": "data/raw/433/Data/synth_file_2014.dta",
+    "format": "dta"
+  },
+  "variables": {
+    "outcome": "fat_vmt",
+    "unit_id": "fips",
+    "time": "mn_yr",
+    "cluster": "fips",
+    "treatment_twfe": "treatment",
+    "gvar_cs": "gvar_CS",
+    "twfe_controls": [
+      "precip",
+      "temp",
+      "un_rate",
+      "max_speed"
+    ],
+    "cs_controls": [],
+    "additional_fes": [
+      "year",
+      "month"
+    ]
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "single",
+    "allow_unbalanced": false
+  },
+  "analysis": {
+    "run_csdid_nt": true,
+    "run_csdid_nyt": false,
+    "run_sa": false,
+    "run_gardner": true,
+    "run_bacon": false,
+    "has_event_study": true,
+    "event_pre": 6,
+    "event_post": 6,
+    "base_period": "universal"
+  },
+  "preprocessing": {
+    "construct_vars": [
+      "df$gvar_CS <- as.numeric(ifelse(df$fips == 41, 38, 0))"
+    ]
+  },
+  "original_result": {
+    "beta_twfe": 0.7103,
+    "se_twfe": 0.1281
+  },
+  "notes": "DeAngelo & Hansen (2014), AEJ: Economic Policy. Oregon State Police mass layoff Feb 1, 2003 (single-timing DiD). State-level monthly panel, 47 states (excl AK, HI, VT), 2000-2005. Treatment: Oregon (fips=41) from Feb 2003 (mn_yr=38); Jan 2003 coded as pre-treatment since layoff was Feb 1. Outcome: fat_vmt = traffic fatalities per VMT (all highways, all weather conditions). OUTCOME SELECTION: Protocol rule (ii) largest N selects full US sample (N=3384, Table 4 col 1) over geographic control WA+ID (N=216, col 2). Rule (iii.a) selects fat_vmt (aggregate) over fat_good_vmt (outside city/dry weather subcategory). Original beta_twfe=0.7103 is the raw coefficient; paper reports semi-elasticity=0.05 (=0.7103/13.00 mean). DATA FILE: original fatal_analysis_file_2014.dta is MISSING from replication package. Using synth_file_2014.dta which contains identical variables for all 47 states; treatment variable is already coded in the data. This file has 47 states (missing VT fips=50) vs paper's 48 (N=3456 vs 3384, difference of 1 state). Stata: areg fat_vmt treatment mon_* y_* precip temp un_rate max_speed, a(fips) robust cluster(state). FE structure: fips absorbed by areg, year+month dummies as covariates = equivalent to feols(... | fips + year + month). Clustering: state-level for full US sample (fips is 1:1 with state). Paper also reports WA+ID geographic control (robust SE, no clustering) and synthetic control (5 states with weights). CS-DID note: only 1 treated unit (Oregon) with 46 never-treated states; att_gt should work but variance estimation may be imprecise with single treated unit. SA trivial for single timing but included for consistency. Event study: monthly data with 37 pre-periods and 35 post-periods relative to Feb 2003; event_pre/post set to 6 for readable plot (6 months each side). No run_csdid_nyt because there are never-treated states available (run_csdid_nt instead). No Bacon decomposition because single timing (no heterogeneous treatment timing)."
+}

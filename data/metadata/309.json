@@ -1,0 +1,49 @@
+{
+  "id": 309,
+  "author_label": "Johnson, Schwab, Koval (2024)",
+  "group_label": "escalonada_sem_controles",
+  "title": "Legal Protection Against Retaliatory Firing Improves Workplace Safety",
+  "journal": "Review of Economics and Statistics",
+  "data": {
+    "file": "data/raw/309/replication_May_2022/intermediate_dtas/osha_nsc2_for_cs_estimator.dta",
+    "format": "dta",
+    "sample_filter": "((is.na(state_run_office) | state_run_office != 1) & year >= 1979) | (state_run_office == 1 & year >= 1992)",
+    "data_structure": "panel"
+  },
+  "variables": {
+    "outcome": "ln_acc_rateY_matt",
+    "unit_id": "state_code",
+    "time": "year",
+    "treatment_twfe": "wdlapY",
+    "gvar_cs": "first_year_full_wdlapY",
+    "cluster": "state_code",
+    "weight": "sh_emp1979",
+    "twfe_controls": [],
+    "cs_controls": [],
+    "additional_fes": []
+  },
+  "panel_setup": {
+    "data_structure": "panel",
+    "treatment_timing": "staggered",
+    "allow_unbalanced": false
+  },
+  "analysis": {
+    "event_pre": 5,
+    "event_post": 5,
+    "run_sa": true,
+    "run_bacon": true,
+    "run_csdid_nt": true,
+    "run_csdid_nyt": true,
+    "has_event_study": true
+  },
+  "preprocessing": {
+    "construct_vars": []
+  },
+  "original_result": {
+    "beta_twfe": -0.137,
+    "se_twfe": 0.046,
+    "source": "Table 2, Column 1 (TWFE with state+year FEs, aw=sh_emp1979, cluster state)",
+    "n": 1077
+  },
+  "notes": "Staggered DiD: 21 adoption cohorts (1970-1993). Treatment = public policy exception to at-will employment. wdlapY is fractional (0-1) in adoption year. CS-ready .dta has first_year_full_wdlapY as gvar (0 for 7 never-treated states). sh_emp1979 = state employment share in 1979 (analytic weights). Column 1 is simplest spec (no controls beyond FEs). SA applicable (21 cohorts). CSDID FIX: att_gt() segfaults on the severely unbalanced panel (21 state-run OSHA states have only 14 years [1992-2005] vs 29 states with 27 years [1979-2005]). Both panel=TRUE+unbalanced and panel=FALSE cause C-level segfaults in did v2.3.0. Fix: balance panel to 29 full-coverage states (allow_unbalanced=false). Loses 7 cohorts (1970,1974,1976,1977,1983,1984,1987); 13 cohorts + 7 NT states remain. CS-NT ATT=-0.201, CS-NYT ATT=-0.202. See fix_csdid_309.R."
+}

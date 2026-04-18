@@ -1,0 +1,89 @@
+\chapter{Related Literature}
+\label{Chapter2}
+
+\section{Classical TWFE approach and its problems}
+
+Recent work on DiD begins from a now well-established point. With multiple periods, staggered adoption, and heterogeneous treatment effects, the \emph{two-way fixed effects} (TWFE) estimator no longer admits the canonical \(2\times 2\) interpretation. In its most common form,
+\begin{equation}
+Y_{it} = \alpha_i + \lambda_t + \beta D_{it} + \varepsilon_{it},
+\label{eq:twfe_static}
+\end{equation}
+where \(Y_{it}\) is the outcome of interest, \(\alpha_i\) and \(\lambda_t\) are unit and period fixed effects, and \(D_{it}\) indicates treatment. In the \(2\times 2\) case, under parallel trends and no anticipation, \(\beta\) coincides with the usual DiD estimand. In staggered settings, that interpretation breaks down. The main insight of the recent literature is that this is not only a weighting problem. It also concerns which comparisons identify the effect, how dynamic specifications should be interpreted, and how covariates enter the design.
+
+\textcite{goodman2021difference} show that, in the canonical staggered-adoption TWFE design without covariates, the coefficient can be written as a weighted average of admissible \(2\times 2\) DiD estimators:
+\begin{equation}
+\hat{\beta}^{TWFE}
+=
+\sum_{j} \omega_j \hat{\beta}^{2\times 2}_j,
+\qquad
+\sum_j \omega_j = 1.
+\label{eq:bacon_generic_short}
+\end{equation}
+The main implication is that TWFE combines multiple cohort-time comparisons rather than recovering a single ATT-type parameter.\footnote{In \textcite{goodman2021difference}, the relevant comparisons include treated-versus-never-treated and earlier-treated-versus-later-treated \(2\times 2\) designs. The notation \(\omega_j\) in equation~\eqref{eq:bacon_generic_short} is used here as a compact generic label for the Goodman-Bacon weights. A related insight appears in \textcite{de2020two}, who study a broader two-way fixed-effects setting. Under common trends, they show that the TWFE estimand can be expressed as a weighted sum of group-period treatment effects,
+\[
+\beta^{fe}
+=
+\sum_{(g,t):D_{g,t}=1}
+\frac{N_{g,t}}{N_1}
+w_{g,t}\Delta_{g,t},
+\]
+with weights that sum to one but may be negative. This formulation makes transparent why already-treated units can enter the counterfactual in ways that distort the estimand when treatment effects vary across groups or over time.} Once treatment effects vary across cohorts or over exposure time, some of those comparisons become difficult to interpret as clean causal contrasts. The coefficient may then depart from the effect researchers intend to estimate, sometimes by a great deal.
+
+
+
+A parallel problem arises in dynamic \emph{event-study} specifications:
+\begin{equation}
+Y_{it}
+=
+\alpha_i + \lambda_t
++ \sum_{\ell \neq -1} \mu_{\ell}\mathbf{1}\{t-E_i=\ell\}
++ u_{it},
+\label{eq:twfe_event_study_short}
+\end{equation}
+where \(E_i\) denotes the treatment adoption period and \(\ell=t-E_i\) is event time. A common interpretation is that \(\mu_\ell\) measures the average treatment effect at horizon \(\ell\). \textcite{sun2021estimating} show that this interpretation generally breaks down under staggered adoption with heterogeneous treatment effects across cohorts.\footnote{Formally, \textcite{sun2021estimating} show that the TWFE event-study coefficient at relative time \(\ell\) can be written as a weighted sum of cohort-specific average treatment effects on the treated,
+\[
+\mu_{\ell}
+=
+\sum_e \sum_{\ell'} \omega^{\ell}_{e,\ell'}\, CATT_{e,\ell'},
+\]
+where \(CATT_{e,\ell'}\) denotes the average effect for cohort \(e\) at relative period \(\ell'\). The key point is that the coefficient for horizon \(\ell\) generally loads not only on \(CATT_{e,\ell}\), but also on effects from other relative periods \(\ell' \neq \ell\). Their interaction-weighted estimator removes this contamination by averaging \(CATT_{e,\ell}\) only across cohorts that identify the same horizon.} A given lead or lag can mix effects from other relative periods instead of isolating the dynamic effect at that horizon. This matters because applied work routinely uses lead coefficients to assess pre-trends and lag coefficients to describe timing and persistence. Under treatment-effect heterogeneity, those coefficients may misstate both the credibility of the design and the shape of the treatment profile they are supposed to recover.
+
+
+Recent work has reoriented the discussion toward designs that identify treatment effects at the group-time level before aggregation. In \textcite{callaway2021difference}, the basic object is the group-time average treatment effect,
+\begin{equation}
+ATT(g,t)
+=
+\mathbb{E}\!\left[ Y_t(g)-Y_t(0)\mid G_g=1 \right],
+\label{eq:att_gt_short}
+\end{equation}
+where \(G_g\) denotes the group first treated in period \(g\). The key contribution lies in the identification strategy. Treatment effects are first defined for each \((g,t)\) cell and only afterward aggregated into summary parameters. This makes the comparison group explicit. In practice, this appears in the distinction between \emph{never-treated} and \emph{not-yet-treated} controls,\footnote{\textcite{callaway2021difference} consider two alternative conditional parallel trends assumptions. With never-treated controls,
+\[
+E[Y_t(0)-Y_{t-1}(0)\mid X,G_g=1]
+=
+E[Y_t(0)-Y_{t-1}(0)\mid X,C=1].
+\]
+With not-yet-treated controls,
+\[
+E[Y_t(0)-Y_{t-1}(0)\mid X,G_g=1]
+=
+E[Y_t(0)-Y_{t-1}(0)\mid X,D_s=0,G_g=0],
+\]
+for periods such that \(t\ge g-\delta\) and \(t+\delta\le s<\bar g\). In addition, identification requires overlap: \(P(G_g=1)>\varepsilon\) and \(p_{g,t}(X)<1-\varepsilon\) almost surely, where \(p_{g,t}(X)\) is the generalized propensity score.} which correspond to different versions of the parallel trends assumption. The modern literature has made clear that this choice is part of the identification strategy. It determines which untreated outcomes are used to construct the counterfactual and, for that reason, changes the assumptions behind the estimate.
+
+Even with more interpretable estimators, identification still depends on some version of parallel trends. Applied work often evaluates that assumption through pre-trend tests in dynamic specifications. \textcite{roth2022pretest} show why this practice is weaker than it often appears. Failure to reject pre-trends may simply reflect low power, and conditioning the analysis on passing that test induces pre-test bias. \textcite{rambachan2023more} propose a different approach, replacing the pass-or-fail logic with explicit sensitivity analysis. Rather than treat exact parallel trends as something established by insignificant leads, they ask how conclusions change under bounded deviations from that benchmark. This shift is important for the broader literature because it moves credibility assessment away from mechanical hypothesis testing and toward transparent robustness to plausible violations.
+
+Covariate choices are also part of identification. In modern DiD designs, adding controls replaces an unconditional parallel trends assumption with a conditional one, so the design begins to depend on which covariates enter and how they enter. In \textcite{callaway2021difference}, this conditioning is built around pre-treatment covariates, and \(ATT(g,t)\) can be implemented through outcome regression, inverse probability weighting, or doubly robust estimands.\footnote{In \textcite{callaway2021difference}, the relevant conditioning variables are pre-treatment covariates. This includes time-invariant characteristics and pre-treatment summaries of time-varying variables, but excludes post-treatment covariates that may themselves be affected by treatment.} This is conceptually different from the familiar practice of adding controls to a TWFE regression and interpreting the result as a more flexible version of the same estimand.
+
+The distinction becomes sharper once one considers time-varying covariates. As emphasized by \textcite{caetano2022difference}, if treatment can affect these covariates, conditioning on their realized post-treatment values may amount to conditioning on mediators or selection variables rather than on untreated characteristics. Even when treatment does not affect them directly, \textcite{caetano_callaway2024_hiddenlinearity} and {\textcite{wooldridge2025two} show that standard TWFE implementations can still impose additional and often opaque restrictions. After removing unit fixed effects, the regression may condition only on changes in time-varying covariates, while time-invariant covariates disappear from the transformed specification altogether. The lesson from this literature is that conditioning choices alter the maintained assumptions behind the design and can affect interpretation in ways that are easy to miss in routine empirical practice.
+
+Implementation details can also matter in finite samples. In principle, differences across modern DiD estimators should reflect differences in identification, aggregation, or target parameters. In practice, numerical choices such as balancing rules, support restrictions, and first-step estimation can also affect results, especially in highly unbalanced panels or designs with weak overlap. This point belongs in the literature review because it clarifies that disagreements across estimates need not always reflect purely conceptual differences. Some arise because distinct commands operationalize the same estimand differently in finite samples.\footnote{For corroborating evidence from an external software audit, see Scott Cunningham, ``Claude Code 31: Apple-to-Apple Audit of Six Callaway and Sant'Anna packages,'' \emph{Scott's Mixtape Substack}, March 12, 2026, together with the accompanying slide deck posted on his website. Because this evidence comes from an audit note and slides rather than a peer-reviewed methodological article, it is better treated as supporting implementation evidence than as a canonical reference in the methodological literature.}
+
+\section{Reanalyses, robustness, and reproducibility}
+
+The literature closest to this dissertation includes both the papers that diagnose TWFE problems and the papers that revisit published empirical findings after those problems became clear. \textcite{baker2022much} connect the new staggered-DiD theory to applications in finance and accounting. Their contribution is useful less for its scale than for showing in applied settings that the recent methodological critique is empirically consequential. Alternative estimators can change interpretation, magnitude, and dynamic profiles, including in cases where specification choices such as \emph{binning} affect the estimated path.
+
+\textcite{chiu2023and} extend this reanalysis literature to political science. They replicate and reanalyze 49 studies published in the \emph{American Political Science Review}, \emph{American Journal of Political Science}, and \emph{The Journal of Politics} that use TWFE for causal inference in observational panel settings. Their findings are not limited to treatment-effect heterogeneity. In many cases, heterogeneity-robust estimators remain qualitatively close to TWFE, though some applications show sign reversals or losses of precision. The more important result concerns identification. Only a subset of studies presents direct evidence against parallel trends, but many more are too underpowered to rule out violations large enough to alter the practical meaning of the estimate. This shifts the focus of reanalysis toward identification and uncertainty, rather than a simple exercise in replacing one coefficient with another.
+
+\textcite{brodeur2026reproducibility} place these concerns within the wider literature on reproducibility and robustness in economics and political science. They reanalyze 110 recent papers published in top journals with mandatory data and code sharing policies, distinguishing computational reproducibility from robustness to alternative analytical decisions. They report high reproducibility rates and show that many significant findings remain significant after reanalysis, although the sample is selective and likely reflects an upper bound on empirical robustness in recent research. The value of this work for the present exercise is less about DiD specifically than about what systematic reanalysis can reveal regarding empirical credibility, fragility, and the conditions under which published findings survive alternative but reasonable analytical choices.
+
+These literatures define the space this dissertation enters. The methodological work shows why conventional TWFE estimates can become difficult to interpret in staggered settings, why dynamic profiles and pre-trend tests require more careful reading, and why covariates and implementation choices are part of the design itself. The reanalysis literature shows that these issues have practical consequences. Revisiting published estimates can change both statistical conclusions and the credibility of the underlying design. This dissertation conducts a focused reanalysis of a specific applied domain using modern DiD estimators, and the goal is to assess whether published results change and to trace those changes to identifiable margins of design and implementation.
