@@ -1,25 +1,22 @@
 #!/bin/bash
-# Full sync: Test → deposit + refresh overleaf/Figures + refresh
-# health_did_replication/Figures and rebuild its main.tex from current chapters.
+# Full sync: refresh overleaf/Figures + refresh health_did_replication/Figures
+# and rebuild the working-paper main.tex from current chapters.
+#
+# Since Phase-2 consolidation (2026-04-18), the pipeline runs directly in the
+# deposit (`Replication Package/`) — no Test staging copy is used. The old
+# "Test → deposit" stage of this script has been removed; the deposit is the
+# single working copy. Historical Test folder is preserved in
+# `_archive/phase2_consolidation_20260418/`.
 set -e
 
-TEST="/c/Users/victo/OneDrive/Pesquisas/replication_analysis/Replication Package - Test"
 DEP="/c/Users/victo/OneDrive/Pesquisas/replication_analysis/Replication Package"
 OV="$DEP/overleaf"
 WP="$DEP/health_did_replication"
 OUT="$DEP/output"
 PROMOTE="$DEP/code/audit/promote_headings.sh"
 
-# ── 1. Test → deposit (the canonical replication package) ────────────
-echo "=== 1/4 Sync Test → deposit ==="
-cp -r "$TEST/code/"*               "$DEP/code/"
-cp "$TEST/data/metadata/"*.json    "$DEP/data/metadata/"
-cp -r "$TEST/results/by_article/"* "$DEP/results/by_article/"
-cp "$TEST/analysis/"*.csv          "$DEP/analysis/"
-cp -r "$TEST/output/"*             "$OUT/"
-# Sync knowledge base (master is in parent; mirror to deposit for git)
-cp -r "/c/Users/victo/OneDrive/Pesquisas/replication_analysis/knowledge/"* "$DEP/knowledge/" 2>/dev/null || true
-# Cleanup helper scripts (one-shot diagnostics) so deposit stays minimal
+# Cleanup orphan helper scripts that occasionally land in code/audit during
+# iterative dev (one-shot diagnostics). Ignore missing files.
 rm -f "$DEP/code/audit/inspect_aggte.R" \
       "$DEP/code/audit/inspect_305.R" \
       "$DEP/code/audit/early_spot_check.R" \
@@ -28,21 +25,12 @@ rm -f "$DEP/code/audit/inspect_aggte.R" \
       "$DEP/code/audit/check_convergence.R" \
       "$DEP/code/audit/fix_meta_pattern49_v2.R" \
       "$DEP/code/audit/update_234_late.R" \
-      "$DEP/code/audit/update_meta_pattern49.R"
-rm -f "$TEST/code/audit/inspect_aggte.R" \
-      "$TEST/code/audit/inspect_305.R" \
-      "$TEST/code/audit/early_spot_check.R" \
-      "$TEST/code/audit/investigate_outliers.R" \
-      "$TEST/code/audit/deep_dive.R" \
-      "$TEST/code/audit/check_convergence.R" \
-      "$TEST/code/audit/fix_meta_pattern49_v2.R" \
-      "$TEST/code/audit/update_234_late.R" \
-      "$TEST/code/audit/update_meta_pattern49.R"
+      "$DEP/code/audit/update_meta_pattern49.R" \
+      "$DEP/code/audit/_tmp_"*.R 2>/dev/null || true
 [ -f "$DEP/Rplots.pdf" ] && rm "$DEP/Rplots.pdf"
-echo "  [OK] deposit synced"
 
-# ── 2. Refresh overleaf/Figures from output/figures ─────────────────
-echo "=== 2/4 Refresh overleaf/Figures ==="
+# ── 1. Refresh overleaf/Figures from output/figures ─────────────────
+echo "=== 1/3 Refresh overleaf/Figures ==="
 declare -A MAP=(
   ["agregado/agregado_dynamic_v3.pdf"]="figure_4_1_aggregate_scatter_dynamic.pdf"
   ["agregado/agregado_dynamic.pdf"]="figure_4_1_aggregate_scatter_dynamic.pdf"
@@ -63,6 +51,7 @@ declare -A MAP=(
   ["agregado/panel_csdid_controls_133.pdf"]="figure_4_8_panel_controls_133.pdf"
   ["agregado/panel_csdid_controls_133_v2.pdf"]="figure_4_8_panel_controls_133.pdf"
   ["agregado/panel_graduated_sensitivity.pdf"]="figure_4_9_graduated_sensitivity.pdf"
+  ["agregado/figure_4_1_headline_composite.pdf"]="figure_4_1_headline_composite.pdf"
 )
 for dst in "${!MAP[@]}"; do
   src="$OUT/figures/${MAP[$dst]}"
@@ -81,13 +70,13 @@ for f in "$OUT"/figures/appendix_bacon/*.pdf; do
 done
 echo "  [OK] overleaf/Figures refreshed"
 
-# ── 3. Refresh health_did_replication/Figures (mirror overleaf) ────
-echo "=== 3/4 Refresh health_did_replication/Figures ==="
+# ── 2. Refresh health_did_replication/Figures (mirror overleaf) ────
+echo "=== 2/3 Refresh health_did_replication/Figures ==="
 cp -r "$OV/Figures/"* "$WP/Figures/"
 echo "  [OK] working-paper Figures synced"
 
-# ── 4. Rebuild working-paper main.tex from updated chapters ────────
-echo "=== 4/4 Rebuild health_did_replication/main.tex ==="
+# ── 3. Rebuild working-paper main.tex from updated chapters ────────
+echo "=== 3/3 Rebuild health_did_replication/main.tex ==="
 mkdir -p /tmp/wp_rebuild
 for n in 1 2 3 4 5; do
   bash "$PROMOTE" "$OV/Chapters/Chapter$n.tex" "/tmp/wp_rebuild/Chapter$n.tex"
