@@ -345,6 +345,23 @@ if (run_nt) {
     df_base <- df
   }
 
+  # ─── Pattern 50 invariant: CS sample must match TWFE sample ───────────
+  # unless metadata explicitly overrides via cs_sample_filter or
+  # cs_construct_vars. Silent divergence = Kresch-class bug (id 233,
+  # 2026-04-17). See knowledge/failure_patterns.md Pattern 50.
+  has_cs_override <- (has_cs_filter || has_cs_construct)
+  n_units_twfe <- n_distinct(df[[idname]])
+  n_units_cs   <- n_distinct(df_base[[idname]])
+  if (n_units_twfe != n_units_cs && !has_cs_override) {
+    stop(sprintf(
+      "[Pattern 50] CS sample has %d units but TWFE sample has %d units, yet no cs_sample_filter or cs_construct_vars is declared in metadata. This is a silent-sample-mismatch bug (see knowledge/failure_patterns.md Pattern 50; Kresch 2020 / id 233 was the discovery case). Either (a) add cs_sample_filter to metadata to justify the difference, or (b) fix the upstream pipeline so df_base inherits df correctly.",
+      n_units_cs, n_units_twfe))
+  }
+  if (n_units_twfe != n_units_cs && has_cs_override) {
+    cat(sprintf("    [Pattern 50 OK] CS sample differs from TWFE (cs: %d, twfe: %d) — justified by cs_sample_filter/cs_construct_vars\n",
+                n_units_cs, n_units_twfe))
+  }
+
   if (cs_is_panel) {
     df_cs  <- df_base
     the_id <- idname

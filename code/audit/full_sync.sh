@@ -17,6 +17,8 @@ cp "$TEST/data/metadata/"*.json    "$DEP/data/metadata/"
 cp -r "$TEST/results/by_article/"* "$DEP/results/by_article/"
 cp "$TEST/analysis/"*.csv          "$DEP/analysis/"
 cp -r "$TEST/output/"*             "$OUT/"
+# Sync knowledge base (master is in parent; mirror to deposit for git)
+cp -r "/c/Users/victo/OneDrive/Pesquisas/replication_analysis/knowledge/"* "$DEP/knowledge/" 2>/dev/null || true
 # Cleanup helper scripts (one-shot diagnostics) so deposit stays minimal
 rm -f "$DEP/code/audit/inspect_aggte.R" \
       "$DEP/code/audit/inspect_305.R" \
