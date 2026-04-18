@@ -1,7 +1,7 @@
 {
   "id": "65",
   "title": "Effects of Federal Policy to Insure Young Adults: Evidence from the 2010 Affordable Care Act's Dependent-Coverage Mandate",
-  "author_label": "Monheit et al. (2011)",
+  "author_label": "Akosa Antwi, Moriya & Simon (2013)",
   "group_label": "unica_controles",
   "data": {
     "file": "data/raw/65/AEJEPcode/data/depcov_dataset.dta",
@@ -74,5 +74,5 @@
     ]
   },
   "original_result": {},
-  "notes": "EVENT STUDY REVIEWED. Monheit et al. (2011). Stata: xi: areg anyhi mar_sep10 after_oct10 fedelig elig_mar10 elig_oct10 age17-age25 age27-age29 trend female ue hispanic white asian other student mar fpl_ratio fpl_ratio_2 ue_treat y2009 y2010 month2-month12 st_trend_1-st_trend_55 [weight=p_weight], absorb(fipstate) cluster(fipstate). Treatment = fedelig (age 19-25) x after_oct10 (post Oct 2010). SIPP data, all ages 16-29. Template simplification: uses fipstate + yearmonth + age FEs (more saturated than Stata which uses fipstate + year + month + trend + state-specific trends). State-specific linear trends NOT included — may cause discrepancy. CS-DID: gvar_CS=34 (Oct 2010 as yearmonth) for treated (fedelig=1), 0 for never-treated."
+  "notes": "EVENT STUDY REVIEWED. Akosa Antwi, Moriya & Simon (2013, AEJ:EP). Stata: xi: areg anyhi mar_sep10 after_oct10 fedelig elig_mar10 elig_oct10 age17-age25 age27-age29 trend female ue hispanic white asian other student mar fpl_ratio fpl_ratio_2 ue_treat y2009 y2010 month2-month12 st_trend_1-st_trend_55 [weight=p_weight], absorb(fipstate) cluster(fipstate). Treatment = fedelig (age 19-25) x after_oct10 (post Oct 2010). SIPP data, all ages 16-29. Template simplification: uses fipstate + yearmonth + age FEs (more saturated than Stata which uses fipstate + year + month + trend + state-specific trends). State-specific linear trends NOT included — may cause discrepancy. CS-DID: gvar_CS=34 (Oct 2010 as yearmonth) for treated (fedelig=1), 0 for never-treated."
 }

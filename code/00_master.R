@@ -20,6 +20,7 @@
 #   code/figures/03_panel_event_study.R
 #   code/figures/06_graduated_sensitivity.R
 #   code/figures/07_density_covariates.R
+#   code/figures/08_headline_composite.R
 #
 # TIER 2 — Requires original papers' raw data (see data_availability_statement.md)
 #   code/analysis/01_run_all_did.R    — TWFE/CS/SA/BJS for all 56 articles
@@ -83,6 +84,7 @@ run_script("code/figures/02_density_z.R")
 run_script("code/figures/03_panel_event_study.R")
 run_script("code/figures/06_graduated_sensitivity.R")
 run_script("code/figures/07_density_covariates.R")
+run_script("code/figures/08_headline_composite.R")
 
 # ---------------- TIER 2: requires raw data ----------------
 
