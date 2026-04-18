@@ -1,0 +1,2 @@
+id,author_label,date,rating,twfe,csdid,bacon,honestdid,dechaisemartin,n_fail,n_warn,short_summary
+233,"Kresch (2020)",2026-04-18,LOW,WARN,PASS,SKIPPED,WARN,NOT_NEEDED,0,2,"Pre-trend pattern (400-715 BRL pre-periods) threatens parallel trends; first-period effect fragile at HonestDiD Mbar~0.4-0.5; peak effect holds through Mbar~0.6; TWFE=2868 reproduced exactly; CS-NT=3329 correct after Pattern49 fix"

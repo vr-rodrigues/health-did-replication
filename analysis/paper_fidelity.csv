@@ -1,0 +1,2 @@
+id,author_label,date,verdict,paper_beta,paper_se,our_beta,our_se,rel_diff_beta_pct,rel_diff_se_pct,selected_spec_note
+233,Kresch (2020),2026-04-18,EXACT,2868,1319,2868.317,1254.260,0.011,-4.91,Table 3 Col 1 (Total investment); balance2001==1 subsample; cluster WS company (149 clusters); N=14460
