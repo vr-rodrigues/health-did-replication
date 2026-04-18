@@ -245,6 +245,49 @@ if (!is.null(comp_type) && comp_type == "additive_2" && !is.null(comp_vars)) {
 cat("    β_TWFE =", round(beta_twfe, 5), "| SE =", round(se_twfe, 5),
     "| t =", round(beta_twfe / se_twfe, 2), "\n")
 
+# --- Spec (B): TWFE without controls ---
+# If twfe_controls is empty, spec (B) = spec (C) by definition.
+cat("\n[3b] TWFE — no controls (Spec B)\n")
+if (length(tw_ctrls) == 0) {
+  beta_twfe_no_ctrls <- beta_twfe
+  se_twfe_no_ctrls   <- se_twfe
+  cat("    No TWFE controls — Spec B identical to Spec C.\n")
+} else {
+  # Build formula without controls; keep same FE, cluster, weights
+  if (!is.null(twfe_fe_override) && nchar(trimws(twfe_fe_override)) > 0) {
+    fe_str_b <- twfe_fe_override
+  } else {
+    fe_vars_b <- unique(c(idname, tname, add_fes))
+    fe_str_b  <- paste(fe_vars_b, collapse = " + ")
+  }
+  fml_twfe_b <- as.formula(paste0(yname, " ~ ", treat, " | ", fe_str_b))
+  fit_twfe_b_args <- list(
+    fml     = fml_twfe_b,
+    data    = df,
+    cluster = as.formula(paste0("~", cname))
+  )
+  if (!is.null(wname)) fit_twfe_b_args$weights <- as.formula(paste0("~", wname))
+  fit_twfe_b <- tryCatch(
+    do.call(feols, fit_twfe_b_args),
+    error = function(e) { cat("    TWFE (no controls) failed:", conditionMessage(e), "\n"); NULL }
+  )
+  if (!is.null(fit_twfe_b)) {
+    if (!is.null(comp_type) && comp_type == "additive_2" && !is.null(comp_vars)) {
+      v1 <- comp_vars[1]; v2 <- comp_vars[2]
+      beta_twfe_no_ctrls <- coef(fit_twfe_b)[v1] + 2 * coef(fit_twfe_b)[v2]
+      se_twfe_no_ctrls   <- se(fit_twfe_b)[v1]   + 2 * se(fit_twfe_b)[v2]
+    } else {
+      beta_twfe_no_ctrls <- coef(fit_twfe_b)[treat]
+      se_twfe_no_ctrls   <- se(fit_twfe_b)[treat]
+    }
+    cat("    β_TWFE_B =", round(beta_twfe_no_ctrls, 5),
+        "| SE =", round(se_twfe_no_ctrls, 5), "\n")
+  } else {
+    beta_twfe_no_ctrls <- NA_real_
+    se_twfe_no_ctrls   <- NA_real_
+  }
+}
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 4. Helper: run att_gt with automatic retry
 # ─────────────────────────────────────────────────────────────────────────────
@@ -422,7 +465,74 @@ if (run_nt) {
   att_nt_d <- if (!is.null(agg_nt_d)) agg_nt_d$overall.att else NA_real_
   se_nt_d  <- if (!is.null(agg_nt_d)) agg_nt_d$overall.se  else NA_real_
   cat("    ATT_NT =", round(att_nt, 5), "| SE =", round(se_nt, 5), "\n")
+
+  # --- Spec (A): CS-DID NT with twfe_controls (matched protocol) ---
+  att_cs_nt_with_ctrls     <- NA_real_
+  se_cs_nt_with_ctrls      <- NA_real_
+  att_cs_nt_with_ctrls_dyn <- NA_real_
+  se_cs_nt_with_ctrls_dyn  <- NA_real_
+  cs_nt_with_ctrls_status  <- "NOT_ATTEMPTED"
+
+  if (length(tw_ctrls) > 0) {
+    cat("\n[4b] CS-DID NT with twfe_controls (Spec A — matched protocol)\n")
+    cs_nt_with_ctrls_result <- tryCatch({
+      xformla_matched <- as.formula(paste0("~", paste(tw_ctrls, collapse = " + ")))
+      args_matched <- list(
+        yname                  = yname,
+        tname                  = tname,
+        idname                 = the_id,
+        gname                  = gcsname,
+        xformla                = xformla_matched,
+        weightsname            = if (!is.null(wname)) wname else NULL,
+        clustervars            = cs_cname,
+        control_group          = "nevertreated",
+        panel                  = cs_is_panel,
+        allow_unbalanced_panel = cs_allow_unbal,
+        base_period            = "universal",
+        est_method             = "dr",
+        data                   = as.data.frame(df_cs_nt)
+      )
+      cs_nt_m     <- do.call(att_gt, args_matched)
+      agg_group_m <- aggte(cs_nt_m, type = "group")
+      agg_dyn_m   <- aggte(cs_nt_m, type = "dynamic")
+      list(
+        att     = agg_group_m$overall.att,
+        se      = agg_group_m$overall.se,
+        att_dyn = agg_dyn_m$overall.att,
+        se_dyn  = agg_dyn_m$overall.se,
+        status  = "OK"
+      )
+    }, error = function(e) {
+      msg    <- conditionMessage(e)
+      status <- if (grepl("collinear|singular|perfect|separation", msg, ignore.case = TRUE))
+                  "FAIL_collinear"
+                else if (grepl("(cell|group).*(size|units)|too few", msg, ignore.case = TRUE))
+                  "FAIL_thin_cells"
+                else if (grepl("(maximum.*iter|convergence|NaN)", msg, ignore.case = TRUE))
+                  "FAIL_convergence"
+                else
+                  paste0("FAIL_other: ", substr(msg, 1, 100))
+      list(att = NA_real_, se = NA_real_, att_dyn = NA_real_, se_dyn = NA_real_, status = status)
+    })
+    att_cs_nt_with_ctrls     <- cs_nt_with_ctrls_result$att
+    se_cs_nt_with_ctrls      <- cs_nt_with_ctrls_result$se
+    att_cs_nt_with_ctrls_dyn <- cs_nt_with_ctrls_result$att_dyn
+    se_cs_nt_with_ctrls_dyn  <- cs_nt_with_ctrls_result$se_dyn
+    cs_nt_with_ctrls_status  <- cs_nt_with_ctrls_result$status
+    cat(sprintf("    [Spec A] NT with controls: status=%s, att=%.4g\n",
+                cs_nt_with_ctrls_status,
+                ifelse(is.na(att_cs_nt_with_ctrls), NA_real_, att_cs_nt_with_ctrls)))
+  } else {
+    cs_nt_with_ctrls_status <- "N/A_no_twfe_controls"
+    cat("    [Spec A] NT with controls: N/A (no twfe_controls)\n")
+  }
 } else {
+  # NT was skipped — initialise Spec A variables so results.csv always has them
+  att_cs_nt_with_ctrls     <- NA_real_
+  se_cs_nt_with_ctrls      <- NA_real_
+  att_cs_nt_with_ctrls_dyn <- NA_real_
+  se_cs_nt_with_ctrls_dyn  <- NA_real_
+  cs_nt_with_ctrls_status  <- "NOT_ATTEMPTED"
   cat("\n[4] CSDID — Skipped (run_csdid_nt = false)\n")
 }
 
@@ -456,6 +566,74 @@ if (is_staggered && run_nyt) {
   att_nyt_d <- if (!is.null(agg_nyt_d)) agg_nyt_d$overall.att else NA_real_
   se_nyt_d  <- if (!is.null(agg_nyt_d)) agg_nyt_d$overall.se  else NA_real_
   cat("    ATT_NYT =", round(att_nyt, 5), "| SE =", round(se_nyt, 5), "\n")
+
+  # --- Spec (A): CS-DID NYT with twfe_controls (matched protocol) ---
+  att_cs_nyt_with_ctrls     <- NA_real_
+  se_cs_nyt_with_ctrls      <- NA_real_
+  att_cs_nyt_with_ctrls_dyn <- NA_real_
+  se_cs_nyt_with_ctrls_dyn  <- NA_real_
+  cs_nyt_with_ctrls_status  <- "NOT_ATTEMPTED"
+
+  if (length(tw_ctrls) > 0) {
+    cat("\n[5b] CS-DID NYT with twfe_controls (Spec A — matched protocol)\n")
+    cs_nyt_with_ctrls_result <- tryCatch({
+      xformla_matched <- as.formula(paste0("~", paste(tw_ctrls, collapse = " + ")))
+      args_matched <- list(
+        yname                  = yname,
+        tname                  = tname,
+        idname                 = the_id,
+        gname                  = gcsname,
+        xformla                = xformla_matched,
+        weightsname            = if (!is.null(wname)) wname else NULL,
+        clustervars            = cs_cname,
+        control_group          = "notyettreated",
+        panel                  = cs_is_panel,
+        allow_unbalanced_panel = cs_allow_unbal,
+        base_period            = "universal",
+        est_method             = "dr",
+        data                   = as.data.frame(df_cs)
+      )
+      cs_nyt_m    <- do.call(att_gt, args_matched)
+      agg_group_m <- aggte(cs_nyt_m, type = "group")
+      agg_dyn_m   <- aggte(cs_nyt_m, type = "dynamic")
+      list(
+        att     = agg_group_m$overall.att,
+        se      = agg_group_m$overall.se,
+        att_dyn = agg_dyn_m$overall.att,
+        se_dyn  = agg_dyn_m$overall.se,
+        status  = "OK"
+      )
+    }, error = function(e) {
+      msg    <- conditionMessage(e)
+      status <- if (grepl("collinear|singular|perfect|separation", msg, ignore.case = TRUE))
+                  "FAIL_collinear"
+                else if (grepl("(cell|group).*(size|units)|too few", msg, ignore.case = TRUE))
+                  "FAIL_thin_cells"
+                else if (grepl("(maximum.*iter|convergence|NaN)", msg, ignore.case = TRUE))
+                  "FAIL_convergence"
+                else
+                  paste0("FAIL_other: ", substr(msg, 1, 100))
+      list(att = NA_real_, se = NA_real_, att_dyn = NA_real_, se_dyn = NA_real_, status = status)
+    })
+    att_cs_nyt_with_ctrls     <- cs_nyt_with_ctrls_result$att
+    se_cs_nyt_with_ctrls      <- cs_nyt_with_ctrls_result$se
+    att_cs_nyt_with_ctrls_dyn <- cs_nyt_with_ctrls_result$att_dyn
+    se_cs_nyt_with_ctrls_dyn  <- cs_nyt_with_ctrls_result$se_dyn
+    cs_nyt_with_ctrls_status  <- cs_nyt_with_ctrls_result$status
+    cat(sprintf("    [Spec A] NYT with controls: status=%s, att=%.4g\n",
+                cs_nyt_with_ctrls_status,
+                ifelse(is.na(att_cs_nyt_with_ctrls), NA_real_, att_cs_nyt_with_ctrls)))
+  } else {
+    cs_nyt_with_ctrls_status <- "N/A_no_twfe_controls"
+    cat("    [Spec A] NYT with controls: N/A (no twfe_controls)\n")
+  }
+} else {
+  # NYT block not run — initialise Spec A variables
+  att_cs_nyt_with_ctrls     <- NA_real_
+  se_cs_nyt_with_ctrls      <- NA_real_
+  att_cs_nyt_with_ctrls_dyn <- NA_real_
+  se_cs_nyt_with_ctrls_dyn  <- NA_real_
+  cs_nyt_with_ctrls_status  <- "NOT_ATTEMPTED"
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -489,8 +667,12 @@ if (!exists("att_nyt_d")) { att_nyt_d <- NA_real_; se_nyt_d <- NA_real_ }
 results <- data.frame(
   id_artigo       = meta$author_label,
   grupo           = meta$group_label,
+  # ── Spec (C): TWFE with controls + CS unconditional (previous default) ──
   beta_twfe       = beta_twfe,
   se_twfe         = se_twfe,
+  # ── Spec (B): TWFE without controls ──────────────────────────────────────
+  beta_twfe_no_ctrls = beta_twfe_no_ctrls,
+  se_twfe_no_ctrls   = se_twfe_no_ctrls,
   # Main CS columns = GROUP (CS-recommended, θ_sel^O)
   att_csdid_nt    = att_nt,
   se_csdid_nt     = se_nt,
@@ -505,7 +687,18 @@ results <- data.frame(
   att_nyt_simple  = att_nyt_s,
   se_nyt_simple   = se_nyt_s,
   att_nyt_dynamic = att_nyt_d,
-  se_nyt_dynamic  = se_nyt_d
+  se_nyt_dynamic  = se_nyt_d,
+  # ── Spec (A): CS-DID with twfe_controls (matched protocol, doubly-robust) ─
+  att_cs_nt_with_ctrls      = att_cs_nt_with_ctrls,
+  se_cs_nt_with_ctrls       = se_cs_nt_with_ctrls,
+  att_cs_nt_with_ctrls_dyn  = att_cs_nt_with_ctrls_dyn,
+  se_cs_nt_with_ctrls_dyn   = se_cs_nt_with_ctrls_dyn,
+  cs_nt_with_ctrls_status   = cs_nt_with_ctrls_status,
+  att_cs_nyt_with_ctrls     = att_cs_nyt_with_ctrls,
+  se_cs_nyt_with_ctrls      = se_cs_nyt_with_ctrls,
+  att_cs_nyt_with_ctrls_dyn = att_cs_nyt_with_ctrls_dyn,
+  se_cs_nyt_with_ctrls_dyn  = se_cs_nyt_with_ctrls_dyn,
+  cs_nyt_with_ctrls_status  = cs_nyt_with_ctrls_status
 )
 write.csv(results, file.path(out_dir, "results.csv"), row.names=FALSE)
 cat("    Saved: results.csv\n")

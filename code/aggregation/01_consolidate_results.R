@@ -31,6 +31,11 @@ for (id in ids) {
     if (name %in% names(res)) as.numeric(res[[name]][1]) else NA_real_
   }
 
+  # Helper to pull a character column (for status fields)
+  gchr <- function(name) {
+    if (name %in% names(res)) as.character(res[[name]][1]) else NA_character_
+  }
+
   # Handle multi-row estimator format
   if ("estimator" %in% names(res)) {
     tw <- res[res$estimator == "TWFE", ]
@@ -45,12 +50,19 @@ for (id in ids) {
     rows[[length(rows) + 1]] <- data.frame(
       id = id, author_label = meta$author_label, group_label = meta$group_label,
       beta_twfe = bt, se_twfe = st,
+      beta_twfe_no_ctrls = NA_real_, se_twfe_no_ctrls = NA_real_,
       att_csdid_nt = ant, se_csdid_nt = snt,
       att_csdid_nyt = anyt, se_csdid_nyt = snyt,
       att_nt_simple = ant, se_nt_simple = snt,
       att_nyt_simple = anyt, se_nyt_simple = snyt,
       att_nt_dynamic = ant, se_nt_dynamic = snt,
       att_nyt_dynamic = anyt, se_nyt_dynamic = snyt,
+      att_cs_nt_with_ctrls = NA_real_, se_cs_nt_with_ctrls = NA_real_,
+      att_cs_nt_with_ctrls_dyn = NA_real_, se_cs_nt_with_ctrls_dyn = NA_real_,
+      cs_nt_with_ctrls_status = NA_character_,
+      att_cs_nyt_with_ctrls = NA_real_, se_cs_nyt_with_ctrls = NA_real_,
+      att_cs_nyt_with_ctrls_dyn = NA_real_, se_cs_nyt_with_ctrls_dyn = NA_real_,
+      cs_nyt_with_ctrls_status = NA_character_,
       has_event_study = isTRUE(meta$analysis$has_event_study),
       treatment_timing = meta$panel_setup$treatment_timing,
       data_structure = meta$panel_setup$data_structure,
@@ -59,12 +71,24 @@ for (id in ids) {
     rows[[length(rows) + 1]] <- data.frame(
       id = id, author_label = meta$author_label, group_label = meta$group_label,
       beta_twfe = gcol("beta_twfe"), se_twfe = gcol("se_twfe"),
+      beta_twfe_no_ctrls = gcol("beta_twfe_no_ctrls"),
+      se_twfe_no_ctrls   = gcol("se_twfe_no_ctrls"),
       att_csdid_nt = gcol("att_csdid_nt"), se_csdid_nt = gcol("se_csdid_nt"),
       att_csdid_nyt = gcol("att_csdid_nyt"), se_csdid_nyt = gcol("se_csdid_nyt"),
       att_nt_simple = gcol("att_nt_simple"), se_nt_simple = gcol("se_nt_simple"),
       att_nyt_simple = gcol("att_nyt_simple"), se_nyt_simple = gcol("se_nyt_simple"),
       att_nt_dynamic = gcol("att_nt_dynamic"), se_nt_dynamic = gcol("se_nt_dynamic"),
       att_nyt_dynamic = gcol("att_nyt_dynamic"), se_nyt_dynamic = gcol("se_nyt_dynamic"),
+      att_cs_nt_with_ctrls      = gcol("att_cs_nt_with_ctrls"),
+      se_cs_nt_with_ctrls       = gcol("se_cs_nt_with_ctrls"),
+      att_cs_nt_with_ctrls_dyn  = gcol("att_cs_nt_with_ctrls_dyn"),
+      se_cs_nt_with_ctrls_dyn   = gcol("se_cs_nt_with_ctrls_dyn"),
+      cs_nt_with_ctrls_status   = gchr("cs_nt_with_ctrls_status"),
+      att_cs_nyt_with_ctrls     = gcol("att_cs_nyt_with_ctrls"),
+      se_cs_nyt_with_ctrls      = gcol("se_cs_nyt_with_ctrls"),
+      att_cs_nyt_with_ctrls_dyn = gcol("att_cs_nyt_with_ctrls_dyn"),
+      se_cs_nyt_with_ctrls_dyn  = gcol("se_cs_nyt_with_ctrls_dyn"),
+      cs_nyt_with_ctrls_status  = gchr("cs_nyt_with_ctrls_status"),
       has_event_study = isTRUE(meta$analysis$has_event_study),
       treatment_timing = meta$panel_setup$treatment_timing,
       data_structure = meta$panel_setup$data_structure,
