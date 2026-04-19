@@ -38,6 +38,10 @@ empty_or <- function(x, alt = "none") if (length(x) == 0) alt else paste(x, coll
 
 all_r_files <- list.files(file.path(base_dir, "code"),
                           pattern = "\\.R$", recursive = TRUE, full.names = TRUE)
+# Exclude one-shot diagnostic scripts under code/audit/diagnostics/ from
+# the path/base_dir hygiene checks (these are user-invoked debugging helpers
+# created during the iterative-review phase, not pipeline scripts).
+all_r_files <- all_r_files[!grepl("/audit/diagnostics/", all_r_files)]
 top_setup <- file.path(base_dir, "00_setup.R")
 if (file.exists(top_setup)) all_r_files <- c(all_r_files, top_setup)
 
@@ -305,8 +309,9 @@ readme_txt <- paste(read_txt(file.path(base_dir, "README.md")), collapse = "\n")
 master_txt <- paste(read_txt(file.path(base_dir, "code", "00_master.R")), collapse = "\n")
 all_txt <- paste(readme_txt, master_txt)
 script_rel <- list.files(file.path(base_dir, "code"), pattern = "\\.R$", recursive = TRUE)
-# Allow the audit script itself
+# Allow the audit script itself + skip one-shot diagnostics under audit/diagnostics/.
 script_rel <- script_rel[!grepl("audit/run_audit\\.R$", script_rel)]
+script_rel <- script_rel[!grepl("audit/diagnostics/", script_rel)]
 orphan_scripts <- c()
 for (s in script_rel) {
   b <- basename(s)
