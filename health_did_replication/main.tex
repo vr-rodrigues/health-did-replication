@@ -164,6 +164,8 @@ HonestDiD, replication, health economics.
 %======================================================================
 
 %======================================================================
+
+%======================================================================
 %  MAIN TEXT (chapters 1-5 of the dissertation, inlined)
 %======================================================================
 
@@ -596,6 +598,16 @@ This matters because the relevant empirical margin is often magnitude, not sign 
 \includegraphics[width=1\textwidth]{Figures/agregado/agregado_dynamic_v3.pdf}
 \caption[Aggregate comparison between TWFE and CS-DID]{Aggregate comparison between TWFE and CS-DID across the 53-article comparable subsample. Each point is the main result of one article. Both axes are scaled by the reported TWFE standard error, so the horizontal axis is the TWFE z-score and the vertical axis places the CS-DID estimate on the same scale. The 45-degree dashed line marks perfect agreement. Points are classified by whether both estimates are significant and agree in sign (Concordant), the TWFE estimate is significant but CS-DID is not (Significance loss), the reverse (Significance gain), or neither is significant (Both insignificant). Sign reversals are shown separately. The upper-left inset displays the distribution of the ratio of point estimates (CS-DID / TWFE), with median close to 1. The lower-right inset shows the ratio of standard errors (CS-DID SE / TWFE SE), with median 1.42, reflecting precision loss under heterogeneity-robust estimation.}
 \label{fig:ch3_aggregate_scatter}
+\end{figure}
+
+% =========================================================
+% FIGURE 4.1b — Matched protocol variant
+% =========================================================
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\textwidth]{Figures/agregado/figure_4_1_aggregate_scatter_matched.pdf}
+\caption[Aggregate comparison under matched protocol]{Aggregate comparison between TWFE and CS-DID under the \emph{matched protocol} (Spec~A): for each article, TWFE and CS-DID both use the paper's original controls; if the paper has no controls, both estimators are unconditional. The figure includes the 32 articles for which Spec~A is estimable; 21 articles of the 53-paper comparable subsample are excluded because their CS-DID Spec~A collapsed to zero or failed numerically (Pattern~42 family --- see Appendix~\ref{AppendixC}). Conditional on Spec~A being estimable, the estimator-only divergence is visible more cleanly than in Figure~\ref{fig:ch3_aggregate_scatter}: 14 concordant, 10 significance losses, 2 insignificant sign reversals, 5 both-insignificant, 1 significant sign reversal. The matched-protocol figure is the cleanest isolation of the estimator-change margin because it holds the covariate set fixed across TWFE and CS-DID; the asymmetric protocol used in Figure~\ref{fig:ch3_aggregate_scatter} bundles estimator and protocol changes together.}
+\label{fig:ch3_aggregate_scatter_matched}
 \end{figure}
 
 % =========================================================

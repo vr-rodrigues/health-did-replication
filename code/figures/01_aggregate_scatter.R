@@ -45,6 +45,12 @@ for (id in ids) {
     if (name %in% names(res)) as.numeric(res[[name]][1]) else NA_real_
   }
 
+  # Metadata: how many TWFE controls does the paper declare? Used for the
+  # matched-protocol figure variant (Spec A): only papers with twfe_controls
+  # non-empty require the CS-DID version that also uses those controls.
+  n_twfe_controls <- if (!is.null(meta$variables$twfe_controls))
+                      length(meta$variables$twfe_controls) else 0
+
   if ("estimator" %in% names(res)) {
     beta_twfe <- se_twfe <- NA
     twfe_row <- res[res$estimator == "TWFE", ]
@@ -53,6 +59,7 @@ for (id in ids) {
     csnyt_row <- res[res$estimator == "CS-NYT", ]
     rows[[length(rows) + 1]] <- data.frame(
       id = id, author_label = meta$author_label, group_label = meta$group_label,
+      n_twfe_controls = n_twfe_controls,
       beta_twfe = beta_twfe, se_twfe = se_twfe,
       att_nt_group = if (nrow(csnt_row) > 0) as.numeric(csnt_row$att[1]) else NA,
       se_nt_group = if (nrow(csnt_row) > 0) as.numeric(csnt_row$se[1]) else NA,
@@ -60,10 +67,14 @@ for (id in ids) {
       se_nyt_group = if (nrow(csnyt_row) > 0) as.numeric(csnyt_row$se[1]) else NA,
       att_nt_simple = NA, se_nt_simple = NA, att_nyt_simple = NA, se_nyt_simple = NA,
       att_nt_dynamic = NA, se_nt_dynamic = NA, att_nyt_dynamic = NA, se_nyt_dynamic = NA,
+      att_cs_nt_with_ctrls = NA, se_cs_nt_with_ctrls = NA,
+      att_cs_nt_with_ctrls_dyn = NA, se_cs_nt_with_ctrls_dyn = NA,
+      cs_nt_with_ctrls_status = NA_character_,
       stringsAsFactors = FALSE)
   } else {
     rows[[length(rows) + 1]] <- data.frame(
       id = id, author_label = meta$author_label, group_label = meta$group_label,
+      n_twfe_controls = n_twfe_controls,
       beta_twfe = gcol("beta_twfe"), se_twfe = gcol("se_twfe"),
       att_nt_group = gcol("att_csdid_nt"), se_nt_group = gcol("se_csdid_nt"),
       att_nyt_group = gcol("att_csdid_nyt"), se_nyt_group = gcol("se_csdid_nyt"),
@@ -71,6 +82,12 @@ for (id in ids) {
       att_nyt_simple = gcol("att_nyt_simple"), se_nyt_simple = gcol("se_nyt_simple"),
       att_nt_dynamic = gcol("att_nt_dynamic"), se_nt_dynamic = gcol("se_nt_dynamic"),
       att_nyt_dynamic = gcol("att_nyt_dynamic"), se_nyt_dynamic = gcol("se_nyt_dynamic"),
+      att_cs_nt_with_ctrls = gcol("att_cs_nt_with_ctrls"),
+      se_cs_nt_with_ctrls  = gcol("se_cs_nt_with_ctrls"),
+      att_cs_nt_with_ctrls_dyn = gcol("att_cs_nt_with_ctrls_dyn"),
+      se_cs_nt_with_ctrls_dyn  = gcol("se_cs_nt_with_ctrls_dyn"),
+      cs_nt_with_ctrls_status = if ("cs_nt_with_ctrls_status" %in% names(res))
+                                  as.character(res$cs_nt_with_ctrls_status[1]) else NA_character_,
       stringsAsFactors = FALSE)
   }
 }
@@ -91,6 +108,14 @@ cat_levels <- names(cat_colors)
 
 # ============ BUILD + CLASSIFY ============
 build_agg <- function(all_data, agg_type) {
+  # agg_type "matched": matched-protocol Spec A vs TWFE-with-controls.
+  #   - Papers with twfe_controls non-empty AND cs_nt_with_ctrls_status=="OK"
+  #     use att_cs_nt_with_ctrls_dyn.
+  #   - Papers with twfe_controls empty use att_nt_dynamic (no controls either side
+  #     = same as Spec B = same as Spec C).
+  #   - Papers where Spec A failed (status != OK OR att == 0 with SE NA)
+  #     are EXCLUDED from the matched-protocol figure — the matched gap is
+  #     not estimable in those cases.
   if (agg_type == "group") {
     nt_att <- "att_nt_group"; nt_se <- "se_nt_group"
     nyt_att <- "att_nyt_group"; nyt_se <- "se_nyt_group"
@@ -101,6 +126,59 @@ build_agg <- function(all_data, agg_type) {
     nyt_att <- "att_nyt_simple"; nyt_se <- "se_nyt_simple"
     fb_nt_att <- "att_nt_dynamic"; fb_nt_se <- "se_nt_dynamic"
     fb_nyt_att <- "att_nyt_dynamic"; fb_nyt_se <- "se_nyt_dynamic"
+  } else if (agg_type == "matched") {
+    # Matched Spec A: use CS-with-ctrls for papers that have them.
+    df <- all_data %>%
+      filter(!is.na(beta_twfe) & !is.na(se_twfe) & se_twfe > 0)
+    df$att_cs <- NA_real_; df$se_cs <- NA_real_; df$cs_source <- NA_character_
+    for (i in seq_len(nrow(df))) {
+      if (df$n_twfe_controls[i] == 0) {
+        # Symmetric unconditional: both estimators see no controls.
+        if (!is.na(df$att_nt_dynamic[i]) && !is.na(df$se_nt_dynamic[i]) && df$se_nt_dynamic[i] > 0) {
+          df$att_cs[i]   <- df$att_nt_dynamic[i]
+          df$se_cs[i]    <- df$se_nt_dynamic[i]
+          df$cs_source[i] <- "NT-unconditional (matched)"
+        } else if (!is.na(df$att_nyt_dynamic[i]) && !is.na(df$se_nyt_dynamic[i]) && df$se_nyt_dynamic[i] > 0) {
+          df$att_cs[i]   <- df$att_nyt_dynamic[i]
+          df$se_cs[i]    <- df$se_nyt_dynamic[i]
+          df$cs_source[i] <- "NYT-unconditional (matched)"
+        }
+      } else {
+        # Paper has twfe_controls: we need Spec A CS-DID-with-ctrls.
+        status_ok <- !is.na(df$cs_nt_with_ctrls_status[i]) &&
+                     df$cs_nt_with_ctrls_status[i] == "OK"
+        nonzero   <- !is.na(df$att_cs_nt_with_ctrls_dyn[i]) &&
+                     abs(df$att_cs_nt_with_ctrls_dyn[i]) > 1e-9 &&
+                     !is.na(df$se_cs_nt_with_ctrls_dyn[i]) &&
+                     df$se_cs_nt_with_ctrls_dyn[i] > 0
+        if (status_ok && nonzero) {
+          df$att_cs[i]   <- df$att_cs_nt_with_ctrls_dyn[i]
+          df$se_cs[i]    <- df$se_cs_nt_with_ctrls_dyn[i]
+          df$cs_source[i] <- "NT-with-ctrls (matched)"
+        }
+        # If Spec A failed (collapse to 0 / NA), leave att_cs NA → will be filtered out below.
+      }
+    }
+    df <- df %>% filter(!is.na(att_cs) & !is.na(se_cs) & se_cs > 0)
+    # Short-circuit: skip the dplyr pipeline below, classify directly.
+    crit <- 1.96
+    df <- df %>% mutate(
+      z_twfe = beta_twfe / se_twfe, z_cs = att_cs / se_twfe,
+      ratio_att = att_cs / beta_twfe, ratio_se = se_cs / se_twfe,
+      sig_twfe = abs(beta_twfe / se_twfe) > crit,
+      sig_cs   = abs(att_cs / se_cs) > crit,
+      same_sign = sign(beta_twfe) == sign(att_cs),
+      category = factor(case_when(
+        !same_sign & (sig_twfe | sig_cs) ~ "Sign\nreversal",
+        !same_sign & !sig_twfe & !sig_cs ~ "Sign reversal\n(insig)",
+        same_sign & sig_twfe & sig_cs    ~ "Concordant",
+        same_sign & sig_twfe & !sig_cs   ~ "Significance\nloss",
+        same_sign & !sig_twfe & sig_cs   ~ "Significance\ngain",
+        same_sign & !sig_twfe & !sig_cs  ~ "Both\ninsignificant",
+        TRUE ~ "Other"), levels = cat_levels),
+      short_label = gsub(" et al\\.", "", author_label),
+      short_label = gsub(" \\(\\d{4}[a-z]?\\)", "", short_label))
+    return(df)
   } else {
     nt_att <- "att_nt_dynamic"; nt_se <- "se_nt_dynamic"
     nyt_att <- "att_nyt_dynamic"; nyt_se <- "se_nyt_dynamic"
@@ -219,10 +297,12 @@ out_names <- list(
   simple  = list(scatter = "agregado_simple.pdf",
                  dot     = "variacao_pct_simple.pdf"),
   dynamic = list(scatter = "figure_4_1_aggregate_scatter_dynamic.pdf",
-                 dot     = "figure_4_3_variation_pct_dynamic.pdf")
+                 dot     = "figure_4_3_variation_pct_dynamic.pdf"),
+  matched = list(scatter = "figure_4_1_aggregate_scatter_matched.pdf",
+                 dot     = "figure_4_3_variation_pct_matched.pdf")
 )
 
-for (agg in c("group", "simple", "dynamic")) {
+for (agg in c("group", "simple", "dynamic", "matched")) {
   cat(sprintf("\n=== aggte(%s) ===\n", agg))
   df <- build_agg(all_data, agg)
   if (nrow(df) == 0) { cat("  No data\n"); next }
