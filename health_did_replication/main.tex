@@ -166,6 +166,8 @@ HonestDiD, replication, health economics.
 %======================================================================
 
 %======================================================================
+
+%======================================================================
 %  MAIN TEXT (chapters 1-5 of the dissertation, inlined)
 %======================================================================
 
@@ -784,11 +786,42 @@ An important distinction is between baseline and time-varying covariates. Baseli
 \subsubsection{Decomposing the TWFE vs CS-DID gap: estimator versus covariates}
 \label{sec:matched_protocol}
 
-A natural concern with the comparison above is that it confounds two margins at once: the estimator swap (TWFE $\rightarrow$ CS-DID) and the covariate margin (with $X$ $\rightarrow$ without $X$). To isolate these, for each of the 38 papers whose original TWFE specification includes covariates, we also run a matched-protocol CS-DID in which the \texttt{xformla} argument is set to the same covariate set as the original paper and the doubly-robust estimator of \textcite{sant2020doubly} is used. This produces three parallel specifications: (A) both TWFE and CS-DID with controls, (B) both without, and (C) the common paper-vs-replication comparison, with TWFE using the paper's controls and CS-DID unconditional.\footnote{A small number of papers fail specification~(A) when the covariate set is highly collinear or when the sample is too large to fit the propensity-score and outcome-regression components in memory; the template records these as \texttt{FAIL\_collinear} or \texttt{FAIL\_memory} rather than silently proceeding. Out of 38 candidate papers, 25 produced a valid specification~(A) estimate.}
+A natural concern with the comparison above is that it confounds two margins at once: the estimator swap (TWFE $\rightarrow$ CS-DID) and the covariate margin (with $X$ $\rightarrow$ without $X$). To isolate these, for each of the papers whose original TWFE specification includes covariates, we also run a matched-protocol CS-DID in which the \texttt{xformla} argument is set to the same covariate set as the original paper and the doubly-robust estimator of \textcite{sant2020doubly} is used. This produces three parallel specifications: (A) both TWFE and CS-DID with controls, (B) both without, and (C) the common paper-vs-replication comparison, with TWFE using the paper's controls and CS-DID unconditional.\footnote{A non-trivial number of papers fail specification~(A) when the covariate set is highly collinear, too numerous for the doubly-robust propensity-score estimator to fit without overfit, or too large to fit in memory; the template records these as \texttt{FAIL\_collinear}, \texttt{status=OK, ATT=0} (silent numerical collapse), or \texttt{FAIL\_memory} rather than silently substituting in a different specification. Out of the 53-paper comparable subsample, 32 produce an estimable matched-protocol estimate (Figure~\ref{fig:ch3_aggregate_scatter_matched}). The 21 papers where Spec~A failed form a substantive class of findings in their own right, discussed below.}
 
 Table~\ref{tab:ch3_aggregate_concordance} compares the three specifications on the subsample where all three are available. Two empirical facts are worth flagging. \textit{First}, the covariate margin is not second-order: the median absolute proportional shift in the point estimate between specifications (B) and (C) --- holding the estimator fixed at TWFE-with-controls on one side, and changing the CS-DID side from unconditional to matched --- is substantially different from the median under (C) alone. The matched-protocol CS-DID systematically shifts further from TWFE than the unconditional CS-DID does in this sample, not closer. \textit{Second}, the direction of this shift is ambiguous in the aggregate: for some papers the matched-protocol estimate is closer to the TWFE point; for others it is further away. The aggregate picture is therefore not a simple ``controls explain the gap'' story. The gap between TWFE-with-controls and CS-DID is split across an estimator margin \emph{and} a covariate margin, and the two do not always point in the same direction.
 
 A useful interpretation draws on \textcite{caetano2022difference} and \textcite{caetano_callaway2024_hiddenlinearity}. Under TWFE with time-varying covariates, the regression implicitly conditions on within-unit changes in $X$ after the unit fixed effect is absorbed, and its target estimand is not the same object as the $ATT(g,t)$ recovered by CS-DID with an $X$-conditional propensity-score model. Even a protocol-matched comparison, therefore, compares two estimators that target slightly different conditional-trend assumptions; the matched-protocol exercise narrows the estimand gap but does not eliminate it. The practical implication for readers of the original papers is that the divergence between TWFE and modern estimators is not reducible to a single ``fix,'' and covariate-handling choices require explicit justification --- either as baseline conditioning under an identification argument, or as efficiency-only additions under \textcite{sant2020doubly}.
+
+\subsubsection{Six canonical behaviors of CS-DID under matched protocol}
+\label{sec:spec_a_hexagon}
+
+Running Spec~A across the 53-paper comparable subsample revealed six qualitatively distinct behaviors of the doubly-robust CS-DID estimator when its covariate set is set to match the paper's original TWFE specification. Table~\ref{tab:lesson7_hexagon} summarises the taxonomy.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Six canonical behaviors of CS-DID Spec~A (matched protocol) across the 53-article subsample}
+\label{tab:lesson7_hexagon}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}p{1.8cm} p{1.6cm} p{3.2cm} p{2.8cm} p{4.8cm}@{}}
+\toprule
+\textbf{Behavior} & \textbf{Example} & \textbf{Control structure} & \textbf{Design} & \textbf{Interpretation} \\
+\midrule
+CLEAN                 & 25 Carrillo-Feres   & 18 pre-treatment $\times$ linear trends        & near-single-cohort      & Covariates enter as baseline $\times$ time interactions; well behaved under the DR propensity. \\
+\addlinespace
+AMPLIFY               & 60 Schmitt          & 6 direct-level, moderate count                 & staggered               & Direction preserved; magnitude grows $\sim 57\%$. Estimator-only margin visible. \\
+\addlinespace
+COLLAPSE               & 79 Carpenter-Lawler, 47 Clemens, 335 Le Moglie-Sorrenti, 358 Bargain-Boutin-Champeaux & Many direct time-varying levels                & staggered or single-cohort & Propensity-score overfitting; ATT $\to 0$ with \texttt{status=OK}, masquerading as null result. Pattern 42. 12--14 papers in our sample. \\
+\addlinespace
+INFLATE                & 125 Levine-McKnight-Heep & 6 individual-level covariates                  & single-cohort RCS       & IPW weights become extreme because individual covariates are collinear with treatment within RCS cells; ATT magnitude inflates 3--9$\times$ and can flip a null into a false positive. Pattern 51 (documented April 2026). \\
+\addlinespace
+FE-LIMIT              & 420 Bailey-Goodman-Bacon, 263 Axbard-Deng & Paper relies on FE structure (urban$\times$year, province$\times$year) the CS estimator cannot absorb & staggered               & SE inflation and/or magnitude divergence driven by CS's inability to match the paper's FE dimensionality through \texttt{xformla}. Partial fixes via compact dummy proxies (e.g.\ \texttt{xformla = $\sim$Durb\_f}) help but rarely close the gap. \\
+\addlinespace
+STRUCTURAL-NA          & 234 Myers, 242 Moorthy-Shaloka, 380 Kuziemko et al. & Paper uses multivariate / restricted-access / trend-absorbing structure the template cannot reproduce  & various                 & Not a Spec~A failure per se — the reanalysis cannot implement the paper's specification at all. Excluded from the comparable subsample. \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+The taxonomy has two immediate implications for the interpretation of Figure~\ref{fig:ch3_aggregate_scatter_matched}. First, the $21$-paper gap between the $N=53$ and the $N=32$ matched-protocol comparable count is not random missingness; it is dominated by the COLLAPSE behavior (Pattern 42 family), which occurs preferentially in staggered-adoption designs with many direct time-varying controls. Second, the direction of the matched-protocol divergence is not uniform across the taxonomy: AMPLIFY papers see CS-DID magnitudes grow relative to TWFE (Lesson 8-type attenuation confirmed), COLLAPSE papers see CS-DID magnitudes shrink spuriously, INFLATE papers see CS-DID magnitudes grow spuriously. Bundling these six categories under a single ``controls matter for CS-DID'' slogan misses the structural sources of the divergence. Reviewers and applied researchers consulting our per-article cards (Appendix~\ref{AppendixB}) should read the matched-protocol estimate together with the behavior label; the point estimate alone does not carry the credibility information.
 
 Figure~\ref{fig:csdid_controls_133} illustrates a case where covariates do matter. \textcite{hoynes2015income} study the effect of the EITC on low birth weight using repeated cross-sections of U.S.\ birth records. In the unconditional CS-DID replication, the event study shows visible pre-trend problems. Once the replication conditions on state and demographic characteristics, the pre-trends flatten and the post-treatment effect shrinks sharply. Two readings of this joint attenuation are available, and the credibility argument hinges on which one applies. The favoured interpretation is that the covariates remove confounding that was inflating both the pre-trends and the post-treatment effect. An alternative, flagged by \textcite{caetano2022difference}, is that some of the conditioning variables lie along the treatment's causal pathway: in a repeated cross-section of birth records, demographic composition can itself shift in response to the EITC, in which case conditioning on it partly absorbs the very effect we aim to estimate. Whether the Hoynes result is best read as design improvement or as bad-controls attenuation depends on whether the conditioning variables are plausibly pre-determined relative to EITC expansion timing.
 
