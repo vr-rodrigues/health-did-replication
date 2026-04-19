@@ -1,69 +1,83 @@
-# CS-DID Reviewer Report — Article 201 (Maclean & Pabilonia 2025)
+# CSDID review: 201 — Maclean & Pabilonia (2025)
 
 **Verdict:** WARN
-
-**Date:** 2026-04-18
-
-## Checklist
-
-### 1. CS-DID setup appropriateness
-The underlying data is a repeated cross-section (ATUS, monthly, 139K obs with hh_child==1). CS-DID requires panel data (same units observed over time). The workaround — collapsing monthly ATUS microdata to yearly state×year means — is a common approach but introduces three concerns:
-- (a) The collapsed panel treats the state-year cell mean as if it were a panel unit, losing within-cell variation.
-- (b) Sample sizes per state-year cell are very small (ATUS declining coverage; some cells have <5 obs per state-year).
-- (c) Collapsing to yearly discards the monthly variation that the TWFE exploits.
-
-The approach is defensible (Gardner 2022 also requires panel-level data and has similar issues), but introduces imprecision.
-
-### 2. Group variable construction
-gvar_CS is constructed as the first year in which pslm_state_lag2==1 is observed in the monthly data, then converted to a calendar year. This is a reasonable mapping. Six cohorts identified: first_t years 2014, 2017, 2018, 2019, 2020, 2022 (in monthly encoding → calendar years).
-
-### 3. Control group
-Never-treated (34 states that never adopted PSL by end of study period). This is the appropriate control group given the available variation.
-
-### 4. Covariates
-cs_controls: [] (empty). The 19 individual and state-level covariates used in TWFE are unavailable in the collapsed yearly panel. This is a limitation flagged in the metadata: the CS-DID estimates are unconditional ATTs, while TWFE conditions on a rich covariate set. The comparison between TWFE (+4.61 with controls) and CS-NT (-1.92 without controls) is therefore not apples-to-apples.
-
-### 5. ATT estimates
-- att_csdid_nt = 0.637 (SE=6.055) — near-zero, insignificant
-- att_nt_simple = -1.916 (SE=5.795) — small negative, insignificant
-- att_nt_dynamic = -3.044 (SE=4.745) — small negative, insignificant
-- CS with controls: FAIL (control variables not in collapsed data)
-
-All CS-NT estimates are statistically insignificant (p > 0.5 approximately). The point estimates are negative or near-zero, contrasting with TWFE's positive significant estimate.
-
-### 6. Pre-trend assessment (CS-NT event study)
-CS-NT pre-period coefficients (yearly collapsed):
-- t=-8: +6.75 (SE=8.68) — positive, insignificant
-- t=-7: +5.39 (SE=7.12) — positive, insignificant
-- t=-6: +3.81 (SE=9.34) — positive, insignificant
-- t=-5: +5.57 (SE=7.52) — positive, insignificant
-- t=-4: +8.38 (SE=6.13) — positive, marginally significant (t≈1.37)
-- t=-3: +0.37 (SE=5.52) — near zero
-- t=-2: +3.57 (SE=5.89) — positive, insignificant
-
-Pre-trends show a pattern of positive but insignificant coefficients in the distant pre-period (t=-8 to t=-5), with magnitudes around +5-8 minutes. This mildly suggests treated states had slightly higher (or trending higher) childcare pre-treatment, though none are individually significant. The t=-4 coefficient (8.38) approaches significance. This is a mild concern for parallel trends.
-
-### 7. Post-period pattern
-CS-NT post-period: t=0: +2.92, t=1: +9.84, t=2: -8.08, t=3: -0.02, t=4: -17.51, t=5: -5.41, t=6: -7.17, t=7: +21.59.
-High variance across post-periods. The t=+7 estimate (+21.59, SE=3.66) is anomalously large and positive — this is a binning artifact noted in the metadata: at h=+7, only Cohort 2014 (CT, N≈33 state-year cells) contributes, making it extremely noisy and unreliable. The endpoint restriction creates this artefact.
-
-### 8. Sign reversal vs TWFE
-TWFE=+4.61 (p<0.05) vs CS-NT simple=-1.92 (ns) is a sign reversal of 6.5 minutes. This is material but the CS-NT estimates are so imprecise (SE≈5-6 minutes) that the two confidence intervals overlap substantially. The reversal is partly explained by:
-(a) Cohort 2020 (34% weight in TWFE, ATT=+10.12) possibly COVID-confounded — CS distributes weights more uniformly across cohorts.
-(b) Missing controls in CS-NT (could attenuate estimates).
-(c) Data collapse from monthly to yearly losing precision.
-
-### 9. CS-DID with controls failure
-FAIL_other: "The following variables are not in data: fam_med, pto_state, poverty, pop, female, age, age2, non_wh..." — this is an implementation limitation stemming from the data structure. The unconditional CS estimates are valid but less comparable to the TWFE specification.
+**Date:** 2026-04-19 (updated for monthly CS-DID run — panel=FALSE directly on 78k obs)
 
 ## Summary
-WARN issued because:
-1. Pre-period CS-NT coefficients show a pattern of mild positive coefficients (t=-8 to t=-4: +6 to +8 min), suggesting possible pre-existing trend differences — though none individually significant.
-2. Post-period t=+7 estimate is an endpoint binning artefact (pure Cohort 2014, N≈33).
-3. CS estimates lack controls (implementation limitation), making direct comparison to TWFE difficult.
-4. All CS-NT ATT estimates are statistically insignificant; sign reversal vs TWFE is real but partially explainable.
 
-The CS-DID setup is as well-executed as the data structure allows, but the RCS-to-yearly collapse and missing controls are inherent limitations that reduce confidence in the CS-NT estimates.
+CS-DID NT now runs directly on the 78,080 monthly individual-level ATUS observations via `panel=FALSE`, assigning a fresh `row_id__` pseudo-ID to each row. The 2026-04-19 template update removed the prior state×year pre-aggregation step that had (a) collapsed 78k individual records to ~880 state-year cells, (b) destroyed all 19 individual-level TWFE controls (age, female, education, etc.) in the process, and (c) produced a less informative att_gt(g,t) cell structure. The updated run gives CS-NT group aggregation = -15.265 (SE = 6.257, t = -2.44), CS-NT dynamic = -14.188 (SE = 7.413), CS-NT simple = -22.806 (SE = 8.612). The sign reversal vs TWFE (+4.609) is thus amplified from 7.7 min (old) to ~20 min (new). WARN is retained because: (1) Spec A (CS with controls) returns an anomalous zero — Pattern 42; (2) the event-study pre-trend pattern in CS-NT is erratic (t=-8: -34.2, t=-5: -34.3, t=-4: +10.8) with 8 pre-periods of noisy variation; (3) the dramatic magnitude difference across aggregations (simple=-22.8, dynamic=-14.2, group=-15.3) signals cohort composition effects.
 
-## Reference
-Full data: `results/by_article/201/results.csv`, `results/by_article/201/event_study_data.csv`
+## Checks
+
+| # | Check | Status | Note |
+|---|---|---|---|
+| 1.1 | idname = fips valid | PASS | 44 state FIPS codes, time-invariant |
+| 1.2 | tname = time (monthly numeric) | PASS | 239 monthly periods, strictly ordered |
+| 1.3 | gvar = gvar_CS (year of first treatment) | PASS | Constructed from pslm_state_lag2==1; gvar=0 for never-treated |
+| 1.4 | panel=FALSE (RCS) | PASS | row_id__ pseudo-ID; correct for RCS data |
+| 2.1 | No pre-balance filter | PASS | Template does not filter to balanced pseudo-panel |
+| 2.2 | cs_sample_filter justified | PASS | Same sample_filter (hh_child==1) as TWFE; no separate cs_sample_filter |
+| 2.3 | cs_construct_vars | PASS | gvar construction only (join to get first_t); restored correctly |
+| 2.4 | cs_allow_unbalanced | PASS | allow_unbalanced=FALSE at TWFE level; RCS uses panel=FALSE so balancing irrelevant |
+| 2.5 | Late-treated drop (Pattern 25) | PASS | gvar > max(time) check applied; no late-treated obs in this sample |
+| 3.1 | yname = carehh_k | PASS | Matches outcome |
+| 3.2 | tname / idname / gname args | PASS | All correctly mapped |
+| 3.3 | xformla = ~1 (unconditional) | PASS | cs_controls = [] per metadata |
+| 3.4 | weightsname = wt06 | PASS | Survey weights applied |
+| 3.5 | clustervars = fips | PASS | State-level cluster matches TWFE |
+| 3.6 | control_group = "nevertreated" | PASS | 34 never-treated states |
+| 3.7 | panel = FALSE | PASS | RCS correctly set |
+| 3.8 | base_period = "universal" | PASS | Standard; required for HonestDiD compatibility |
+| 3.9 | Three-way controls decomposition | WARN | Spec A (CS with twfe_controls) returns 0/anomalous (Pattern 42). See below. |
+| 4.1 | aggte type="group","simple","dynamic" | PASS | All three computed |
+| 4.2 | cs_max_e = 5 clipping | PASS | Declared in metadata; dynamic aggregation clipped at e=5 |
+| 5.1 | Sign concordance | WARN | TWFE=+4.609 (sig) vs CS-NT group=-15.265 (sig). Both significant, opposite signs. MATERIAL reversal. |
+| 5.2 | Magnitude divergence | WARN | |CS-NT/TWFE| = 3.3; well outside [0.5, 2] threshold |
+| 5.3 | CS SE vs TWFE SE ratio | WARN | SE ratio = 6.257/1.799 = 3.48; CS SEs are 3.5x TWFE. RCS pseudo-ID means CS VCV estimated over 78k rows but effective clustering is 44 states. |
+| 6.1 | Event study window check | PASS | 8 pre-periods, 7 post-periods per event_study_data.csv |
+| 6.2 | Estimates at every egt | PASS | All 16 event-time cells present |
+| 6.3 | At least 3 pre-periods | PASS | 8 pre-periods (t=-8 to t=-1, reference t=-1) |
+| 7.1 | Parallel trends pre-test | WARN | CS-NT pre-periods highly erratic: t=-8=-34.2, t=-7=-17.6, t=-6=-32.6, t=-5=-34.3, t=-4=+10.8, t=-3=+14.8, t=-2=-27.9. Non-flat, large magnitudes relative to post-treatment. |
+
+## Three-way controls decomposition
+
+| Spec | TWFE β (SE) | CS-DID NT ATT (SE) | Status |
+|---|---|---|---|
+| (A) both with controls | — | 0 / NA | Pattern 42 — CS DR estimator with 19 controls collapses to 0 on individual-level RCS |
+| (B) both without controls | 1.820 (2.352) | -15.265 (6.257) | OK |
+| (C) TWFE with, CS without | 4.609 (1.799) | -15.265 (6.257) | Headline (current) |
+
+Key ratios:
+- Estimator margin (protocol-matched Spec A): NOT AVAILABLE (Pattern 42)
+- Covariate margin (TWFE side): (4.609 - 1.820) / |4.609| = **+60.5%** — controls substantially raise TWFE estimate
+- Covariate margin (CS side): Spec A unavailable
+- Total gap (Spec B): (1.820 - (-15.265)) / |1.820| = **+939%** — enormous gap even without controls
+
+Interpretation: The estimator gap is not driven by the controls asymmetry. Even in the matched unconditional Spec B, TWFE (+1.820) and CS-NT (-15.265) differ by over 17 minutes with opposite signs. This is a pure cohort-weighting divergence: TWFE/Gardner give disproportionate weight to the large, COVID-contaminated Cohort 2020 (ATT=+10.12, Bacon weight=34%), while CS-NT uses uniform group×time weighting which downweights this cohort relative to Cohorts 2017 (ATT=-3.97) and 2022 (ATT=-21.49). Spec A failure (Pattern 42) is an implementation limitation of doubly-robust CS on individual-level RCS with 19 controls across thin group×time cells.
+
+## Pattern 42 documentation
+
+Spec A (CS-NT with 19 twfe_controls, doubly-robust est_method="dr") reports `att_cs_nt_with_ctrls = 0 / NA` with status = "OK" in results.csv. This is anomalous — a zero ATT with status OK indicates numerical collapse in the DR propensity score estimation rather than a true null effect. Root cause: at the individual RCS level, 19 controls (including binary demographics) create thin or degenerate group×time×control cells for the 6 cohorts, causing propensity score near-saturation. The template catches this as `status = "OK"` because it does not distinguish a genuine null from a numerical zero; the DR aggte=0 is a Pattern 42 artifact, not evidence that PSL has zero effect.
+
+## Critical issues
+
+- **Spec A returns anomalous zero (Pattern 42):** The doubly-robust CS-NT with 19 twfe_controls produces `att_cs_nt_with_ctrls = 0`. This is a known numerical failure mode for DR estimation on thin individual-level RCS cells, not a true effect estimate. The `cs_nt_with_ctrls_status = "OK"` field should ideally flag this as `"FAIL_thin_cells"` or `"WARN_dr_collapse"`. Recommend: update status field logic to detect near-zero att_gt aggregates.
+
+## Recommendations
+
+- Update failure-pattern detection in Spec A block to distinguish genuine nulls from numerical collapses (add check: if abs(att) < 0.001 and est_method="dr", set status="WARN_dr_collapse").
+- Document in metadata notes that Spec A is unavailable for this paper due to Pattern 42.
+- For meta-analysis: use the paper's Gardner (4.45**) estimate, not CS-NT (-15.265) which captures the aggregate of all cohorts including the COVID-contaminated Cohort 2020 under uniform weighting.
+
+## Reproducible snippets
+
+```r
+# CS-DID NT (updated: panel=FALSE, monthly RCS)
+att_gt(yname="carehh_k", tname="time", idname="row_id__",
+       gname="gvar_CS", xformla=~1, weightsname="wt06",
+       clustervars="fips", control_group="nevertreated",
+       panel=FALSE, allow_unbalanced_panel=FALSE,
+       base_period="universal", data=df_cs_nt)
+# → aggte("group")$overall.att = -15.265 (SE = 6.257)
+# → aggte("dynamic", max_e=5)$overall.att = -14.188 (SE = 7.413)
+```

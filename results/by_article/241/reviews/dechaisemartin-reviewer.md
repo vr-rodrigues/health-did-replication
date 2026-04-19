@@ -1,15 +1,14 @@
 # de Chaisemartin Reviewer Report — Article 241 (Soliman 2025)
 
 **Verdict:** NOT_NEEDED
-**Date:** 2026-04-18
+**Date:** 2026-04-19
 
 ## Applicability check
-- Treatment type: binary absorbing (counties receive DEA crackdown enforcement and do not reverse).
-- Treatment is staggered but standard absorbing-binary. This is the canonical CS-DiD setting.
-- de Chaisemartin & D'Haultfoeuille (2020) estimator (DID_M) is designed for: (a) non-absorbing treatments, (b) continuous treatments, or (c) heterogeneous dose at adoption.
-- None of these conditions apply to Article 241. Treatment switches on and stays on.
+- Treatment type: binary absorbing (counties receive DEA crackdown enforcement and do not reverse). Standard absorbing-binary-staggered design.
+- de Chaisemartin & D'Haultfoeuille (2020) estimator (DID_M) is designed for: (a) non-absorbing treatments, (b) continuous treatments, or (c) heterogeneous dose at adoption. None of these conditions apply.
+- CS-DID (Callaway-Sant'Anna) and Bacon decomposition are the appropriate diagnostic tools for this design, and both have been applied.
 
 ## Conclusion
-The de Chaisemartin estimator is NOT_NEEDED for this design. CS-DiD and the Bacon decomposition are the appropriate diagnostic tools, and both have been applied. No additional action required on this axis.
+The de Chaisemartin estimator adds no information beyond what CS-DID and the Bacon decomposition already provide for this standard absorbing-binary-staggered design.
 
 **Overall:** NOT_NEEDED

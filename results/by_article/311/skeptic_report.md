@@ -1,79 +1,108 @@
-# Skeptic report: 311 — Galasso & Schankerman (2024)
+# Skeptic report: 311 -- Galasso & Schankerman (2024)
 
-**Overall rating:** LOW
-**Date:** 2026-04-18
-**Reviewers run:** twfe (WARN), csdid (FAIL), bacon (WARN), honestdid (PASS), dechaisemartin (NOT_NEEDED), paper-auditor (NOT_APPLICABLE)
+**Overall rating:** LOW  *(built from Fidelity x Implementation)*
+**Design credibility:** D-MODERATE  *(separate axis -- a finding about the paper, not about our reanalysis)*
+**Date:** 2026-04-19
+**Reviewers run:** twfe (impl=WARN: clustering mismatch), csdid (impl=PASS; updated 2026-04-19), bacon (impl=WARN: run_bacon=false insufficient grounds; TvT share unavailable), honestdid (impl=PASS; Mbar_first=2.0 both, Mbar_avg=0.75 TWFE/1.25 CS-NT, Mbar_peak=0.50 TWFE/0.75 CS-NT), dechaisemartin (NOT_NEEDED), paper-auditor (EXACT, 0.07%)
 
 ---
 
 ## Executive summary
 
-Galasso & Schankerman (2024) estimate the effect of Medicines Patent Pool (MPP) membership on drug access for developing countries using a staggered DiD design across 6,746 country×product units over 2005–2018 (7 treatment cohorts, 84.6% never-treated). The headline TWFE ATT is 0.663 (se = 0.050) — a large, highly significant effect. However, the audit flags three methodological concerns that jointly warrant a LOW rating: (1) the CS-DID estimator — the primary modern robustness check — failed to produce a valid ATT in the main results pipeline (all fields NA in results.csv), most likely because the panel-balancing instruction conflicted with the dataset's 84.8% fill rate; (2) pre-period TWFE coefficients at t=-4 and t=-3 are statistically significant and positive, raising concern about pre-trends or anticipation effects that could inflate the post-period estimates; (3) the Bacon decomposition was disabled without adequate justification (the 7-cohort design is trivial for `bacondecomp`). The positive finding is that HonestDiD analysis confirms the TWFE first-post-period estimate is robust to violations up to Mbar=2, and the CS-NT estimate in the HonestDiD auxiliary run (~0.644) aligns closely with TWFE, giving indirect reassurance. The stored TWFE result (0.663) likely captures a real access effect but should be treated with caution pending a clean CS-DID run.
+Galasso & Schankerman (2024) estimate the effect of Medicines Patent Pool (MPP) membership on drug access using a staggered DiD design across 6,746 country-by-product units, 14 years (2005-2018), with 84.6% never-treated and 7 treatment cohorts. The 2026-04-19 update resolves the primary prior failure: toggling allow_unbalanced from false to true recovered CS-DID from complete NA to a valid CS-NT ATT of 0.7135 (se = 0.0331), directionally consistent with TWFE = 0.6625 at a modest +7.7% premium -- the expected direction when forbidden comparisons are a small share of TWFE weight. The paper-auditor records an EXACT fidelity verdict (0.07% gap). The stored TWFE estimate reliably captures the paper headline result and our modern CS-DID estimate corroborates it. The rating is LOW because two implementation concerns persist: (1) one-way clustering (product_code only) versus the paper two-way clustering (product x country), which underestimates standard errors; and (2) the Bacon decomposition remains disabled despite a 7-cohort staggered design that is computationally trivial for bacondecomp. The design-credibility finding (separate axis) is D-MODERATE: the first-post-period ATT survives violations up to Mbar = 2 (very robust), but the average ATT breaks down at Mbar ~0.75 (TWFE) / 1.25 (CS-NT), and significant pre-period coefficients at t = -3 and t = -4 are a substantive design concern. The user can trust the stored CS-NT ATT as the best available estimate of the paper treatment effect; the TWFE estimate is corroborated but should be interpreted with awareness of the pre-trend signals.
 
 ---
 
 ## Per-reviewer verdicts
 
 ### TWFE (WARN)
-- Pre-period coefficients at t=-4 (+0.046, 2.8σ) and t=-3 (+0.042, 3.8σ) are statistically significant, suggesting possible pre-trend or anticipation effects violating parallel trends.
-- Staggered adoption with 7 cohorts creates contaminated TWFE comparisons; effect direction is consistent but weight sign cannot be verified without Bacon output.
-- Clustering specification differs from paper (one-way vs. two-way), likely underestimating standard errors.
-- Full report: [`reviews/twfe-reviewer.md`](reviews/twfe-reviewer.md)
+- Pre-period coefficients at t = -4 (beta = +0.046, se = 0.016, t = 2.8) and t = -3 (beta = +0.042, se = 0.011, t = 3.8) are statistically significant -- a design finding (Axis 3), not an implementation failure.
+- Clustering mismatch: template uses one-way clustering on product_code; paper uses two-way clustering (product_code x country_code). SE underestimation in results.csv is the implementation concern (Axis 2 WARN).
+- Post-period TWFE coefficients (0.62-0.77) are large, consistent, and monotonically growing -- a positive signal for effect stability.
+- Full report: reviews/twfe-reviewer.md
 
-### CS-DID (FAIL)
-- All CS-DID ATT fields in results.csv are NA — the estimator did not converge in the main pipeline.
-- Likely cause: forced panel balancing (`allow_unbalanced = false`) on an 84.8% fill-rate panel produces an overly sparse balanced subset.
-- A CS-NT estimate of ~0.644 appears in the HonestDiD auxiliary analysis, close to TWFE, but is not formally recorded as a robust check.
-- Full report: [`reviews/csdid-reviewer.md`](reviews/csdid-reviewer.md)
+### CS-DID (PASS -- updated 2026-04-19)
+- CS-NT ATT = 0.7135 (se = 0.0331), statistically significant, direction unanimous with TWFE.
+- The +7.7% premium over TWFE (0.6625) is consistent with TWFE minor downward bias from forbidden comparisons in an 84.6%-never-treated sample.
+- allow_unbalanced = true is the correct setting for an 84.8%-fill-rate panel; the prior false setting caused forced balancing to produce NA estimates.
+- Full report: reviews/csdid-reviewer.md
 
 ### Bacon (WARN)
-- `run_bacon = false` in metadata, citing "large dataset size" — but a 7-cohort design requires only 28 two-by-two comparisons, well within `bacondecomp` capacity.
-- Cannot formally verify whether TWFE negative-weight comparisons exist or their magnitude.
-- TWFE and SA event-study consistency across post-periods provides indirect reassurance of limited contamination.
-- Full report: [`reviews/bacon-reviewer.md`](reviews/bacon-reviewer.md)
+- run_bacon = false in metadata; no Bacon output available. Formal verification of TWFE weight signs is unavailable.
+- Justification (large dataset size) is insufficient: a 7-cohort staggered design requires only 28 two-by-two comparisons, well within bacondecomp capacity.
+- TvT share expected to be low given 84.6% never-treated; multi-estimator consistency (TWFE / CS-NT / SA / Gardner all in 0.62-0.74 range) provides strong indirect reassurance.
+- Full report: reviews/bacon-reviewer.md
 
 ### HonestDiD (PASS)
-- First post-period ATT survives violations up to Mbar=2 (TWFE) and Mbar=2 (CS-NT) — very robust.
-- Average ATT survives Mbar=0.75 (TWFE) and Mbar=1.25 (CS-NT) — moderate-to-strong robustness.
-- CS-NT HonestDiD CI [0.576, 0.705] at Mbar=0 is tight and reassuring.
-- Full report: [`reviews/honestdid-reviewer.md`](reviews/honestdid-reviewer.md)
+- Mbar_first = 2.0 for both TWFE and CS-NT -- the first-post-period ATT survives violations up to 2x pre-period variation, a very strong standard.
+- Mbar_avg = 0.75 (TWFE) / 1.25 (CS-NT). CS-NT average ATT is more robust, consistent with CS-NT being the correct estimator for this design.
+- Mbar_peak = 0.50 (TWFE) / 0.75 (CS-NT). Peak ATT is moderately robust.
+- Full report: reviews/honestdid-reviewer.md
 
 ### de Chaisemartin (NOT_NEEDED)
-- Treatment is absorbing binary staggered — standard design where CS-DID is the appropriate estimator.
-- No evidence of dose heterogeneity or treatment reversals.
-- Full report: [`reviews/dechaisemartin-reviewer.md`](reviews/dechaisemartin-reviewer.md)
+- Absorbing binary staggered design; no dose heterogeneity or treatment reversals. CS-DID is the appropriate estimator.
+- Full report: reviews/dechaisemartin-reviewer.md
 
-### Paper-Auditor (NOT_APPLICABLE)
-- `pdf/311.pdf` not found; `original_result` field in metadata is empty `{}`.
-- Fidelity axis cannot be evaluated. Rating uses methodology score alone.
+### Paper-Auditor (EXACT)
+- Stored beta = 0.6625 vs paper beta = 0.663 (Table 2, Col 1); relative gap = -0.07%, well within the 1% EXACT threshold.
+- SE divergence (0.0504 vs paper 0.054, -6.6%) fully explained by documented one-way vs. two-way clustering difference.
+- N discrepancy of 2 observations (80,103 vs 80,101) is negligible.
+- Full report: reviews/paper_audit.md
+
+---
+
+## Three-way controls decomposition
+
+N/A -- paper has no original covariates (twfe_controls = [], cs_controls = []); unconditional comparison only. Specs B = C = headline; Spec A not applicable.
+
+---
+
+## Three-axis rating breakdown
+
+**Axis 1 -- Fidelity:** F-HIGH (paper-auditor: EXACT, 0.07% gap)
+
+**Axis 2 -- Implementation:** I-LOW (2 implementation WARNs)
+- WARN 1 (twfe-reviewer): one-way clustering vs. paper two-way clustering -- documented mismatch, SE underestimation.
+- WARN 2 (bacon-reviewer): run_bacon = false on a computationally tractable 7-cohort design prevents formal TWFE weight verification.
+
+**Axis 3 -- Design credibility:** D-MODERATE (finding about the paper, not a rating demerit)
+- Mbar_first = 2.0 for both TWFE and CS-NT -- D-ROBUST at first-post threshold.
+- Mbar_avg = 0.75 (TWFE) / 1.25 (CS-NT) -- D-MODERATE (Mbar in [0.5, 1] for TWFE).
+- Pre-period coefficients at t = -3 (3.8 sigma) and t = -4 (2.8 sigma): treated units appear on a rising trajectory before MPP adoption, potentially reflecting anticipatory effects or genuine pre-trends.
+- Bacon TvT share: not computed; expected low given 84.6% never-treated.
+- Overall design verdict: D-MODERATE (first-post very robust; average ATT moderately robust; pre-trends a substantive concern requiring author-level explanation).
+
+**Final rating matrix:** F-HIGH x I-LOW = **LOW**
 
 ---
 
 ## Material findings (sorted by severity)
 
-**FAIL:**
-- CS-DID (never-treated) produced NA estimates in results.csv. The primary modern estimator is unavailable for formal comparison, leaving the TWFE estimate unvalidated against heterogeneous-treatment-effects-robust alternatives.
+**WARN (Implementation Axis 2):**
+- Clustering mismatch: one-way product_code clustering in results.csv vs. paper two-way product_code x country_code. Standard errors are underestimated relative to the paper. Effect significance should be interpreted with the paper larger SEs (0.054 vs. our 0.0504). Beta is unaffected.
+- Bacon decomposition disabled (run_bacon = false) on an insufficient justification. A 7-cohort staggered design is computationally trivial for bacondecomp. Re-enabling would formally verify TWFE weight signs and TvT share.
 
-**WARN:**
-- Pre-trend violation: TWFE pre-period coefficients at t=-4 (β=+0.046, se=0.016) and t=-3 (β=+0.042, se=0.011) are statistically significant, indicating the parallel trends assumption may not hold in the pre-period window.
-- Bacon decomposition disabled on an inadequate justification. A 7-cohort design is computationally trivial for `bacondecomp`; re-enabling would formally verify TWFE weight signs.
-- Clustering mismatch: template uses one-way clustering on `product_code` while the paper employs two-way clustering (`product_code × country_code`). Standard errors in results.csv are likely underestimated relative to the paper.
+**Design findings (Axis 3 -- informational, not demerits):**
+- Pre-period TWFE coefficients at t = -4 (beta = +0.046, se = 0.016) and t = -3 (beta = +0.042, se = 0.011) are statistically significant across TWFE, CS-NT, and SA. This is a design-credibility concern for the paper parallel trends assumption.
+- Average ATT robustness (Mbar_avg = 0.75 TWFE) means pre-trend violations of ~75% of pre-period variation magnitude would cause sign loss. Given the observed pre-trend magnitudes, this is a non-trivial concern.
+- The CS-NT average ATT is more robust (Mbar_avg = 1.25), providing a more credible HonestDiD bound on the paper causal claim.
 
 ---
 
 ## Recommended actions
 
-- **Repo-custodian:** Set `run_bacon = true` in `data/metadata/311.json` and re-run the Analyst stage. The 7-cohort staggered design is not computationally prohibitive.
-- **Repo-custodian:** Investigate the CS-DID failure. Options: (a) set `allow_unbalanced = true` in metadata to allow the `did` package to handle the unbalanced panel natively; or (b) verify the balanced-panel subset size — if it is tiny relative to the full dataset, `allow_unbalanced` should be set to `true` and the gvar_CS construction verified on the resulting subset.
-- **User (methodological judgement):** The significant pre-period coefficients at t=-3 and t=-4 are a substantive concern. These may reflect anticipatory effects (countries applying for MPP membership before formal approval) or a genuine pre-trend. The authors should be asked whether they report pre-trend tests and whether their specification includes a specific pre-treatment window for the parallel trends assumption.
-- **Pattern-curator:** Add or update failure pattern: "CS-DID NA when allow_unbalanced=false on dataset with <90% fill rate — balanced panel subset is too sparse. Resolution: set allow_unbalanced=true."
-- **Paper-auditor:** Obtain `pdf/311.pdf` and populate `original_result` in metadata if a comparable TWFE estimate is reported in the paper, to enable fidelity auditing.
+- **Repo-custodian:** Set run_bacon = true in data/metadata/311.json and re-run the Analyst stage. The 7-cohort staggered design requires only 28 two-by-two comparisons. Pre-balance the panel to the observation years common across all cohorts, or use the balanced subset within each 2x2 pair as bacondecomp does by default.
+- **No action needed on allow_unbalanced:** The 2026-04-19 fix is correct and the CS-DID NA failure is resolved. allow_unbalanced = true should be retained.
+- **User (methodological judgement):** The significant pre-period coefficients at t = -3 and t = -4 may reflect: (a) anticipatory access effects, (b) differential pre-trends between treated and never-treated country-product pairs, or (c) measurement noise in the early years. The HonestDiD bound (Mbar_first = 2) suggests the first-year effect is very robust, but the authors should be asked whether they report formal pre-trend tests and whether any anticipation window is built into their specification.
+- **No action needed on fidelity:** EXACT match at 0.07%; no metadata correction required.
 
 ---
 
 ## Individual reports
-- [`reviews/twfe-reviewer.md`](reviews/twfe-reviewer.md)
-- [`reviews/csdid-reviewer.md`](reviews/csdid-reviewer.md)
-- [`reviews/bacon-reviewer.md`](reviews/bacon-reviewer.md)
-- [`reviews/honestdid-reviewer.md`](reviews/honestdid-reviewer.md)
-- [`reviews/dechaisemartin-reviewer.md`](reviews/dechaisemartin-reviewer.md)
+- reviews/twfe-reviewer.md
+- reviews/csdid-reviewer.md
+- reviews/bacon-reviewer.md
+- reviews/honestdid-reviewer.md
+- reviews/dechaisemartin-reviewer.md
+- reviews/paper_audit.md
+

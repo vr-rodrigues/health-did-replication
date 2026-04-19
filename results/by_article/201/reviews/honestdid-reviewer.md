@@ -1,65 +1,74 @@
-# HonestDiD Reviewer Report — Article 201 (Maclean & Pabilonia 2025)
+# HonestDiD review: 201 — Maclean & Pabilonia (2025)
 
-**Verdict:** WARN
+**Implementation verdict:** WARN
+**Design credibility signal:** FRAGILE
+**Date:** 2026-04-19 (updated with monthly CS-NT run)
 
-**Date:** 2026-04-18
+*(Implementation WARN is for n_pre=2 of 7 available pre-periods used, not for low Mbar values — those are design findings.)*
 
 ## Applicability
-has_event_study: true; event_pre: 7 (>= 3 pre-periods). APPLICABLE.
 
-## Setup assessment
+- has_event_study: YES (event_pre=7, event_post=7)
+- n_pre used in HonestDiD: 2 (of 7 available pre-periods in event_study_data.csv)
+- n_post used: 4
+- First post-period (TWFE t=0) point estimate: -11.65 (SE = 10.95), t = -1.06 (NOT significant at 5%)
+- First post-period (CS-NT t=0) point estimate: -13.22 (SE = 10.84), t = -1.22 (NOT significant at 5%)
 
-### Pre-periods used in HonestDiD
-n_pre = 2 (only 2 pre-periods used despite 7 being available). This is a significant limitation: HonestDiD uses the pre-period event-study coefficients to bound violations of parallel trends. Using only 2 pre-periods:
-(a) Reduces statistical power to detect violations.
-(b) Uses only t=-2 (TWFE: -21.02, SE=15.52; CS-NT: +3.57, SE=5.89) as the information-bearing pre-period.
-The discrepancy between n_pre=2 and event_pre=7 suggests a technical limitation (likely the yearly collapsed CS panel only has 2 pre-periods with sufficient cell counts, or the HonestDiD specification was set up on the collapsed data).
+## Input construction (our implementation)
 
-### ATTs used in HonestDiD
-From honest_did_v3.csv:
-- TWFE: att_first=-11.65, att_avg=-11.37, att_peak=-18.90
-- CS-NT: att_first=-8.30, att_avg=-5.01, att_peak=-8.30
+| Check | Status | Note |
+|---|---|---|
+| betahat vector excludes reference period (t=-1) | PASS | t=-1 excluded by construction; "universal" base |
+| sigma matrix from event-study VCV | PASS | Internally consistent per estimator |
+| numPrePeriods = 2 | WARN | Only 2 of 7 available pre-periods used. Likely runner truncates to last 2 pre-periods. HonestDiD with n_pre=2 calibrates Mbar on a minimal pre-trend window, understating potential trend violations. Sensitivity CIs are wider and less discriminating than with n_pre=7. |
+| numPostPeriods = 4 | PASS | cs_max_e=5 declared; 4 post-periods in dynamic output |
+| base_period = "universal" for CS-NT | PASS | att_gt call uses base_period="universal" |
+| l_vec for "first" | PASS | basisVector(1, 4) |
+| l_vec for "peak" | WARN | Peak selection: runner identifies peak by max |betahat/SE| among post-periods. For TWFE: t=2 has ATT=-18.90, SE=10.46, t=-1.81 → peak. For CS-NT: all positive targets overlap; peak = first (t=0: -13.22, t=2: -28.29, SE=6.98, t=-4.05; CS peak is t=2). Stored peak target in honest_did_v3.csv shows mbar_peak_twfe=0 and mbar_peak_cs=0, consistent with t=2 being a noisy large negative for TWFE. |
+| Restriction type = Relative Magnitudes | PASS | createSensitivityResults_relativeMagnitudes confirmed |
+| Mbarvec = seq(0, 2, 0.25) | PASS | Sensitivity file has 9 Mbar levels (0, 0.25, ..., 2.0) |
 
-IMPORTANT SIGN NOTE: These are NEGATIVE, contradicting the static TWFE=+4.61. This is because HonestDiD here uses the event-study post-period coefficients, which average negative. The static TWFE (+4.61) is estimated from the level regression (pslm_state_lag2 dummy), while the event-study post-period coefficients (TWFE: t=0 to t=+7 averaging around -12 to -15) are estimated from a separate event-study specification. This discrepancy is a WARN: the static and dynamic TWFE estimates tell different stories.
+## Stored breakdown values (design-credibility evidence)
 
-### Mbar breakeven analysis
-From honest_did_v3_sensitivity.csv:
-**TWFE:**
-- target=first, Mbar=0: CI=[-33.10, +9.86] — INCLUDES ZERO, not robust even at Mbar=0
-- target=avg, Mbar=0: CI=[-29.52, +6.87] — INCLUDES ZERO
-- target=peak, Mbar=0: CI=[-39.17, +1.05] — barely includes zero
+From `results/by_article/201/honest_did_v3.csv` and `honest_did_v3_sensitivity.csv`:
 
-**CS-NT:**
-- target=first, Mbar=0: CI=[-19.59, +2.90] — INCLUDES ZERO
-- target=avg, Mbar=0: CI=[-13.73, +3.68] — INCLUDES ZERO
-- target=peak, Mbar=0: CI=[-19.59, +2.90] — INCLUDES ZERO
+| Metric | TWFE | CS-NT | Runner convention |
+|---|---|---|---|
+| first M̄ | 0 | 0 | basisVector(1, 4) |
+| avg M̄ | 0 | 0 | equal-weight average |
+| peak M̄ | 0 | 0 | basisVector(argmax|t|, 4) |
 
-All sensitivity intervals include zero even at Mbar=0 (no parallel trends violation allowed). The Mbar_breakeven=0 in the CSV means there is NO positive Mbar at which the result becomes significant — the ATT is already insignificant under the event-study specification. This confirms the event-study-based ATTs (which are negative but imprecise) are fragile.
+Sensitivity CIs at Mbar=0 (no violation tolerance):
+- TWFE first: [-33.10, +9.86] → includes zero → FRAGILE
+- TWFE avg: [-29.52, +6.87] → includes zero → FRAGILE
+- TWFE peak: [-39.17, +1.05] → includes zero (barely) → FRAGILE
+- CS-NT first: [-19.59, +2.90] → includes zero → FRAGILE
+- CS-NT avg: [-13.73, +3.68] → includes zero → FRAGILE
+- CS-NT peak: [-19.59, +2.90] → includes zero → FRAGILE
 
-## Pre-trend assessment
-TWFE pre-period used: t=-2: -21.02 (SE=15.52). A pre-treatment coefficient of -21 minutes is large relative to the outcome mean (pre-treatment mean ~77 min/day in treated states). This is a concerning pre-trend, though imprecise. It suggests potential differential pre-trends, which is exactly what HonestDiD is designed to handle — but with only 2 pre-periods, the sensitivity calibration is based on very little information.
+All CIs include zero at Mbar=0, meaning even zero violation of parallel trends is insufficient to establish a significant effect under the event-study specification.
 
-CS-NT pre-period: t=-2: +3.57 (SE=5.89) — small and flat, more reassuring for parallel trends.
+## Interpretation narrative
 
-## Design credibility signal
-The TWFE event-study Mbar analysis (all CIs include zero at Mbar=0) signals the event-study TWFE estimate is NOT robust to ANY degree of parallel trends violation. The CS-NT sensitivity intervals are also all non-significant at Mbar=0. This is a FAIL on design credibility grounds: if we trust the event-study specification, the result cannot survive even zero trend violation.
+All six HonestDiD targets (TWFE: first/avg/peak; CS-NT: first/avg/peak) return Mbar=0, indicating that the event-study-based estimates are not robust even to zero deviation from parallel trends. This is a design fragility finding: the event-study ATTs (TWFE post-period range: -11.6 to -18.9 min; CS-NT post-period range: -13.2 to -28.3 min) all have wide confidence intervals that comfortably include zero at every Mbar value in the sensitivity grid. The fragility is partially structural: with n_pre=2 (only last 2 of 7 pre-periods fed to HonestDiD), the calibration of the relative-magnitudes bound is less informative than it would be with n_pre=7. The wide event-study CIs also reflect the fundamental limitation of ATUS: state-year cells are thin (few diary days per state per period), making individual-event-time estimates noisy. The static Gardner estimate (4.45**) benefits from aggregating over all post-periods and is more stable than any single event-time ATT.
 
-However, this finding must be interpreted carefully: the event-study ATTs (negative) differ from the static ATT (positive). The static TWFE captures the average post-treatment effect, while the event-study average collapses across heterogeneous lags (some positive early, some large negative late — see t=+4:-15.4, t=+5:-18.1, t=+7:-9.7). The static specification may be more informative given the noisy post-period event study.
+**Critical distinction:** The paper's headline Gardner estimate IS significant (+4.45, t≈2.5). HonestDiD here tests the event-study specification, which is less efficient. The D-FRAGILE verdict applies to the event-study framework's ability to pin down causal effects under sensitivity analysis, not to the paper's headline Gardner static ATT.
 
-## Mbar design credibility classification
-- TWFE Mbar_first breakeven: 0 (insignificant at Mbar=0 → D-FRAGILE)
-- TWFE Mbar_avg breakeven: 0 (D-FRAGILE)
-- TWFE Mbar_peak breakeven: 0 (D-FRAGILE)
-- CS-NT: all D-FRAGILE
+## Critical issues
 
-**Design credibility: D-FRAGILE** (event-study estimates insignificant even at Mbar=0)
+- **n_pre=2 of 7:** The runner uses only the last 2 pre-periods before treatment (t=-2, t=-1 implicitly). This means the relative-magnitudes bound M is calibrated on a 1-step pre-trend comparison, when in fact the event study has 7 pre-periods with substantial variation (range: -34.6 to +10.8 min). With n_pre=7, the reference max pre-trend |β| would be much larger, making Mbar=0 relative magnitudes correspond to a meaningfully different absolute tolerance. The n_pre=2 truncation is a runner implementation limitation that makes the HonestDiD analysis informationally sparse.
 
-## Summary
-WARN issued because:
-1. HonestDiD used only n_pre=2 despite 7 pre-periods specified — severe underutilization of pre-period information.
-2. TWFE pre-period t=-2 coefficient (-21.02 min) is large relative to outcome, suggesting possible pre-trends.
-3. All sensitivity CIs include zero at Mbar=0 for both TWFE and CS-NT event-study specs — design is fragile.
-4. Discrepancy between static TWFE ATT (+4.61) and event-study average ATT (-11 to -19) is a specification-choice concern.
+## Recommendations
 
-## Reference
-Full data: `results/by_article/201/honest_did_v3.csv`, `results/by_article/201/honest_did_v3_sensitivity.csv`
+- Investigate why the runner truncates to n_pre=2. If technical (memory or solver stability with n_pre=7 and monthly CS-DID), document this as a known limitation.
+- Treat all Mbar=0 findings as D-FRAGILE (event-study spec fragile), not as D-BROKEN (no feasible causal claim), because the paper's primary Gardner estimate is statistically significant.
+- For the dissertation's HonestDiD chapter: cite this as an example where event-study-based sensitivity analysis has low power due to noisy pre-treatment estimates (ATUS small cells), while the aggregated static estimate is more informative.
+
+## Reproducible snippets
+
+```r
+# From honest_did_v3_sensitivity.csv — TWFE peak CI at Mbar=0:
+# lb = -39.17, ub = +1.05  (barely includes zero — most fragile target)
+# CS-NT first CI at Mbar=0:
+# lb = -19.59, ub = +2.90  (includes zero — CS also fragile)
+```

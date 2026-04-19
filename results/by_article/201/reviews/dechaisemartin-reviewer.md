@@ -1,25 +1,28 @@
-# de Chaisemartin & D'Haultfoeuille Reviewer Report — Article 201 (Maclean & Pabilonia 2025)
+# de Chaisemartin review: 201 — Maclean & Pabilonia (2025)
 
 **Verdict:** NOT_NEEDED
+**Date:** 2026-04-19
 
-**Date:** 2026-04-18
+## Applicability
 
-## Applicability check
-The de Chaisemartin & D'Haultfoeuille (2020) estimator (DID_M) is most valuable when:
-- Treatment is non-absorbing (units can move in and out of treatment)
-- Treatment is continuous or has a heterogeneous dose at adoption
-- The design departs from standard binary absorbing staggered rollout
+- Treatment absorbing: YES (PSL adoption is absorbing; no state has repealed its mandate in the sample)
+- Treatment binary: YES (pslm_state_lag2 is 0/1)
+- Staggered: YES (6 cohorts: 2014, 2017, 2018, 2019, 2020, 2022)
+- Reversible: NO
+- Recommended for de Chaisemartin reanalysis: NO
 
-For article 201:
-- **Treatment:** pslm_state_lag2 — binary indicator for whether a state has an active paid sick leave mandate (lagged 2 years). Once a state adopts a PSL mandate, it does not repeal it (absorbing binary treatment, per standard PSL policy design).
-- **Structure:** 10 treated states, 34 never-treated states, 6 cohorts (2014, 2017, 2018, 2019, 2020, 2022). Standard absorbing staggered rollout.
-- **Dose heterogeneity:** PSL mandates vary in days offered (7 days is standard), but the paper treats all mandates as equivalent binary indicators (pslm_state_lag2). No dose heterogeneity is modeled.
-- **No switchers-back:** States do not repeal PSL mandates in the study period.
+This is a standard absorbing binary staggered design. CS-DID (Callaway–Sant'Anna) handles this design correctly and provides the appropriate estimands. de Chaisemartin's `did_multiplegt_dyn` adds no new identification power here: both frameworks estimate group×time ATT cells and aggregate them, with the difference being weighting (uniform vs size-proportional).
 
-## Assessment
-This is a canonical absorbing binary staggered adoption design. The de Chaisemartin estimator adds no diagnostic value beyond what Callaway-Sant'Anna already provides. The relevant heterogeneous treatment effects bias is already addressed by CS-DID and Gardner (did2s).
+The paper's authors independently ran a Bacon decomposition and used Gardner (did2s) as their primary estimator precisely because they were aware of TWFE's heterogeneity concerns. Running `did_multiplegt_dyn` would reproduce approximately what CS-DID already provides, without informational gain.
 
-**Note:** There is a subtlety — the 2-year lag means a state "switches on" in pslm_state_lag2 two years after actual mandate adoption. This creates the COVID-contamination concern for the 2018 cohort (activates 2020), but this is captured by the Bacon decomposition and CS-DID, not by de Chaisemartin.
+## Expected informational gain
 
-## Conclusion
-NOT_NEEDED: Standard binary absorbing staggered design. No dose heterogeneity, no switchers-back. Callaway-Sant'Anna (CS-NT) already provides the appropriate estimator for this design.
+None over CS-DID in this absorbing binary staggered design. The principal source of TWFE bias here is COVID-contamination of Cohort 2020, which is already fully diagnosed by the Bacon decomposition and CS-NT's cohort-uniform weighting. de Chaisemartin's estimator would weight cohorts similarly to CS-DID and would not resolve the COVID confound.
+
+## Critical issues
+
+None. Design is within CS-DID scope.
+
+## Recommendations
+
+NOT_NEEDED. Focus diagnostic effort on the COVID contamination mechanism (Cohort 2020, pslm_state_lag2 = 1 throughout all of 2020 for 2018 PSL-adopting states) and whether the paper's sample restriction (excluding March 18–May 9, 2020 diary days) fully resolves the confound.
