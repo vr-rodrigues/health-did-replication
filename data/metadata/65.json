@@ -49,7 +49,7 @@
   "panel_setup": {
     "data_structure": "repeated_cross_section",
     "treatment_timing": "unica",
-    "allow_unbalanced": true
+    "allow_unbalanced": false
   },
   "analysis": {
     "run_csdid_nt": true,

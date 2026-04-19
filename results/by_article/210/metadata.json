@@ -32,7 +32,7 @@
   "panel_setup": {
     "data_structure": "panel",
     "treatment_timing": "staggered",
-    "allow_unbalanced": true
+    "allow_unbalanced": false
   },
   "analysis": {
     "run_csdid_nt": false,

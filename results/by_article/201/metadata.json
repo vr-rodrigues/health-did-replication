@@ -43,7 +43,7 @@
   "panel_setup": {
     "data_structure": "repeated_cross_section",
     "treatment_timing": "staggered",
-    "allow_unbalanced": true,
+    "allow_unbalanced": false,
     "cs_data_structure": "panel",
     "cs_allow_unbalanced": false
   },

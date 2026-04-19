@@ -83,7 +83,7 @@
   "panel_setup": {
     "data_structure": "repeated_cross_section",
     "treatment_timing": "staggered",
-    "allow_unbalanced": true
+    "allow_unbalanced": false
   },
   "analysis": {
     "run_csdid_nyt": true,
