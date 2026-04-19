@@ -49,5 +49,5 @@
     "att_csdid_nt": 0.0058,
     "se_csdid_nt": 0.0118
   },
-  "notes": "Stata: reg sportsclub Post_avg i.year_3rd i.bula_3rd i.cityno, vce(cluster cityno). CSDID: csdid2 sportsclub i.bula_3rd, gvar(gvar_CS) time(year_3rd) agg(event) cluster(cityno) long2. gvar_CS must be constant within cityno — fixed by using group_by(cityno) max of tbula_3rd. Event study: data covers 2006-2010, treatment at 2008; event_pre=2 shows event times -2,-1; event_post=2 shows 0,1,2. BJS aggregates RCS to (cityno × year_3rd) panel; bula_3rd FE lost in aggregation."
+  "notes": "Stata: reg sportsclub Post_avg i.year_3rd i.bula_3rd i.cityno, vce(cluster cityno). CSDID: csdid2 sportsclub i.bula_3rd, gvar(gvar_CS) time(year_3rd) agg(event) cluster(cityno) long2. gvar_CS must be constant within cityno — fixed by using group_by(cityno) max of tbula_3rd. Event study: data covers 2006-2010, treatment at 2008; event_pre=2 shows event times -2,-1; event_post=2 shows 0,1,2. BJS aggregates RCS to (cityno × year_3rd) panel; bula_3rd FE lost in aggregation. | AUDIT 2026-04-19: Paper-auditor EXACT (0.83%). 0 ctrls → no Spec A. Null result across all estimators: TWFE=0.0089 ns, CS-NT=0.0199 ns. WARN was CS-NT 3.4x RCS aggregation gap (Pattern 25), not implementation bug. Single-cohort 2008 voucher launch."
 }

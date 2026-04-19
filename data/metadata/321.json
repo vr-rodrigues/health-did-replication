@@ -44,5 +44,5 @@
     "source": "Table 2, Column 3 (Town + Year FEs, clustered at district)",
     "n": 14714
   },
-  "notes": "Single treatment timing: indian_dm1918=1 towns treated 1918-1919 (post=1). 1061 towns in 205 districts. Clustering at district level (did). SA disabled (single cohort). Event study uses biannual periods in the paper, but our template uses annual. indian_dm1918_post is pre-computed in data."
+  "notes": "Single treatment timing: indian_dm1918=1 towns treated 1918-1919 (post=1). 1061 towns in 205 districts. Clustering at district level (did). SA disabled (single cohort). Event study uses biannual periods in the paper, but our template uses annual. indian_dm1918_post is pre-computed in data. | AUDIT 2026-04-19: Paper-auditor EXACT (0.25%). 0 ctrls → no Spec A/B/C. TWFE=-0.142, CS-NT=-0.110 (direction match, 22% smaller mag). LOW rating driven by pre-trend coefficients in TWFE (t=-4 and t=-3 both |t|>2.6) + CS-NT (3 pre-periods sig) — PAPER DESIGN FRAGILITY (1918 pandemic cohort is unique, Indian-DM towns had pre-existing divergent trajectories). HonestDiD D-FRAGILE Mbar=0.25 follows from pre-trend magnitude. Not implementation."
 }

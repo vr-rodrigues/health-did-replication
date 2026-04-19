@@ -5,6 +5,8 @@
   "data": {
     "file": "data/raw/241/analysis_panel.dta",
     "format": "dta",
+    "sample_filter": "(rel_year >= -3 & rel_year <= 3) | gvar_CS == 0",
+    "cs_sample_filter": "",
     "es_sample_filter": "rel_year >= -3 & rel_year <= 3 | gvar_CS == 0"
   },
   "variables": {
@@ -33,7 +35,9 @@
     "event_pre": 2,
     "event_post": 3,
     "run_sa": true,
-    "run_gardner": true
+    "run_gardner": true,
+    "cs_min_e": -3,
+    "cs_max_e": 3
   },
   "preprocessing": {
     "construct_vars": []
@@ -42,5 +46,5 @@
     "beta_twfe": -31.52,
     "se_twfe": 5.767
   },
-  "notes": "EVENT STUDY REVIEWED. Soliman (2025) DEA crackdowns on pill mills. Staggered county-year panel. 3006 counties (95 treated, 8 cohorts 2007-2014, 2911 never-treated). Paper uses county + state*year FEs (additional_fes). Paper restricts TWFE to rel_year in [-3,3] (line 239 of Manuscript Code.R), dropping 247 treated-county obs far from treatment. Never-treated have rel_year=0 (always in window). Without filter: TWFE=-33.65 (6.76% gap). With filter: TWFE=-31.52 (exact match). CS segfaults on filtered sample (unbalanced panel: treated 4-7yrs, never-treated 9yrs triggers did pkg C code crash). STANDALONE SCRIPT required: investigate_241.R runs TWFE on filtered data, CS/SA/BJS on full data. Template cannot handle separate TWFE/CS samples. No controls in main spec. Outcome = MME per capita * 10. Table 1 Col 1. Replication code is R (not Stata). Original code: data/241/Files for Replication/Programs/AEJPol-2023-0640 Manuscript Code.R."
+  "notes": "EVENT STUDY REVIEWED. Soliman (2025) DEA crackdowns on pill mills. Staggered county-year panel. 3006 counties (95 treated, 8 cohorts 2007-2014, 2911 never-treated). Paper uses county + state*year FEs (additional_fes). Paper restricts TWFE to rel_year in [-3,3] (line 239 of Manuscript Code.R), dropping 247 treated-county obs far from treatment. Never-treated have rel_year=0 (always in window). Without filter: TWFE=-33.65 (6.76% gap). With filter: TWFE=-31.52 (exact match). CS segfaults on filtered sample (unbalanced panel: treated 4-7yrs, never-treated 9yrs triggers did pkg C code crash). STANDALONE SCRIPT required: investigate_241.R runs TWFE on filtered data, CS/SA/BJS on full data. Template cannot handle separate TWFE/CS samples. No controls in main spec. Outcome = MME per capita * 10. Table 1 Col 1. Replication code is R (not Stata). Original code: data/241/Files for Replication/Programs/AEJPol-2023-0640 Manuscript Code.R. | FIX APPLIED 2026-04-19: sample_filter rel_year∈[-3,3] now applied globally (matches paper's Table 1 Col 1 explicit filter, line 239 Manuscript Code.R). cs_sample_filter='' opts CS-DID OUT of the TWFE filter → CS-DID runs on full 9-year panel. cs_min_e=-3, cs_max_e=3 restrict dynamic aggregation to the paper's event window. Result: TWFE=-31.52 (EXACT paper match); CS-NT dyn=-40.96, CS-NYT dyn=-41.06 (both clipped to horizons -3..+3, 30% larger magnitude than TWFE → Lesson 8 Bacon-attenuation). WARN → EXACT."
 }

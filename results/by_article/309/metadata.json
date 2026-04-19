@@ -25,7 +25,7 @@
   "panel_setup": {
     "data_structure": "panel",
     "treatment_timing": "staggered",
-    "allow_unbalanced": false
+    "allow_unbalanced": true
   },
   "analysis": {
     "event_pre": 5,
@@ -45,5 +45,5 @@
     "source": "Table 2, Column 1 (TWFE with state+year FEs, aw=sh_emp1979, cluster state)",
     "n": 1077
   },
-  "notes": "Staggered DiD: 21 adoption cohorts (1970-1993). Treatment = public policy exception to at-will employment. wdlapY is fractional (0-1) in adoption year. CS-ready .dta has first_year_full_wdlapY as gvar (0 for 7 never-treated states). sh_emp1979 = state employment share in 1979 (analytic weights). Column 1 is simplest spec (no controls beyond FEs). SA applicable (21 cohorts). CSDID FIX: att_gt() segfaults on the severely unbalanced panel (21 state-run OSHA states have only 14 years [1992-2005] vs 29 states with 27 years [1979-2005]). Both panel=TRUE+unbalanced and panel=FALSE cause C-level segfaults in did v2.3.0. Fix: balance panel to 29 full-coverage states (allow_unbalanced=false). Loses 7 cohorts (1970,1974,1976,1977,1983,1984,1987); 13 cohorts + 7 NT states remain. CS-NT ATT=-0.201, CS-NYT ATT=-0.202. See fix_csdid_309.R."
+  "notes": "Staggered DiD: 21 adoption cohorts (1970-1993). Treatment = public policy exception to at-will employment. wdlapY is fractional (0-1) in adoption year. CS-ready .dta has first_year_full_wdlapY as gvar (0 for 7 never-treated states). sh_emp1979 = state employment share in 1979 (analytic weights). Column 1 is simplest spec (no controls beyond FEs). SA applicable (21 cohorts). CSDID FIX: att_gt() segfaults on the severely unbalanced panel (21 state-run OSHA states have only 14 years [1992-2005] vs 29 states with 27 years [1979-2005]). Both panel=TRUE+unbalanced and panel=FALSE cause C-level segfaults in did v2.3.0. Fix: balance panel to 29 full-coverage states (allow_unbalanced=false). Loses 7 cohorts (1970,1974,1976,1977,1983,1984,1987); 13 cohorts + 7 NT states remain. CS-NT ATT=-0.201, CS-NYT ATT=-0.202. See fix_csdid_309.R. | FIX 2026-04-19: allow_unbalanced toggled false→true. With false, did_standarization drops 17 units + small-group warnings → zero-length argument error. With true: CS-NT=-0.033, CS-NYT=-0.034 (same sign as TWFE -0.137 but 4× smaller magnitude). The older metadata claim CS-NT=-0.201 appears to predate a `did` package update (works-as-configured today, but with different numbers). Paper-auditor EXACT (0.24%) on TWFE; CS-DID direction consistent but magnitude much smaller than historical metadata number — not immediately comparable to paper's reported CS."
 }

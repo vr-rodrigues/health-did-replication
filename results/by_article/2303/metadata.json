@@ -63,6 +63,7 @@
     "Event study uses YEARLY event time: year_month = first treated year per (id, month) pair.",
     "Paper uses did_imputation (Borusyak 2022). Gardner replicates this; pre-trends flat (~0).",
     "CS-NT diverges at late horizons (Pattern 38: shrinking not-yet-treated control).",
-    "TWFE and SA converge well; all estimators confirm significant negative post-treatment effect."
+    "TWFE and SA converge well; all estimators confirm significant negative post-treatment effect.",
+    "AUDIT 2026-04-19: Paper-auditor EXACT (0.01% vs paper -4.836). Full pipeline re-run 2026-04-19: TWFE no-ctrls (Spec B) = -5.075 (previously NA — now recovered); CS-NT with 7 weather ctrls (Spec A): simple=-2.037, dynamic=-1.709 (previously FAIL_memory — now recovered). Pipeline took ~2.5 hours on 217k obs × 7 ctrls × 125 cohorts doubly-robust CS-DID. All estimators confirm negative effect; controls attenuate CS-NT magnitude by ~60-70% (weather strongly predictive). 5-estimator direction unanimous."
   ]
 }

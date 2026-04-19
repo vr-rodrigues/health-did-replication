@@ -31,7 +31,7 @@
   "panel_setup": {
     "data_structure": "panel",
     "treatment_timing": "staggered",
-    "allow_unbalanced": false
+    "allow_unbalanced": true
   },
   "analysis": {
     "run_twfe": true,
@@ -51,5 +51,5 @@
     "twfe_n": 4086,
     "csdid_att_simple": -0.031
   },
-  "notes": "EVENT STUDY REVIEWED — Dataset reconstructed from Census API (tidycensus B01001 under-19 approx + S1701 poverty) + CMS enrollment + KFF policy data. ACS.dta (IPUMS) not redistributable; pop/totpop/pov from Census published tables. TWFE gap 6% (-0.0182 vs -0.0172) due to IPUMS perwt sums vs Census table estimates. N=4085 vs 4086 (match). Interpolation: approx(rule=1) matches Stata ipolate (no extrapolation). Paper uses aggte(type='simple'); our protocol uses aggte(type='dynamic'). 15 treated states, 12 distinct treatment cohorts, ~35 never-treated."
+  "notes": "EVENT STUDY REVIEWED — Dataset reconstructed from Census API (tidycensus B01001 under-19 approx + S1701 poverty) + CMS enrollment + KFF policy data. ACS.dta (IPUMS) not redistributable; pop/totpop/pov from Census published tables. TWFE gap 6% (-0.0182 vs -0.0172) due to IPUMS perwt sums vs Census table estimates. N=4085 vs 4086 (match). Interpolation: approx(rule=1) matches Stata ipolate (no extrapolation). Paper uses aggte(type='simple'); our protocol uses aggte(type='dynamic'). 15 treated states, 12 distinct treatment cohorts, ~35 never-treated. | FIX 2026-04-19: allow_unbalanced switched false→true. With false, did_standarization dropped 13 units to balance the panel and then failed with 'argumento de comprimento zero' because remaining cohorts were too small. With allow_unbalanced=true, all units retained; CS-NT dynamic=-0.0298 (3.7% gap vs paper target -0.031), CS-NYT=-0.0296 directionally consistent. NET: CS-DID estimates recovered, within-tolerance match to paper's reported CS value. TWFE WARN 6% is still data-substitute (IPUMS→tidycensus), not implementation."
 }

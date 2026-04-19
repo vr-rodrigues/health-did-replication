@@ -50,6 +50,7 @@
     "Unit for panel: provinceind = province x industry (245 units). FEs: provinceind + year + industry.",
     "Paper Table 2 Col 1: -0.051 (0.040), N=1755. R TWFE: -0.047 (0.041), N=1756.",
     "Small N gap: Stata drops 1 obs during merge that R doesn't. 8% coefficient gap from merge/processing diffs.",
-    "Clustering at province level (31 clusters)."
+    "Clustering at province level (31 clusters).",
+    "AUDIT 2026-04-19: 9% gap investigated. FE structure confirmed matching paper's Col 1 spec (province FE + year + industry) via direct test produces -0.047 (same as our template). Gap is in pre-processing pipeline (Stata: reshape long + multi-step merges + qrate construction handles `property_quota` formats 'numbers'/'percentage' + drop _m==2 + drop if reported<0). Full Stata→R port of data-prep would be required to fully close the gap. All specs give insignificant null. TWFE -0.047, CS-NT dyn +0.028, CS-NT simple -0.001 — sign noise around zero, HonestDiD robust null at all Mbar. WARN persists but is not fixable via metadata/template edits."
   ]
 }
