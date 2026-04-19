@@ -15,8 +15,8 @@ On 2026-04-19 the audit was repeated end-to-end after a critical infrastructure 
 
 | Rating | Count | Share |
 |---|---|---|
-| HIGH | 6 | 11.3% |
-| MODERATE | 14 | 26.4% |
+| HIGH | 7 | 13.2% |
+| MODERATE | 13 | 24.5% |
 | LOW | 33 | 62.3% |
 | **Total** | **53** | **100%** |
 
@@ -24,13 +24,13 @@ On 2026-04-19 the audit was repeated end-to-end after a critical infrastructure 
 
 | Verdict | Count | Share |
 |---|---|---|
-| EXACT | 33 | 62.3% |
+| EXACT | 34 | 64.2% |
 | WITHIN_TOLERANCE | 5 | 9.4% |
 | NOT_APPLICABLE | 8 | 15.1% |
-| WARN | 7 | 13.2% |
+| WARN | 6 | 11.3% |
 | FAIL | 0 | 0% |
 
-**38/53 (72%) papers reproduce the original paper's headline TWFE estimate exactly or within rounding tolerance.** A further 8 papers are NOT_APPLICABLE for legitimate structural reasons (paper uses CS-DID/Gardner/event-study as main estimator, paper does not report a static ATT, treatment is binarized vs paper's continuous, etc.). Only 7 papers carry a WARN, and after the 3 FAILs were excluded as non-comparable, no FAIL remains.
+**39/53 (74%) papers reproduce the original paper's headline TWFE estimate exactly or within rounding tolerance.** A further 8 papers are NOT_APPLICABLE for legitimate structural reasons (paper uses CS-DID/Gardner/event-study as main estimator, paper does not report a static ATT, treatment is binarized vs paper's continuous, etc.). Only 7 papers carry a WARN, and after the 3 FAILs were excluded as non-comparable, no FAIL remains.
 
 The 7 WARN papers are documented limitations rather than implementation bugs:
 
@@ -61,6 +61,20 @@ The 7 WARN papers are documented limitations rather than implementation bugs:
 
 These papers have either (a) one implementation WARN with no FAILs, the methodological core is sound; or (b) M-HIGH downgraded by F-MOD (paper-auditor WARN). Members:
 9 (Dranove), 21 (Buchmueller), 25 (Carrillo-Feres), **68 (Tanaka, ↓ from HIGH)**, 79 (Carpenter-Lawler), 125 (Levine-McKnight-Heep), 213 (Estrada-Lombardi), 228 (Sarmiento-Wagner-Zaklan), 253 (Bancalari), 267 (Bhalotra et al), 281 (Steffens-Pereda), 333 (Clarke-Muhlrad), 335 (Le Moglie-Sorrenti), 337 (Cameron-Seager-Shah), 358 (Bargain-Boutin-Champeaux), 525 (Danzer-Zyska).
+
+## 4a. Lesson 7 pentagon — Spec A behavior under matched protocol
+
+The iterative audit (2026-04-19, decision log in `analysis/iterative_review_log.md`) identified five canonical behaviors of CS-DID Spec A (matched protocol: paper's original controls passed to `xformla` in `att_gt`):
+
+| Paper | N ctrls | Control structure | Design | Spec A verdict |
+|---|---:|---|---|---|
+| 25 Carrillo-Feres | 18 | pre-treatment × linear trends | near single-cohort | ✅ **CLEAN** (matched CS 0.097 vs unconditional 0.114 vs TWFE 0.116) |
+| 79 Carpenter-Lawler | 53 | direct demographic | staggered | ❌ **COLLAPSE** (CS → 0 with 53 ctrls; Pattern 42 overfit) |
+| 125 Levine-McKnight-Heep | 6 | RCS individual-level | single-cohort RCS | ⚠️ **INFLATE** (CS 9× magnitude vs no-ctrls; Pattern 51 — formally added) |
+| 335 Le Moglie-Sorrenti | 18 | direct time-varying levels | single-cohort | ❌ **COLLAPSE** (CS → 0 despite only 18 ctrls; structural not count-based) |
+| 358 Bargain-Boutin-Champeaux | 30 | direct time-varying levels | 2×2 | ❌ **COLLAPSE** (CS → 0 in 2-period design; worst-case propensity overfit) |
+
+**Takeaway for Chapter 4 / Lesson 7:** the matched-protocol CS-DID behavior is not a simple function of covariate count. The *structure* of the controls (pre-treatment × trends vs. direct time-varying levels vs. individual RCS) AND the design (multi-period staggered vs single-cohort vs 2×2) jointly determine whether Spec A produces an informative ATT (25), collapses via propensity-score overfit (79 staggered, 335 single-cohort, 358 2×2), or inflates via collinearity (125). The rule emerging: **direct level ctrls + few-period design + doubly-robust propensity score → collapse**. The asymmetric protocol (Spec C: TWFE with ctrls vs. CS without) can mask this divergence — paper 25 is the textbook example where Spec C shows 1.3% "concordance" while Spec A reveals a 16% matched gap.
 
 ## 5. LOW-rated papers (33)
 

@@ -51,6 +51,7 @@
     "No weights used in original regressions.",
     "Single treatment date - all treated units get treatment in 1992.",
     "Table 3 Col 2: DID = -0.008 (SE 0.003), N = 1,442,376.",
-    "26 state clusters (clustervar1)."
+    "26 state clusters (clustervar1).",
+    "AUDIT NOTE (2026-04-19): Paper-auditor WITHIN_TOLERANCE (2.96% — rounding; paper reports 3 decimals and our -0.00776 rounds to -0.008). TREAT is load-bearing group dummy (rural indicator), NOT a robustness control — dropping it from TWFE produces sign reversal (+0.035) because TREAT absorbs baseline rural-urban fertility differential. So Spec B (no-ctrls TWFE) is a different estimand, not a robustness check. Spec A (CS+1 ctrl where the 1 ctrl IS the group dummy) collapses to 0/NA — this is collinearity, not classical Pattern 42 propensity overfit. CS-NT no-ctrls=-0.014 (81% larger than TWFE with ctrls) is directionally consistent but inflated; probably reflects omitted TREAT baseline differential appearing as treatment effect. 26 state clusters borderline for asymptotic inference. MODERATE rating justified."
   ]
 }

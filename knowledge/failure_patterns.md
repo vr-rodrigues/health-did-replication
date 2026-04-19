@@ -670,6 +670,47 @@ if (n_units_twfe != n_units_cs && has_cs_override) {
 
 ---
 
+## Pattern 51 — RCS control collinearity silently inflates CS-DID ATT (false positive)
+
+**Context**: CS-DID Spec A run on a repeated-cross-section (RCS) design (`data_structure == "rcs"` in metadata) that includes time-varying individual-level demographic covariates (e.g., `married`, `student`, `female`, `age`) in `cs_controls` / `xformla`. The run completes with `status = OK` (no convergence error, no NA). But the resulting ATT is 3×–10× larger in absolute value than the no-controls CS-DID (Spec B), often flipping a statistically null result into a false positive significant finding. TWFE Spec A vs Spec B shows no such divergence.
+
+**Observed failure**: id 125 (Levine, McKnight & Heep 2011 — a null-result paper):
+
+| Estimate | Spec | ATT | SE | t-stat | Significant? |
+|---|---|---|---|---|---|
+| TWFE (paper spec, with ctrls) | A | −0.00045 | 0.007 | −0.07 | No (matches paper) |
+| TWFE (no ctrls) | B | +0.00272 | — | — | No |
+| CS-NT simple (no ctrls) | B | −0.00403 | — | — | No |
+| CS-NT simple (with ctrls) | A | −0.03584 | 0.016 | −2.24 | YES — false positive |
+| CS-NT dynamic (no ctrls) | B | −0.00888 | — | — | No |
+| CS-NT dynamic (with ctrls) | A | −0.02675 | 0.015 | −1.77 | Borderline |
+
+9× magnitude inflation plus crossing the significance threshold is the canonical signature.
+
+**Root Cause**: In an RCS dataset there is no true panel: individual-level demographic covariates vary across observations within the same (unit × time) cell because different individuals are surveyed each period. The CS-DID doubly-robust estimator (`method = 'dr'` in the `did` package) estimates a propensity score Pr(G=g | X) from these individual covariates. With no within-unit continuity, the logistic regression for propensity score becomes near-collinear with the treatment indicator at the cell level. Rather than failing to converge (which would be Pattern 42 / complete overfit), the model converges with extreme but finite IPW weights. At the aggregation step (`aggte(type = "simple")`), these extreme weights mechanically inflate the ATT magnitude rather than identifying a different population estimand. TWFE is unaffected because OLS absorbs collinearity through the Frisch-Waugh projection without reweighting observations.
+
+**Resolution Rule**: When Spec A for an RCS paper produces |ATT_A / ATT_B| > 2, AND either the sign reverses OR one estimate is significant while the other is not, flag as a Pattern 51 collinearity inflation event. In `results.csv`, set `rcs_ctrl_sensitivity_flag = TRUE` for the affected article. Report both Spec A and Spec B to the reader; treat Spec B (no controls) as the primary CS-DID estimate, since it avoids the IPW collinearity pathology entirely. Spec A is retained for transparency but must not be used as the headline ATT for null-result papers without this caveat.
+
+Detection pseudocode:
+```r
+if (data_structure == "rcs" &&
+    !is.null(cs_controls) && length(cs_controls) > 0 &&
+    abs(att_a / att_b) > 2 &&
+    (sign(att_a) != sign(att_b) || xor(p_a < 0.05, p_b < 0.05))) {
+  flag_rcs_ctrl_sensitivity(id)
+}
+```
+
+**Distinction from related patterns**:
+- Pattern 42 (propensity score overfits → ATT collapses to 0 or NA, status may show partial failure). Pattern 51 (propensity score converges with extreme weights → ATT *inflates* → status = OK throughout, harder to detect).
+- Pattern 25 (late-treated states contaminate the NT control group — affects *which units* enter CS-DID). Pattern 51 (correct units, wrong weighting — affects *how* the ATT is aggregated).
+
+**Triptych context (Lesson 7)**: Together with id 25 (Carrillo-Feres, 18 controls as pre-treatment × trends, Spec A clean) and id 79 (Carpenter-Lawler, 53 controls staggered, Spec A collapses = Pattern 42), id 125 completes the three canonical Spec A behaviors: clean / collapse / inflate.
+
+**Detected in**: id 125 (Levine, McKnight & Heep 2011), Spec A audit 2026-04-19.
+
+---
+
 ## Adding New Patterns
 
 When a new failure occurs:
