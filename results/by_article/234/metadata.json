@@ -3,6 +3,8 @@
   "title": "The Power of Abortion Policy: Re-examining the Effects of Young Women's Access to Reproductive Control",
   "author_label": "Myers (2017)",
   "group_label": "escalonada_sem_controles",
+  "excluded_from_sample": true,
+  "exclusion_reason": "Paper-auditor FAIL (gap 60%). Paper's Table 2 Panel A Col 1 baseline is multivariate with 6 reproductive policy variables + state linear trends + race controls; our pipeline can only fit a univariate TWFE on epillconsent18 alone. Same outcome, same data, but estimand is fundamentally different. Excluded 2026-04-19 from comparable subsample (N=53). Methodology reanalysis still recorded in skeptic_report.md for reference.",
   "data": {
     "file": "data/raw/234/analysis_data.csv",
     "format": "csv"

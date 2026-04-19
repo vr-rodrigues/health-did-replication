@@ -26,8 +26,8 @@ all_dirs <- list.dirs(results_dir, recursive = FALSE, full.names = TRUE)
 ids <- basename(all_dirs)
 ids <- ids[grepl("^[0-9]+$", ids)]
 ids <- sort(as.integer(ids))
-# Exclude duplicates
-ids <- ids[!ids %in% c(357, 382, 438)]
+# Exclude duplicates + paper-auditor FAIL (2026-04-19: 234,242,380)
+ids <- ids[!ids %in% c(357, 382, 438, 234, 242, 380)]
 
 rows <- list()
 for (id in ids) {

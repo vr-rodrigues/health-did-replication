@@ -17,7 +17,12 @@ ids <- c(9, 21, 25, 44, 47, 60, 61, 65, 68, 76, 79, 80, 97, 125, 133,
          333, 335, 337, 347, 358, 359, 380, 395, 401,
          419, 420, 432, 433, 437, 525, 744, 1094, 2303)
 
+# Papers excluded from comparable subsample (set excluded_from_sample=true in metadata).
+# As of 2026-04-19: 234 (Myers), 242 (Moorthy-Shaloka), 380 (Kuziemko et al.) — see paper-auditor reports.
+EXCLUDED_FILE <- file.path(base_dir, "analysis", "excluded_papers.csv")
+
 rows <- list()
+excluded_log <- list()
 for (id in ids) {
   meta_file <- file.path(results_dir, id, "metadata.json")
   res_file  <- file.path(results_dir, id, "results.csv")
@@ -25,6 +30,16 @@ for (id in ids) {
     cat(sprintf("  Skipping ID %s (missing files)\n", id)); next
   }
   meta <- fromJSON(meta_file)
+  if (isTRUE(meta$excluded_from_sample)) {
+    cat(sprintf("  EXCLUDED ID %s — %s (reason logged)\n", id,
+                if (!is.null(meta$author_label)) meta$author_label else ""))
+    excluded_log[[length(excluded_log) + 1]] <- data.frame(
+      id = id,
+      author_label = if (!is.null(meta$author_label)) meta$author_label else NA_character_,
+      exclusion_reason = if (!is.null(meta$exclusion_reason)) meta$exclusion_reason else NA_character_,
+      stringsAsFactors = FALSE)
+    next
+  }
   res  <- read.csv(res_file, stringsAsFactors = FALSE)
 
   gcol <- function(name) {
@@ -100,3 +115,10 @@ consolidated <- bind_rows(rows)
 out_file <- file.path(analysis_dir, "consolidated_results.csv")
 write.csv(consolidated, out_file, row.names = FALSE)
 cat(sprintf("Saved: %s (%d articles)\n", out_file, nrow(consolidated)))
+
+# Log excluded papers separately
+if (length(excluded_log) > 0) {
+  excluded_df <- bind_rows(excluded_log)
+  write.csv(excluded_df, EXCLUDED_FILE, row.names = FALSE)
+  cat(sprintf("Saved: %s (%d excluded papers)\n", EXCLUDED_FILE, nrow(excluded_df)))
+}

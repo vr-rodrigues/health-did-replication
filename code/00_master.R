@@ -74,6 +74,17 @@ run_script("00_setup.R")
 # Rebuild consolidated_results.csv from per-article results
 run_script("code/aggregation/01_consolidate_results.R")
 
+# Rebuild paper_fidelity.csv from per-article paper_audit.md files
+# (race-safe — the concurrent paper-auditor runs can trample each other's
+# appends to the CSV; this re-derives it from the individual audit reports).
+run_script("code/aggregation/03_rebuild_paper_fidelity.R")
+
+# Rebuild skeptic_ratings.csv applying the 3-axis rubric
+# (Fidelity × Implementation) with the corrected fidelity column from
+# the paper-auditor rerun (2026-04-19). Drops papers excluded from the
+# comparable subsample (excluded_from_sample=true in metadata).
+run_script("code/aggregation/02_rebuild_skeptic_ratings.R")
+
 # Tables
 run_script("code/tables/01_chapter_statistics.R")
 run_script("code/tables/02_article_cards.R")

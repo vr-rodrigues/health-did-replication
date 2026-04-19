@@ -2,6 +2,8 @@
   "id": 380,
   "author_label": "Kuziemko, Meckel, Rossin-Slater (2018)",
   "group_label": "escalonada_controles",
+  "excluded_from_sample": true,
+  "exclusion_reason": "Paper-auditor FAIL (gap 62%). Paper's preferred Table 3 Col 3 spec uses county-specific linear time trends + multi-dimensional FE structure (county FE + conception-year FE + month-of-year FE + year×month interactions) which the template cannot replicate. Same outcome, same data, but template-imposed FE structure absorbs much less variation. Same sign (positive) but magnitude not comparable. Excluded 2026-04-19 from comparable subsample (N=53).",
   "title": "Does Managed Care Affect Birth Outcomes? Evidence from Texas's Medicaid Managed Care Mandate",
   "journal": "American Economic Journal: Economic Policy",
   "data": {

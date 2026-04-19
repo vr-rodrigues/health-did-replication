@@ -16,7 +16,7 @@ all_dirs <- list.dirs(results_root, recursive = FALSE, full.names = TRUE)
 ids <- basename(all_dirs)
 ids <- ids[grepl("^[0-9]+$", ids)]
 ids <- sort(as.integer(ids))
-ids <- ids[!ids %in% c(357, 382, 438)]
+ids <- ids[!ids %in% c(357, 382, 438, 234, 242, 380)]   # 2026-04-19 paper-auditor FAIL excluded
 
 rows <- list()
 for (id in ids) {

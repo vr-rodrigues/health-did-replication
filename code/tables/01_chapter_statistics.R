@@ -44,6 +44,7 @@ for (mf in meta_files) {
   if (is.null(m)) next
   id_str <- gsub("\\.json$", "", basename(mf))
   id_int <- suppressWarnings(as.integer(id_str))
+  if (isTRUE(m$excluded_from_sample)) next   # 2026-04-19: skip 234,242,380 (paper-auditor FAIL, see metadata exclusion_reason)
   meta_rows[[length(meta_rows)+1]] <- data.frame(
     id = id_int, id_str = id_str,
     author_label   = ifelse(is.null(m$author_label), NA_character_, m$author_label),

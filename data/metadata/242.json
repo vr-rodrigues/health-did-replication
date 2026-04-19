@@ -3,6 +3,8 @@
   "title": "Blue Collar Booms and American Mortality: Evidence from the Fracking Revolution",
   "author_label": "Moorthy, Shaloka (2025)",
   "group_label": "escalonada_controles",
+  "excluded_from_sample": true,
+  "exclusion_reason": "Paper-auditor FAIL (gap 28%). Paper's headline outcome is mortality (NCHS restricted-access data, not redistributable); our pipeline reanalyzes log earnings (BLS public data) — a fundamentally different outcome. Not a reproduction of the paper's substantive claim. Excluded 2026-04-19 from comparable subsample (N=53).",
   "data": {
     "file": "data/raw/242/dta/final_playonly.dta",
     "format": "dta",
