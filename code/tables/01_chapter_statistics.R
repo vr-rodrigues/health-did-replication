@@ -271,7 +271,7 @@ lines <- c(
       sprintf("CS-NYT is estimated for %d staggered articles; for one-time-adoption designs it is not reported separately because it coincides with CS-NT by construction.",
               as.integer(row_stag_A$csnyt))
     paste0(
-      "\\item Notes: Panel~A reports the number of articles included in the static benchmark analysis. Under the protocol of this dissertation, static comparisons are based on TWFE, CS-NT, and CS-NYT, with CS-DID as the main modern benchmark. Gardner (\\texttt{did2s}) and SA (Sun \\& Abraham) are not reported in Panel~A because they are used here only in the dynamic analysis. Panel~B reports the number of articles for which each estimator produces an event study, conditional on the article having an estimable pre-treatment path (",
+      "\\item Notes: Panel~A reports the number of articles included in the static benchmark analysis. Under the protocol of this paper, static comparisons are based on TWFE, CS-NT, and CS-NYT, with CS-DID as the main modern benchmark. Gardner (\\texttt{did2s}) and SA (Sun \\& Abraham) are not reported in Panel~A because they are used here only in the dynamic analysis. Panel~B reports the number of articles for which each estimator produces an event study, conditional on the article having an estimable pre-treatment path (",
       as.integer(panelB_tot["N"]), " of ", as.integer(panelA_tot["N"]),
       "). CS-NT could not be estimated in ",
       as.integer(row_stag_A$N) - as.integer(row_stag_A$csnt),
