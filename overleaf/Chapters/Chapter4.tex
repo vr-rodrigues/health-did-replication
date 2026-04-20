@@ -394,7 +394,7 @@ The ten lessons above point to a set of checks that an applied DiD paper should 
 
 Box~4.1 is not a substitute for the design reasoning in \textcite{baker2025difference} or in the methodological references cited throughout this chapter. Its purpose is operational: a reviewer or applied researcher can scan the 15 items and identify which empirical margin the paper has left implicit. Our reanalysis shows that papers disagree with modern re-estimation most often on the margins this box foregrounds, and that failure to surface these margins is the commonest source of reader difficulty in the sample.
 
-Two companion artefacts accompany the checklist. Box~\ref{box:decision_tree} is a decision tree for selecting a primary modern estimator given the design features that determine estimator availability and plausibility. Box~\ref{box:failure_catalog} is a failure-mode catalog summarising ten implementation traps that the AI-assisted reanalysis pipeline recurrently encountered while re-estimating the 56 papers (53 of which form the comparable subsample); each item is a specific mistake we would not have identified without running the pipeline end-to-end, and each has cost researcher time elsewhere in the published literature.
+Two companion artefacts accompany the checklist. Box~\ref{box:decision_tree} is a decision tree for selecting a primary modern estimator given the design features that determine estimator availability and plausibility. Box~\ref{box:failure_catalog} is a failure-mode catalog summarising eleven implementation traps that the AI-assisted reanalysis pipeline recurrently encountered while re-estimating the 56 papers (53 of which form the comparable subsample); each item is a specific mistake we would not have identified without running the pipeline end-to-end, and each has cost researcher time elsewhere in the published literature. The full catalog has 51 entries as of April 2026 (Appendix~\ref{AppendixC}).
 
 \begin{tcolorbox}[
   colback=gray!5,
@@ -460,7 +460,7 @@ The tree below orders the design questions that determine which modern estimator
   label={box:failure_catalog}
 ]
 \footnotesize
-The full catalog of implementation patterns is in Appendix~\ref{AppendixC}. The ten below are the traps most worth flagging to an applied user of modern DiD tools; each was encountered during reanalysis of a specific paper in the sample and each produced a silently wrong number until identified.
+The full catalog of implementation patterns is in Appendix~\ref{AppendixC}. The eleven below are the traps most worth flagging to an applied user of modern DiD tools; each was encountered during reanalysis of a specific paper in the sample and each produced a silently wrong number until identified.
 
 \begin{enumerate}[leftmargin=1.6em,itemsep=0.25em,label=\arabic*.]
 \item \textbf{Silent CS/TWFE sample mismatch} (\textcite{kresch2020buck}). If the CS-DID replication runs on a different sample than TWFE (because the original paper's sample filter was not applied to the CS branch), the resulting comparison is not an estimator swap but a protocol swap. Always assert \texttt{n\_distinct(df\_cs[[idname]]) == n\_distinct(df[[idname]])}.
@@ -482,6 +482,8 @@ The full catalog of implementation patterns is in Appendix~\ref{AppendixC}. The 
 \item \textbf{Propensity-score overfitting with fine geographic dummies in \texttt{xformla}} (Pattern~42). Passing state or region dummies through \texttt{xformla} in the doubly-robust \texttt{att\_gt} call can make the propensity-score model numerically unstable when some geographic cells contain few treated or control observations. Collapse to coarser geography, restrict to overlap-supported cells, or drop the dummies and absorb them via additional fixed effects in the TWFE comparison instead.
 
 \item \textbf{Non-deterministic standard errors from unset bootstrap seed} (Pattern~46). \texttt{did::att\_gt} uses multiplier bootstrap for standard errors. Without \texttt{set.seed(\cdot)}, reruns produce slightly different SEs and --- via the influence-function reweighting --- occasionally different point estimates. Always fix the seed at the top of the estimation script.
+
+\item \textbf{RCS control collinearity silently inflating CS-DID ATT to false positive} (Pattern~51, documented April 2026, \textcite{levine2011effective}). When the CS-DID Spec~A is run on a repeated-cross-section paper with time-varying individual-level controls (e.g., \texttt{married}, \texttt{female}, demographic composition), the doubly-robust propensity-score model estimates IPW weights from individual covariates that vary across observations within the same unit-time cell. Unlike Pattern~42 (where the model fails to converge and \texttt{ATT} collapses to zero), the model converges with extreme but finite weights. The aggregation step then mechanically inflates the ATT by 3--10$\times$ relative to the no-controls CS-DID, often flipping a statistically null result into a false positive. TWFE is unaffected because OLS handles collinearity through the Frisch-Waugh projection without reweighting. Detection rule: when \texttt{data\_structure == "rcs"} and \texttt{|ATT\_A / ATT\_B| > 2} with a sign flip or significance change, flag as RCS control-collinearity inflation and treat the no-controls CS-DID (Spec~B) as the primary estimate.
 \end{enumerate}
 \end{tcolorbox}
 
