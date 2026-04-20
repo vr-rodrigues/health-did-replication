@@ -85,6 +85,10 @@ run_script("code/aggregation/03_rebuild_paper_fidelity.R")
 # comparable subsample (excluded_from_sample=true in metadata).
 run_script("code/aggregation/02_rebuild_skeptic_ratings.R")
 
+# Sync excluded_from_sample flag from metadata into article_cards.csv
+# (must run before 02_article_cards.R so the cards reflect the exclusion).
+run_script("code/aggregation/04_flag_excluded_in_cards.R")
+
 # Tables
 run_script("code/tables/01_chapter_statistics.R")
 run_script("code/tables/02_article_cards.R")
