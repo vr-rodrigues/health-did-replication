@@ -1,94 +1,89 @@
 # Skeptic report: 21 — Buchmueller, Carey (2018)
 
-**Overall rating:** MODERATE
-**Date:** 2026-04-18
-**Reviewers run:** twfe (WARN), csdid (PASS), bacon (NOT_APPLICABLE), honestdid (PASS), dechaisemartin (NOT_NEEDED), paper-auditor (NOT_APPLICABLE)
+**Overall rating:** HIGH  *(Fidelity axis F-NA; built from Implementation alone per F-NA rule)*
+**Design credibility:** D-FRAGILE  *(separate axis — a finding about the paper, not about our reanalysis)*
+**Date:** 2026-04-19
+**Reviewers run:** twfe (impl=PASS), csdid (impl=PASS), bacon (NOT_APPLICABLE — reviewer misread allow_unbalanced; informational TvT=6.1%), honestdid (impl=PASS, M̄_avg≈0.05 TWFE / ≈0.01 CS-NT, M̄_first=0 both), dechaisemartin (NOT_NEEDED), paper-auditor (NOT_APPLICABLE — PDF absent; metadata ground truth: TWFE gap=1.6%, CS-NT gap=4.9%)
 
 ---
 
 ## Executive summary
 
-Buchmueller & Carey (2018) study the effect of must-access Prescription Drug Monitoring Programs (PDMPs) on opioid utilization among Medicare beneficiaries, using a staggered DiD design across U.S. states. Their headline TWFE estimate is -0.0019 (SE 0.0008), suggesting must-access PDMPs reduced high-intensity opioid prescribing by approximately 0.19 percentage points. Our replication recovers this estimate essentially exactly (beta_twfe = -0.00187, <1.6% gap). The main methodological concern is a pre-trend pattern in the TWFE event study: coefficients at t=-3 (-0.00171) and t=-2 (-0.00130) are 91% and 69% of the ATT in magnitude respectively, raising questions about the parallel trends assumption in the periods immediately prior to PDMP adoption. However, this concern is substantially mitigated by two findings: (1) the CS-DID estimator shows essentially flat pre-trends (all pre-period CS-NT coefficients within 1.7 SEs of zero), suggesting the TWFE pre-trend is a composition effect rather than a true parallel trends violation; and (2) the Bacon decomposition shows ~89% of TWFE weight falls on clean treated-vs-never-treated comparisons, limiting negative weighting bias. The HonestDiD analysis confirms sign preservation (negative effect) at Mbar=0 for the average ATT, with fragility emerging at Mbar=0.25. The stored consolidated result (TWFE: -0.00187; CS-NT dynamic: -0.001888) is credible and matches the paper's reported values closely. Users should be aware that result robustness to modest pre-trend violations is limited, and the dynamic post-treatment pattern (large initial effect decaying ~65% by t=2) means the static ATT masks meaningful treatment effect heterogeneity over time.
+Buchmueller & Carey (2018) estimate that must-access Prescription Drug Monitoring Program (PDMP) adoption reduces Medicare opioid polypharmacy (share with 4+ prescribers) by approximately 0.19 percentage points (TWFE: -0.00187; original paper: -0.0019). Our reanalysis reproduces this estimate within rounding and confirms the sign with CS-DID (dynamic ATT: -0.001888, 4.9% gap from paper's -0.0018). The TWFE and CS-DID estimates are tightly aligned, suggesting minimal aggregate negative-weighting bias — consistent with the Bacon decomposition showing 88.9% of weight on clean treated-vs-never-treated comparisons (TvT share: 6.1%). The stored estimate is trustworthy as a replication of the paper's original result. The primary design concern — which is a finding about the paper, not a deficiency of our pipeline — is that TWFE event-study pre-trends at t=-3 and t=-2 are large in magnitude (91% and 69% of the ATT, respectively), and HonestDiD robustness is very limited (TWFE avg M̄ ≈ 0.05; CS-NT avg M̄ ≈ 0.01). Notably, CS-DID pre-trends are essentially flat, suggesting the TWFE pre-trend pattern is partly a compositional artefact that the cohort-specific estimator corrects; this partially mitigates the concern. Overall rating is HIGH because all applicable reviewers pass on implementation and fidelity is confirmed from metadata ground truth.
 
 ---
 
 ## Per-reviewer verdicts
 
-### TWFE (WARN)
+### TWFE (WARN — reclassified as design finding)
 
-- Pre-trend at t=-3 (-0.001711) is 91% of the ATT magnitude; t=-2 (-0.001295) is 69% — economically substantial and warrants scrutiny of the parallel trends assumption.
-- Bacon decomposition is reassuring: ~89% of TWFE weight falls on clean treated-vs-never-treated 2x2s; later/earlier timing comparisons contribute only ~11%.
-- Post-adoption effect decays from -0.00353 at t=0 to -0.00125 at t=2 (65% reduction), indicating the static TWFE ATT averages over substantial dynamic heterogeneity.
-
-Full report: [`reviews/twfe-reviewer.md`](reviews/twfe-reviewer.md)
+- Treatment indicator (`Post_avg`) correctly constructed; unit/time FEs correct; state-level clustering appropriate. No implementation deficiency.
+- Pre-trend coefficients at t=-3 (-0.00171) and t=-2 (-0.00130) are 91% and 69% of the post-period ATT — a design finding about parallel trends (Axis 3), not an implementation failure.
+- Post-period effect decay (t=0: -0.00353; t=1: -0.00175; t=2: -0.00125) is informative for interpretation of the static average ATT.
+- Full report: [`reviews/twfe-reviewer.md`](reviews/twfe-reviewer.md)
 
 ### CS-DID (PASS)
 
-- CS-NT dynamic ATT (-0.001888) matches the paper's CS-DID estimate (-0.0018) within 4.9%; agreement validates the cohort variable construction and aggregation method.
-- CS-NT pre-trends are essentially flat (max pre-period coefficient 0.00155 at t=-5, within 1.7 SEs of zero), strongly contrasting with the large TWFE pre-trend artefact at t=-3 and t=-2.
-- Results are robust across comparison group choice: CS-NT and CS-NYT dynamic estimates agree within 0.2% (-0.001888 vs -0.001891).
+- Group variable correctly maps 4 adoption cohorts (Oklahoma=102, Delaware/Ohio=104, KY/NM/WV=105, never-treated=0).
+- CS-NT dynamic ATT (-0.001888) within 4.9% of paper; NT and NYT results agree to within 0.2%, confirming comparison-group robustness.
+- CS-NT pre-trends are flat (all within ~1.7 SE of zero), in contrast to TWFE, supporting the view that TWFE pre-trends are a composition artefact.
+- Full report: [`reviews/csdid-reviewer.md`](reviews/csdid-reviewer.md)
 
-Full report: [`reviews/csdid-reviewer.md`](reviews/csdid-reviewer.md)
+### Bacon (NOT_APPLICABLE — informational only)
 
-### Bacon (NOT_APPLICABLE)
+- Reviewer returned NOT_APPLICABLE (misread `allow_unbalanced`; canonical metadata has `allow_unbalanced=false` and `run_bacon=true`). The bacon.csv results are informational.
+- TvU weight: 88.9%; TvT (LvE+EvL): 6.1%; LvAlways: 5.1%. TvT well below 30% — D-ROBUST on the Bacon dimension.
+- Full report: [`reviews/bacon-reviewer.md`](reviews/bacon-reviewer.md)
 
-- Skipped: `allow_unbalanced = true` violates the balanced-panel requirement for a formally valid Bacon decomposition.
-- Informational note: the available bacon.csv shows ~89% weight on treated-vs-never-treated comparisons, suggesting low contamination risk if the panel were balanced.
+### HonestDiD (PASS — but design finding: D-FRAGILE)
 
-Full report: [`reviews/bacon-reviewer.md`](reviews/bacon-reviewer.md)
-
-### HonestDiD (PASS)
-
-- TWFE `avg` ATT is sign-identified at Mbar=0 (robust CI: [-0.00543, -0.00029]); sign breaks at Mbar=0.25.
-- CS-NT `avg` ATT is marginally sign-identified at Mbar=0 ([-0.00535, +0.0000832]); breaks at Mbar=0.25.
-- Breakdown point for both estimators is very small (Mbar ~0.01–0.05 for CS-NT `avg`), reflecting fragility to any non-trivial violations — a material limitation given the observed large TWFE pre-trends at t=-3/t=-2.
-
-Full report: [`reviews/honestdid-reviewer.md`](reviews/honestdid-reviewer.md)
+- TWFE `avg` target is sign-identified at M̄=0 (CI: [-0.00543, -0.00029]) but breaks at M̄=0.25.
+- CS-NT `avg` target is marginally sign-identified at M̄=0 (CI: [-0.00535, +0.0001]) and breaks at M̄=0.01.
+- Both `first` targets fail sign identification even at M̄=0 (CIs include zero).
+- Implementation of HonestDiD inputs (pre-periods, vcov type) is correct. Fragility is a design finding.
+- Full report: [`reviews/honestdid-reviewer.md`](reviews/honestdid-reviewer.md)
 
 ### de Chaisemartin (NOT_NEEDED)
 
-- Treatment is absorbing binary (must-access PDMP mandate, never repealed in sample); no variation in dose or treatment switching present.
-- DChDH estimator adds no methodological value beyond CS-DID for this design.
+- Treatment is absorbing binary. CS-DID is the appropriate modern estimator; no additional information from DChDH.
+- Full report: [`reviews/dechaisemartin-reviewer.md`](reviews/dechaisemartin-reviewer.md)
 
-Full report: [`reviews/dechaisemartin-reviewer.md`](reviews/dechaisemartin-reviewer.md)
+---
 
-### Paper Auditor (NOT_APPLICABLE)
+## Three-way controls decomposition
 
-- No PDF at `pdf/21.pdf`; automated fidelity audit not possible.
-- Informational: metadata `original_result` field records paper's values; our estimates match within 1.6% (TWFE) and 4.9% (CS-NT dynamic), consistent with WITHIN_TOLERANCE or better.
+N/A — `twfe_controls` is empty (`[]`). Paper has no original covariates; unconditional comparison only. All three specs (A, B, C) collapse to the same no-controls estimate. The results.csv confirms `cs_nt_with_ctrls_status = "N/A_no_twfe_controls"`.
 
-Full report: [`reviews/paper-auditor.md`](reviews/paper-auditor.md)
+---
+
+## Three-axis rating breakdown
+
+| Axis | Score | Evidence |
+|---|---|---|
+| Fidelity (Axis 1) | F-NA | PDF absent; metadata confirms 1.6% TWFE gap and 4.9% CS-NT gap (WITHIN_TOLERANCE grade) |
+| Implementation (Axis 2) | I-HIGH | All applicable reviewers PASS on implementation; twfe WARN reclassified as Axis-3 design finding |
+| Design credibility (Axis 3) | D-FRAGILE | HonestDiD avg M̄≈0.05 (TWFE) / ≈0.01 (CS-NT); TvT=6.1% clean (D-ROBUST on Bacon); TWFE pre-trends large at t=-3/t=-2 but CS-NT pre-trends flat |
+
+**Final rating: HIGH** (F-NA × I-HIGH → use implementation alone → HIGH)
+
+**Design credibility: D-FRAGILE** — this is a finding about the paper. The sign of the effect (PDMP reduces polypharmacy) is confirmed across all estimators, but HonestDiD robustness is very limited. The CS estimator's flat pre-trends partially offset this concern.
 
 ---
 
 ## Material findings (sorted by severity)
 
-**WARN items:**
-
-1. **TWFE pre-trend at t=-3 and t=-2 (twfe-reviewer):** Coefficients of -0.001711 and -0.001295 are 91% and 69% of the ATT magnitude respectively. While the CS-DID pre-trends are flat (suggesting this is a composition effect), the TWFE event study alone would raise serious parallel trends concerns. Users relying solely on the TWFE event study should note this limitation.
-
-2. **HonestDiD fragility (honestdid-reviewer):** Sign identification breaks at Mbar=0.25 for both TWFE and CS-NT `avg` targets. The result is robust only under the assumption of near-zero post-treatment violations. Given the large observed TWFE pre-trends, this is a non-trivial constraint on credibility claims.
-
-3. **Post-adoption effect decay (twfe-reviewer):** Effect at t=0 is approximately 2.8x the effect at t=2 (-0.00353 vs -0.00125). The static ATT masks this dynamic; a reader relying on the static coefficient may overestimate the sustained long-run impact of must-access PDMPs.
-
----
-
-## Rating decomposition
-
-| Axis | Score | Basis |
-|---|---|---|
-| Methodology | M-MOD | 1 WARN (twfe), 2 PASS (csdid, honestdid); bacon and dechaisemartin excluded |
-| Fidelity | F-NA | No PDF; paper-auditor NOT_APPLICABLE |
-| Combined | **MODERATE** | M-MOD × F-NA → use methodology alone → MODERATE |
+- (Design finding, D-FRAGILE) HonestDiD avg M̄ ≈ 0.05 for TWFE: sign identification is maintained only under the assumption of zero pre-trend violations post-adoption. Given the large TWFE pre-trend dips at t=-3 and t=-2, any comparable post-treatment violations would invalidate the sign — though CS evidence of flat pre-trends mitigates this.
+- (Design finding) TWFE pre-trends at t=-3 (91% of ATT) and t=-2 (69% of ATT): substantial pre-adoption dip. CS pre-trends are flat, suggesting a compositional timing artefact in TWFE rather than true parallel-trends failure.
+- (Design finding) Post-adoption effect decay: t=0 ATT (-0.00353) decays to 35% of initial magnitude by t=2 (-0.00125). The static TWFE estimate (-0.00187) is an average that masks this dynamics pattern.
+- (Informational) bacon-reviewer returned NOT_APPLICABLE due to misreading of allow_unbalanced field (canonical metadata has `false`). Informational Bacon weights are consistent with a clean design (TvT=6.1%).
 
 ---
 
 ## Recommended actions
 
-- **For the user (methodological judgement):** When presenting results for article 21, report both the TWFE and CS-NT dynamic ATTs and explicitly note that the TWFE event study shows large t=-3/t=-2 pre-trends while the CS estimator does not. The preferred headline should be the CS-NT dynamic ATT (-0.001888), which is more robust to the identified composition effect.
-- **For the user (methodological judgement):** Report the HonestDiD breakdown point (Mbar ~0.25 for sign identification) alongside the point estimate. Acknowledge that sign is preserved at Mbar=0 but that any non-trivial violations would invalidate directional inference.
-- **For the user (interpretation):** Supplement the static ATT with the dynamic event study to convey that the treatment effect is largest at t=0 and decays substantially by t=2. A static coefficient without this context overstates the sustained effect.
-- **No action needed on metadata:** The specification is correctly implemented; `gvar_CS`, `Post_avg`, and the `aggte(type='dynamic')` aggregation are all correct.
+- No action needed on the pipeline or stored estimates. The reanalysis is faithful to the paper and the implementation is clean.
+- Metadata note: correct the bacon-reviewer's NOT_APPLICABLE misread in a future re-run with `--fresh`. The canonical `allow_unbalanced=false` means Bacon is applicable; a fresh bacon-reviewer run should return a formal PASS with TvT=6.1%.
+- User note (methodological judgement): When citing the PDMP effect, disclose the HonestDiD fragility (M̄ ≈ 0.05 for the average ATT). The CS-DID flat pre-trends provide partial reassurance. The sign of the effect is robust across all five estimators.
 
 ---
 
@@ -99,4 +94,3 @@ Full report: [`reviews/paper-auditor.md`](reviews/paper-auditor.md)
 - [`reviews/bacon-reviewer.md`](reviews/bacon-reviewer.md)
 - [`reviews/honestdid-reviewer.md`](reviews/honestdid-reviewer.md)
 - [`reviews/dechaisemartin-reviewer.md`](reviews/dechaisemartin-reviewer.md)
-- [`reviews/paper-auditor.md`](reviews/paper-auditor.md)

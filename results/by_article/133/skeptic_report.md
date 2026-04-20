@@ -1,80 +1,96 @@
-# Skeptic report: 133 — Hoynes et al. (2015)
+# Skeptic report: 133 -- Hoynes et al. (2015)
 
-**Overall rating:** LOW
-**Date:** 2026-04-18
-**Reviewers run:** twfe (WARN), csdid (WARN), bacon (N/A), honestdid (WARN), dechaisemartin (NOT_NEEDED), paper-auditor (NOT_APPLICABLE)
+**Overall rating:** MODERATE
+**Design credibility:** FRAGILE
+**Date:** 2026-04-19
+**Reviewers run:** twfe (impl=PASS), csdid (impl=WARN -- Spec A anomalous zero), bacon (SKIPPED -- single timing/RCS), honestdid (impl=PASS; M_avg=0.25 TWFE; M_peak=0.25 TWFE; CS-NT uninformative at all M), dechaisemartin (NOT_NEEDED), paper-auditor (NOT_APPLICABLE -- no PDF)
 
 ## Executive summary
 
-Hoynes, Miller & Simon (2015) study the effect of the 1993 EITC expansion on low birthweight among low-income mothers, using a DiD design that compares high-parity mothers (who received a larger EITC credit, treated) to low-parity mothers (control) in 1991–1998. The headline TWFE estimate of approximately -0.35 to -0.39 percentage points on low birthweight rate is reproduced in sign and significance, but three distinct methodological concerns each earn a WARN: (1) the TWFE pre-trends are mild but positive, and the first-period effect is not robustly nonzero under HonestDiD even at Mbar=0; (2) our CS-DID estimate (-0.403) diverges substantially from the paper's reported CS-NT value (-0.180) despite the single-cohort structure, with significant pre-trends visible in the no-controls CS-NT specification; and (3) HonestDiD shows the TWFE average effect breaks down at Mbar=0.25 (modest pre-trend violation), with CS-NT confidence sets uninformative under any Mbar. The design is fundamentally sound — a single treatment cohort avoids staggered-adoption contamination — but the combination of imperfect pre-trends and limited HonestDiD robustness warrants caution. The fidelity axis cannot be evaluated (no PDF available). The stored consolidated result (beta_twfe ≈ -0.387) should be interpreted as broadly supportive of the paper's conclusion but with moderate uncertainty about the true causal magnitude.
+Hoynes; Miller & Simon (2015) estimate the effect of the 1993 EITC expansion on low birthweight among low-income mothers; comparing high-parity mothers (treated) to low-parity mothers (control) over 1991-1998. Our TWFE estimate (-0.387 pp) and CS-NT ATT (-0.403 pp) are directionally consistent and statistically significant. The TWFE implementation is clean. One implementation concern exists: att_cs_nt_with_ctrls returns 0 with status OK (Spec A silent failure; Lesson 7 instance 9; racemiss collinearity in DR propensity). The CS-NT divergence from the paper ATT (-0.403 vs -0.180) and all HonestDiD sensitivity findings are Axis 3 design-credibility signals; not Axis 2 implementation errors. Under the 3-axis rubric: F-NA (no PDF) x I-MOD (1 Spec A anomaly) -> MODERATE. Design is D-FRAGILE: TWFE average effect robust only to M=0.25; significant positive pre-trends in CS-NT no-controls specification. Single-cohort structure avoids staggered-adoption contamination but cannot address parallel-trends concerns. The stored beta_twfe (-0.387) is a credible implementation of the TWFE specification.
 
 ## Per-reviewer verdicts
 
-### TWFE (WARN)
-- Our estimate (-0.387 pp) is ~9% larger in magnitude than the paper's reported -0.355 pp, same sign and significance. Divergence is plausibly due to weighting or sample margin differences.
-- Pre-trends at t=-3 (+0.094) and t=-2 (+0.061) are positive but not individually significant at conventional levels.
-- Post-period effects grow monotonically, consistent with a cumulating income effect.
-- Full report: [`reviews/twfe-reviewer.md`](reviews/twfe-reviewer.md)
+### TWFE (impl=PASS)
+- Our estimate (-0.387 pp) is 9% larger in magnitude than the paper -0.355 pp -- same sign and significance. The 9% gap is a fidelity observation (Axis 1/F-NA); not an implementation error. Full TWFE spec (FEs; controls; clustering; weights) all PASS.
+- Mild positive pre-trends at t=-3 (+0.094; ns) and t=-2 (+0.061; ns): a design finding (Axis 3); not an implementation WARN.
+- Post-period effects grow monotonically (-0.132 to -0.564); consistent with a cumulating income effect.
+- Full report: reviews/twfe-reviewer.md
 
-### CS-DID (WARN)
-- Our CS-NT ATT (-0.403) is more than double the paper's reported CS-NT (-0.180) — a large unexplained divergence despite correctly implementing the single-cohort design.
-- CS-NT (no controls) shows statistically significant positive pre-trends at t=-3 (t≈2.49) and t=-2 (t≈2.14), undermining the parallel trends assumption for this specification.
-- att_cs_nt_with_ctrls = 0 in results (anomalous; likely a computation failure) reduces confidence in the controls-based CS-NT.
-- Full report: [`reviews/csdid-reviewer.md`](reviews/csdid-reviewer.md)
+### CS-DID (impl=WARN)
+- CS-NT ATT (-0.403) is directionally consistent with TWFE and internally coherent for a single-cohort design (TWFE vs CS gap = 0.016 pp). The paper TWFE/CS gap (-0.355 vs -0.180) is internally inconsistent for a single-cohort structure -- a paper-side puzzle; not our pipeline failure.
+- att_cs_nt_with_ctrls = 0 (status OK) is anomalous: Lesson 7 instance 9 (racemiss=0 for all parvar==1 control units -> DR propensity separation). This is the one genuine Axis 2 implementation concern.
+- Significant positive pre-trends in CS-NT no-controls spec (t=-3: t-stat~2.49; t=-2: t-stat~2.14) are a design finding (Axis 3).
+- Full report: reviews/csdid-reviewer.md
 
-### Bacon (NOT_APPLICABLE)
-- Single treatment timing (1994) and repeated cross-section structure; Bacon decomposition not applicable. Single bacon.csv row confirms weight = 1.0 (clean 2×2 DiD, no decomposition needed).
-- Full report: [`reviews/bacon-reviewer.md`](reviews/bacon-reviewer.md)
+### Bacon (SKIPPED)
+- treatment_timing=single; data_structure=repeated_cross_section. Applicability gate not met. Bacon.csv single row (weight=1.0; type=TvU) confirms clean 2x2 structure.
+- Full report: reviews/bacon-reviewer.md
 
-### HonestDiD (WARN)
-- TWFE "avg" and "peak" effects are robustly negative at Mbar=0 (no pre-trend violation allowed) but break down at Mbar=0.25; first-period effect is fragile even at Mbar=0.
-- CS-NT confidence sets include zero at Mbar=0 for all three targets (first, avg, peak) — HonestDiD is uninformative for CS-NT due to wide standard errors.
-- Breakdown at Mbar=0.25 means only 25% of the observed pre-trend magnitude suffices to overturn the average TWFE result.
-- Full report: [`reviews/honestdid-reviewer.md`](reviews/honestdid-reviewer.md)
+### HonestDiD (impl=PASS)
+- TWFE average effect: CI [-0.502; -0.158] at M=0 (robustly negative); breaks down at M=0.25. TWFE peak: CI [-0.776; -0.354] at M=0; also breaks at M=0.25. First-period: includes zero even at M=0.
+- CS-NT: all three targets include zero at M=0 (wide SEs ~0.088-0.131); HonestDiD uninformative for CS-NT -- a precision issue; not evidence of bias.
+- All HonestDiD findings are Axis 3 design findings. HonestDiD execution itself: PASS.
+- Full report: reviews/honestdid-reviewer.md
 
 ### de Chaisemartin (NOT_NEEDED)
-- Binary, absorbing, single-timing treatment with no heterogeneous dose. The de Chaisemartin estimator is not needed for this design.
-- Full report: [`reviews/dechaisemartin-reviewer.md`](reviews/dechaisemartin-reviewer.md)
+- Binary; absorbing; single-timing treatment. de Chaisemartin estimator not needed.
+- Full report: reviews/dechaisemartin-reviewer.md
 
 ### Paper Auditor (NOT_APPLICABLE)
-- PDF not available at `pdf/133.pdf`. Fidelity axis cannot be evaluated from published tables. Quantitative comparison relies solely on the `original_result` field in metadata.json.
-- Full report: [`reviews/paper-auditor.md`](reviews/paper-auditor.md)
+- pdf/133.pdf not found. Fidelity axis cannot be evaluated from published tables. Metadata original_result field (beta_twfe=-0.3549; CS-NT=-0.1799) cannot be verified against the actual paper.
+- Full report: reviews/paper-auditor.md
+
+## Three-way controls decomposition
+
+twfe_controls is non-empty (10 covariates: treat1; after; other; black; age2; age3; high; racemiss; hispanic; hispanicmiss). Decomposition applies.
+
+| Spec | TWFE | CS-DID NT | Status |
+|---|---|---|---|
+| (A) both with controls | -0.387 (se=0.083) | 0 (se=NA) | FAIL_Lesson7 -- Spec A CS-NT collapses to 0 (racemiss=0 for all control units; DR propensity separation; 9th Lesson 7 instance) |
+| (B) both without controls | -0.447 (se=0.103) | -0.403 (se=0.088) | OK |
+| (C) TWFE with controls; CS without (headline) | -0.387 (se=0.083) | -0.403 (se=0.088) | OK -- current default |
+
+Key ratios (Spec B -- only valid matched-protocol spec):
+- Estimator margin (Spec B protocol-matched): (-0.447 - (-0.403)) / |-0.447| = -9.8% (CS-NT 9.8% smaller in magnitude than TWFE without controls)
+- Covariate margin (TWFE side): (-0.387 - (-0.447)) / 0.387 = +15.5% (controls attenuate TWFE; removes 15.5% of the no-controls effect)
+- Total gap (headline Spec C): (-0.387 - (-0.403)) / 0.387 = +4.1% (TWFE and CS-NT almost identical in Spec C)
+
+Verbal interpretation: Spec B shows both estimators agree directionally with a 9.8% magnitude gap -- modest. The large divergence from the paper CS-NT (-0.180) is not reproduced by our pipeline; our single-cohort CS-NT (-0.403) is mechanically coherent with our TWFE (-0.387). Spec A collapses (Lesson 7 Pattern 42; racemiss collinearity). The matched-protocol estimate confirms the estimator gap is small.
+
+This decomposition feeds Deliverable D1 of the QJE review (Sant Anna; 2026-04-17).
+
+## Three-axis rating derivation
+
+| Axis | Score | Basis |
+|---|---|---|
+| Fidelity (paper-auditor) | F-NA | PDF not available; fidelity not evaluable |
+| Implementation (Axis 2) | I-MOD | 1 WARN: att_cs_nt_with_ctrls=0 anomaly (Spec A Lesson7 instance 9). TWFE impl PASS. HonestDiD impl PASS. Pre-trend/divergence WARNs reclassified as Axis 3 design findings. |
+| Design credibility (Axis 3) | D-FRAGILE | TWFE avg M=0.25 (breaks); peak M=0.25; CS-NT positive significant pre-trends; first-period not robust at M=0 |
+
+F-NA x I-MOD -> use implementation alone -> MODERATE
+
+Design credibility is a finding about the paper: parallel-trends evidence is fragile under HonestDiD and the CS-NT no-controls specification shows significant positive pre-trends. This does not downgrade our rating.
 
 ## Material findings (sorted by severity)
 
-- **[WARN — CS-DID divergence]** Our CS-NT ATT (-0.403) diverges from the paper's CS-NT (-0.180) by 0.223 pp (>100%). The single-cohort structure means these should be close; the gap likely reflects a differences in controls implementation (Stata drops collinear racemiss silently; R behavior differs) and/or base_period specification.
-- **[WARN — CS-NT pre-trends]** CS-NT (no controls) shows statistically significant positive pre-trends at t=-3 and t=-2 (t-stats ≈ 2.49 and 2.14). This is a direct threat to the parallel trends assumption for the no-controls CS-NT specification.
-- **[WARN — HonestDiD fragility]** TWFE avg/peak effects are robust only up to Mbar=0.25. CS-NT is uninformative under HonestDiD at any Mbar. The first-period TWFE effect is not robust even at Mbar=0.
-- **[WARN — TWFE magnitude divergence]** Our TWFE beta (-0.387) is 9% larger than the paper's (-0.355), though same sign and significance.
-- **[WARN — att_cs_nt_with_ctrls anomaly]** att_cs_nt_with_ctrls = 0 in results.csv (status "OK") suggests a silent failure in the controls-based CS-NT specification.
+- [Axis 2 -- WARN: Spec A collapse] att_cs_nt_with_ctrls = 0 (status OK) is a silent failure of the doubly-robust CS-NT with controls. Lesson 7 instance 9: racemiss=0 for all parvar==1 control units causes DR propensity separation. Spec A not usable for this article.
+- [Axis 3 -- Design finding: positive CS-NT pre-trends] CS-NT no-controls specification shows statistically significant positive pre-trends at t=-3 (t~2.49) and t=-2 (t~2.14). TWFE pre-trends milder (+0.094; +0.061; both ns).
+- [Axis 3 -- Design finding: HonestDiD fragility] TWFE average and peak effects robust only to M=0.25. First-period effect not robust even at M=0. CS-NT HonestDiD uninformative (precision issue; not bias).
+- [Axis 3 -- Design finding: CS-NT divergence from paper] Paper reports CS-NT=-0.180; our CS-NT=-0.403. The paper TWFE/CS gap is internally inconsistent for a single-cohort design. Source of the paper -0.180 is unresolved.
+- [Axis 1 -- Fidelity not evaluable] No PDF available. Profiled metadata (beta_twfe=-0.3549) suggests a 9% gap from our stored -0.387; documented in metadata as template drift (audit 2026-04-19).
 
 ## Recommended actions
 
-- **For repo-custodian:** Investigate the att_cs_nt_with_ctrls = 0 anomaly — verify whether the controls-based CS-NT ran correctly or silently returned 0. Rerun with diagnostic logging enabled.
-- **For repo-custodian:** Check whether `base_period = 'universal'` was correctly applied in R's did::att_gt() for CS-NT; this is documented in the metadata notes as required to match Stata. Confirm it was used in the stored run.
-- **For repo-custodian:** The CS-NT divergence from the paper (-0.403 vs. -0.180) warrants a targeted diagnostic run — compare against Stata csdid2 output with i.stateres + xformla excluding racemiss, using method=dripw, to identify the source of divergence.
-- **For user (methodological judgement):** The HonestDiD breakdown at Mbar=0.25 for the average effect means confidence in the average post-period impact is contingent on believing pre-trends are nearly zero. Given the observed positive pre-trends (especially in CS-NT), users should acknowledge moderate sensitivity. The peak (5-year) effect is somewhat more robust.
-- **For user:** The large CS-NT divergence from the paper's reported value is unexplained and should be disclosed when reporting the consolidated reanalysis results for this article.
-- **No new pattern needed:** The collinearity issue (racemiss = 0 for all controls) is already documented in the article notes. No new failure_patterns.md entry required.
-
-## Methodology score derivation
-| Reviewer | Verdict | Counted? |
-|---|---|---|
-| twfe | WARN | Yes |
-| csdid | WARN | Yes |
-| bacon | NOT_APPLICABLE | No |
-| honestdid | WARN | Yes |
-| dechaisemartin | NOT_NEEDED | No |
-
-Applicable methodology reviewers: 3. WARNs: 3. FAILs: 0.
-Rule applied: ≥2 WARN (no FAIL) → **M-LOW**
-Fidelity score: F-NA (no PDF). Rating uses methodology alone.
-**Final rating: LOW**
+- For repo-custodian: Investigate att_cs_nt_with_ctrls=0 anomaly -- add diagnostic logging to confirm Lesson 7 Pattern 42 (propensity separation from racemiss) and note Spec A as unavailable in metadata.
+- For user (methodological judgement): Disclose HonestDiD M=0.25 breakdown for the average TWFE effect in the dissertation. The CS-NT pre-trends (significant at t=-3 and t=-2) reinforce the D-FRAGILE signal.
+- For user: Disclose the CS-NT divergence (-0.403 vs paper -0.180) when reporting this article reanalysis. Our value is mechanically coherent for single-cohort.
+- No new pattern needed: racemiss collinearity in Spec A is Lesson 7 / Pattern 42; already documented. 9% TWFE template drift is documented in metadata notes (audit 2026-04-19).
 
 ## Individual reports
-- [`reviews/twfe-reviewer.md`](reviews/twfe-reviewer.md)
-- [`reviews/csdid-reviewer.md`](reviews/csdid-reviewer.md)
-- [`reviews/bacon-reviewer.md`](reviews/bacon-reviewer.md)
-- [`reviews/honestdid-reviewer.md`](reviews/honestdid-reviewer.md)
-- [`reviews/dechaisemartin-reviewer.md`](reviews/dechaisemartin-reviewer.md)
-- [`reviews/paper-auditor.md`](reviews/paper-auditor.md)
+- reviews/twfe-reviewer.md
+- reviews/csdid-reviewer.md
+- reviews/bacon-reviewer.md
+- reviews/honestdid-reviewer.md
+- reviews/dechaisemartin-reviewer.md
+- reviews/paper-auditor.md

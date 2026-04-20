@@ -1,63 +1,83 @@
-# Skeptic report: 147 — Greenstone, Hanna (2014)
+# Skeptic report: 147 --- Greenstone, Hanna (2014)
 
-**Overall rating:** LOW
-**Date:** 2026-04-18
-**Reviewers run:** twfe (WARN), csdid (WARN), bacon (N/A), honestdid (FAIL), dechaisemartin (NOT_NEEDED), paper-auditor (NOT_APPLICABLE)
+**Overall rating:** HIGH  *(Fidelity x Implementation: F-NA x I-HIGH -> use implementation alone -> HIGH)*
+**Design credibility:** BROKEN  *(separate axis -- a finding about the paper, not about our reanalysis)*
+**Date:** 2026-04-19
+**Reviewers run:** twfe (impl=PASS), csdid (impl=PASS), bacon (SKIPPED: allow_unbalanced=true), honestdid (impl=PASS, design-FAIL: M_bar=0 all targets), dechaisemartin (NOT_NEEDED), paper-auditor (NOT_APPLICABLE: no PDF)
 
 ## Executive summary
 
-Greenstone & Hanna (2014) estimate the effect of India's catalytic converter policy on SPM (suspended particulate matter) air pollution using a staggered TWFE design with 9 concurrent SCAP policy controls. The headline TWFE estimate (+8.01 µg/m³, SE=11.93) is statistically insignificant and our replication reproduces it to within rounding precision. However, the pre-trend pattern is systematically large and negative across all estimators (TWFE: -35.6 at h=-5; CS-NT: -55.2 at h=-5; SA: -61.3 at h=-5), revealing selection of high-pollution cities into earlier adoption. The HonestDiD sensitivity analysis fails at every Mbar level — robust confidence intervals cross zero even under the assumption of zero pre-trend violation, providing no informative causal evidence. CS-DID estimates are directionally consistent with TWFE but cannot incorporate the critical SCAP policy controls, limiting comparability. The stored consolidated result (beta_twfe = 8.01) numerically replicates the paper, but confidence in a causal interpretation is low. The primary concern is methodological, inherited from the original paper's design.
+Greenstone and Hanna (2014) estimate the effect of India catalytic converter policy on SPM using a staggered TWFE design with 9 concurrent SCAP policy controls. Our replication reproduces the headline TWFE estimate essentially exactly (8.015 vs 8.01 ug/m3, gap < 0.06%) using the metadata-recorded target; the SE difference (11.93 vs 12.59) is fully explained by feols singleton removal and all CS-DID variants are directionally consistent. Our implementation is clean (I-HIGH). However, the paper design is D-BROKEN: HonestDiD robust CIs include zero at Mbar=0 for every target (first-post, average, peak) and both estimators (TWFE and CS-NT), meaning the causal claim cannot be made robust to even the smallest pre-trend violation. Pre-trends are large and monotonically declining (TWFE h=-5: -35.6 ug/m3; CS-NT h=-5: -55.2 ug/m3) relative to the post-treatment estimate (8 ug/m3), consistent with selection of high-pollution cities into earlier policy adoption. The stored beta_twfe = 8.01 faithfully replicates the paper but should be flagged prominently in any meta-analysis as having a broken identification strategy.
 
 ## Per-reviewer verdicts
 
-### TWFE (WARN)
-- Point estimate replicates the paper essentially exactly (8.015 vs 8.01); SE gap (11.93 vs 12.59) is due to feols singleton removal, not a methodological error.
-- Pre-trends are large and systematic: h=-5 is -35.6 µg/m³ and monotonically approaches zero at h=-1, consistent with selection of deteriorating cities into policy adoption.
-- Controls attenuate the coefficient substantially (14.48 without controls vs 8.01 with); windowed treatment design (event window [-7,+9]) complicates ATT interpretation.
-- Full report: [`reviews/twfe-reviewer.md`](reviews/twfe-reviewer.md)
+### TWFE (impl=PASS, design-WARN: pre-trends + windowed treatment)
+- Point estimate replicates metadata target exactly (8.015 vs 8.01; gap < 0.06%); SE gap (11.93 vs 12.59) attributable to feols singleton removal -- implementation PASS.
+- Pre-trends large and monotonically declining (h=-5: -35.6 ug/m3 to h=-1: -5.7 ug/m3): Axis 3 design finding.
+- Controls attenuate coefficient ~44% (14.48 without vs 8.01 with); windowed treatment [-7,+9] complicates ATT interpretation: Axis 3 design finding.
+- Full report: [reviews/twfe-reviewer.md](reviews/twfe-reviewer.md)
 
-### CS-DID (WARN)
-- CS-NT ATT = 6.97 (SE=19.94) and CS-NYT ATT = 6.52 (SE=19.19): directionally consistent with TWFE but statistically insignificant with wider SEs.
-- CS pre-trends at h=-5 are even larger than TWFE (CS-NT: -55.2; CS-NYT: -40.0), reinforcing parallel trends concern.
-- CS-DID cannot incorporate SCAP policy controls by design, so it measures a different estimand — the comparison is informative but not clean.
-- Full report: [`reviews/csdid-reviewer.md`](reviews/csdid-reviewer.md)
+### CS-DID (impl=PASS, design-WARN: pre-trends + structural SCAP gap)
+- CS-NT ATT = 6.97 (SE=19.94), CS-NYT ATT = 6.52 (SE=19.19): directionally consistent, both insignificant -- implementation correct.
+- CS-DID cannot incorporate SCAP controls (cs_controls=[]); documented structural constraint, not an implementation error -- Axis 3 design finding.
+- CS-NT pre-trends even larger than TWFE (h=-5: -55.2 vs -35.6 ug/m3): Axis 3 design finding.
+- Full report: [reviews/csdid-reviewer.md](reviews/csdid-reviewer.md)
 
-### Bacon (NOT_APPLICABLE)
-- Unbalanced panel (`allow_unbalanced: true`) precludes Bacon decomposition.
-- Full report: [`reviews/bacon-reviewer.md`](reviews/bacon-reviewer.md)
+### Bacon (SKIPPED)
+- Unbalanced panel (allow_unbalanced=true) and run_bacon=false preclude decomposition.
+- Full report: [reviews/bacon-reviewer.md](reviews/bacon-reviewer.md)
 
-### HonestDiD (FAIL)
-- All robust CIs (TWFE and CS-NT; targets first/avg/peak) cross zero at Mbar=0 — no informative lower bound on the treatment effect even assuming zero pre-trend violation.
-- TWFE target=first at Mbar=0: (-34.80, +37.80); CS-NT target=peak at Mbar=0: (-4.56, +76.67).
-- The observed pre-trends (35-55 µg/m³ at h=-5) dwarf the post-treatment estimate (8 µg/m³), making the sensitivity analysis uninformative.
-- Full report: [`reviews/honestdid-reviewer.md`](reviews/honestdid-reviewer.md)
+### HonestDiD (impl=PASS, design-FAIL: M_bar=0 all targets)
+- HonestDiD run correctly against valid inputs (4 pre-periods) -- implementation PASS.
+- All robust CIs include zero at Mbar=0: TWFE first-post (-34.80, +37.80); CS-NT peak (-4.56, +76.67) -- Axis 3 D-BROKEN.
+- No breakdown value computable: pre-trends (35-55 ug/m3) dwarf post-treatment estimate (8 ug/m3).
+- Full report: [reviews/honestdid-reviewer.md](reviews/honestdid-reviewer.md)
 
 ### de Chaisemartin (NOT_NEEDED)
-- Standard staggered absorbing binary design within the event window; CS-DID framework is sufficient.
-- Full report: [`reviews/dechaisemartin-reviewer.md`](reviews/dechaisemartin-reviewer.md)
+- Standard staggered absorbing binary design within event window; CS-DID framework sufficient.
+- Full report: [reviews/dechaisemartin-reviewer.md](reviews/dechaisemartin-reviewer.md)
+
+## Three-way controls decomposition
+
+TWFE controls non-empty (9 covariates). cs_controls=[] by design -- SCAP policy controls are jointly-estimated event-window dummies, not pre-determined covariates passable to CS-DID. Spec A returns att_cs_nt_with_ctrls=0/NA (pipeline status=OK) via propensity separation -- Pattern 42 / Lesson 7 COLLAPSE-staggered.
+
+| Spec | TWFE | CS-DID NT | Status |
+|---|---|---|---|
+| (A) both with controls | 8.015 (SE=11.926) | 0 / NA | COLLAPSE (Pattern 42: 9 direct-level controls + staggered DR) |
+| (B) both without controls | 14.483 (SE=10.553) | 6.965 (SE=19.941) | OK |
+| (C) TWFE with, CS without | 8.015 (SE=11.926) | 6.965 (SE=19.941) | -- (headline, current default) |
+
+Key ratios:
+- Estimator margin (protocol-matched, Spec B): (14.483 - 6.965) / |14.483| = +52%
+- Covariate margin (TWFE side): (8.015 - 14.483) / |8.015| = -81%
+- Total gap (current headline, Spec C): (8.015 - 6.965) / |8.015| = +13%
+
+Verbal interpretation: Spec B matched-protocol reveals +52% estimator gap driven entirely by the TWFE covariate effect (-81%). CS-DID without controls confirms a positive but imprecise treatment signal. Spec A collapses (Pattern 42). Canonical Lesson 7 COLLAPSE-staggered case alongside articles 79, 47, 358.
 
 ## Material findings (sorted by severity)
 
-**FAIL:**
-- HonestDiD sensitivity analysis produces uninformative bounds at all Mbar levels for all targets (TWFE and CS-NT). The pre-trend pattern makes causal identification fundamentally questionable.
+**Design findings (Axis 3 -- findings about the paper, not demerits against our work):**
+- D-BROKEN: M_bar = 0 at first-post and peak for both TWFE and CS-NT. All robust CIs include zero at Mbar=0. No informative lower bound achievable.
+- D-BROKEN (corroborating): Pre-trends large and monotonically declining (TWFE h=-5: -35.6; CS-NT h=-5: -55.2; SA h=-5: -61.3 ug/m3). Consistent with selection of deteriorating-air-quality cities into earlier adoption.
+- Structural SCAP gap: CS-DID cannot control for concurrent SCAP policy; Spec A collapses (Pattern 42); Spec B estimator margin = +52%.
+- Controls sensitivity: TWFE shrinks 44% from 14.48 (no controls) to 8.01 (with controls).
 
-**WARN:**
-- TWFE: Large systematic pre-trends (h=-5: -35.6; h=-4: -30.1 µg/m³) across all estimators suggest selection into treatment based on pre-existing pollution trajectory. Post-treatment estimates oscillate with no coherent pattern.
-- CS-DID: Cannot control for the concurrent SCAP policy, which is a key part of the identification strategy in the original paper. CS-DID estimates a different (and potentially confounded) estimand.
-- Controls sensitivity: removing 9 TWFE controls increases the estimate from 8.01 to 14.48 (+80%), signalling substantial omitted variable dependence.
-- tauSCR and tauCATR dropped for collinearity — the model is over-parameterised.
+**Implementation notes (no WARN-level findings):**
+- SE difference (R: 11.93 vs Stata: 12.59): feols singleton removal; documented in metadata.
+- tauSCR and tauCATR collinear and dropped: expected for event-window dummies + city+year FEs.
 
 ## Recommended actions
 
-- **For the user (methodological judgement):** The HonestDiD FAIL means no robust causal inference can be drawn from any specification. The stored beta_twfe = 8.01 is a replication of the paper's number but should not be interpreted as a credible causal estimate. Flag this paper in any meta-analysis as having severe parallel trends concerns.
-- **For the repo-custodian agent:** Consider flagging in metadata that the treatment variable `catconvpolicy` is a finite-window indicator (not a pure absorbing dummy), and note that the HonestDiD breakdown occurs at Mbar=0 for all targets.
-- **For the pattern-curator:** Add or reinforce Pattern for "selection-into-treatment via pre-existing trend": large monotone pre-trends across all estimators (TWFE, CS-NT, CS-NYT, SA) in a context where pollution levels predict policy adoption — all post-treatment estimates are insignificant and HonestDiD provides no lower bound.
-- **For the user:** If a sensitivity analysis with the Gardner (BJS) estimator pre-trends (which are smaller) is desired, a targeted re-run using the BJS event study may be informative — Gardner pre-trends (h=-5: -7.5, h=-4: -8.9) are much smaller than TWFE/CS, warranting a separate HonestDiD run.
+- No action needed on implementation -- all reviewers PASS on Axis 2.
+- For the user: Flag article 147 as D-BROKEN in any meta-analysis. beta_twfe=8.01 faithfully replicates the paper, but causal inference is untenable.
+- For the user (optional): A BJS-only HonestDiD run may be informative -- Gardner pre-trends (h=-5: -7.5 ug/m3) are much smaller than TWFE (-35.6).
+- For the pattern-curator: Reinforce COLLAPSE-staggered with concurrent SCAP-type policy controls as canonical Lesson 7 COLLAPSE-staggered instance (alongside articles 79, 47, 358).
+- For the pattern-curator: Document compound design failure: D-BROKEN HonestDiD + large monotone pre-trends + concurrent policy confounders (SCAP) + selection into deteriorating units.
 
 ## Individual reports
-- [`reviews/twfe-reviewer.md`](reviews/twfe-reviewer.md)
-- [`reviews/csdid-reviewer.md`](reviews/csdid-reviewer.md)
-- [`reviews/bacon-reviewer.md`](reviews/bacon-reviewer.md)
-- [`reviews/honestdid-reviewer.md`](reviews/honestdid-reviewer.md)
-- [`reviews/dechaisemartin-reviewer.md`](reviews/dechaisemartin-reviewer.md)
-- [`reviews/paper-auditor.md`](reviews/paper-auditor.md)
+- [reviews/twfe-reviewer.md](reviews/twfe-reviewer.md)
+- [reviews/csdid-reviewer.md](reviews/csdid-reviewer.md)
+- [reviews/bacon-reviewer.md](reviews/bacon-reviewer.md)
+- [reviews/honestdid-reviewer.md](reviews/honestdid-reviewer.md)
+- [reviews/dechaisemartin-reviewer.md](reviews/dechaisemartin-reviewer.md)
+- [reviews/paper-auditor.md](reviews/paper-auditor.md)

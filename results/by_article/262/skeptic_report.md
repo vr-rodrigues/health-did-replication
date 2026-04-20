@@ -1,94 +1,114 @@
 # Skeptic report: 262 -- Anderson, Charles, Rees (2020)
 
-**Overall rating:** LOW
-**Date:** 2026-04-18
-**Reviewers run:** twfe (WARN), csdid (WARN), bacon (WARN), honestdid (PASS), dechaisemartin (NOT_NEEDED), paper-auditor (NOT_APPLICABLE)
+**Overall rating:** MODERATE  *(Fidelity x Implementation: F-NA x I-MOD -> use implementation alone -> MODERATE)*
+**Design credibility:** D-FRAGILE  *(separate axis -- finding about the paper, not our reanalysis)*
+**Date:** 2026-04-19
+**Reviewers run:** twfe (impl=PASS; design-WARNs->Axis3), csdid (impl=WARN: Spec A collapse 0/NA), bacon (impl=WARN: metadata flag mismatch; TvT=11.4%->Axis3), honestdid (impl=PASS; M_first~0.25, M_avg=0->D-FRAGILE Axis3), dechaisemartin (NOT_NEEDED), paper-auditor (NOT_APPLICABLE)
 
 ---
 
 ## Executive summary
 
-Anderson, Charles, Rees (2020) studies the effect of hospital desegregation -- operationalized through Medicare certification requirements -- on Black postneonatal mortality in the Deep South, using a staggered DiD design across 7 adoption cohorts (1967-1973). The headline TWFE result is beta = 1.221 (SE = 0.888), which is not statistically significant (t = 1.38, p approx 0.17). The more credible CS-NT estimate is 0.995 (SE = 0.404, t = 2.46, significant at 5%), suggesting a real but modest effect on Black postneonatal mortality. Three methodological concerns collectively drive a LOW rating: (1) extreme cohort imbalance (1967 cohort = 85% of treated units) contaminates both TWFE and CS aggregation; (2) CS-NYT is severely underpowered (SE ~5x CS-NT) due to near-empty not-yet-treated pools for late cohorts; and (3) the Bacon decomposition reveals substantial treatment effect heterogeneity (TvU average ~9.15 vs timing-group average ~2.40), indicating the TWFE estimate is a contaminated blend rather than a clean ATT. HonestDiD provides partial reassurance: the CS-NT estimate is robust under parallel trends (Mbar=0) but breaks at Mbar approx 0.25. The stored CS-NT result (0.995, SE 0.404) can be cautiously trusted as the best available estimate, but the paper's conclusion rests on a TWFE specification that is non-significant and methodologically compromised by forbidden comparisons.
+Anderson, Charles, Rees (2020) studies hospital desegregation -- operationalized through Medicare certification -- on Black postneonatal mortality in the Deep South, staggered DiD across 7 cohorts (1967-1973). Headline TWFE: beta=1.221 (SE=0.888, p~0.17, not significant). CS-NT: 0.995 (SE=0.404, t=2.46, significant at 5%). Fidelity cannot be evaluated (no PDF, no original_result). Implementation is mostly clean with one Axis-2 concern: Spec A CS-NT returns 0/NA (likely Pattern 42 propensity separation with 3 direct-level controls). Design-credibility axis: HonestDiD shows CS-NT robust at M=0 but breaks at M~0.25; Bacon reveals large heterogeneity by cohort timing (TvU avg 9.15 vs timing-group avg 2.5), though TvU share is only 11.4%. CS-NT stored value (0.995, SE 0.404) is the best available estimate; the TWFE headline is non-significant and contaminated by 85%-cohort imbalance.
 
 ---
-
 ## Per-reviewer verdicts
 
-### TWFE (WARN)
+### TWFE (impl=PASS; design WARNs -> Axis 3)
 
-- Specification matches original Stata code exactly: county FE, year FE, three time-varying controls, birth-weighted, clustered by county, Black race subsample with balanced panel restriction.
-- Headline TWFE result not significant at 5%: beta = 1.221, SE = 0.888, t = 1.38. Pre-trends are flat (all pre-period t-stats below 0.55) but measured imprecisely (SE approx 1.5-2.0).
-- Staggered adoption with 85% of treated units adopting in 1967 creates forbidden comparison risk: TWFE uses the dominant 1967 cohort as implicit control for all later cohorts, potentially contaminating the estimate with heterogeneous treatment effects.
+- Specification matches original Stata code exactly: county FE, year FE, three time-varying controls, birth-weighted, clustered by county, Black subsample with balanced panel restriction. Implementation is clean.
+- TWFE pre-trends are flat (all pre-period |t| < 0.55) but measured imprecisely (SE approx 1.5-2.0); low bar for a null pre-trend test -- design finding, Axis 3.
+- Staggered adoption with 85% of treated units in 1967: TWFE uses dominant early cohort as implicit control for all later cohorts. Forbidden-comparison contamination inflates SEs relative to CS-NT (0.888 vs 0.404) -- design finding, Axis 3.
 
 Full report: reviews/twfe-reviewer.md
 
-### CS-DID (WARN)
+### CS-DID (impl=WARN: Spec A 0/NA)
 
-- CS-NT delivers a significant estimate (0.995, SE 0.404, t = 2.46), in contrast to non-significant TWFE, suggesting the forbidden-comparison contamination in TWFE adds noise rather than bias.
-- CS-NYT is non-significant (ATT = 1.270, SE = 2.222) due to near-empty not-yet-treated pools for the 1970-1973 cohorts (< 1% each), making the NYT estimator unreliable for this dataset.
-- att_cs_nt_with_ctrls returns 0 with NA standard error -- anomalous, likely indicating a silent convergence failure in the controlled CS-NT specification.
+- CS-NT simple ATT = 0.995 (SE 0.404, t=2.46) is statistically significant at 5%; CS-NYT (1.270, SE 2.222) is not, because not-yet-treated pools are near-empty for 1970-1973 cohorts (<1% each) -- design finding, Axis 3.
+- Axis-2 concern: att_cs_nt_with_ctrls=0, SE=NA -- Spec A silent convergence failure. With 3 direct-level time-varying controls and extremely imbalanced cohort structure, consistent with Pattern 42 (propensity score separation in doubly-robust estimator). cs_nyt_with_ctrls runs successfully (2.452, SE 2.705, status=OK).
+- CS-NYT severely underpowered (SE 5x CS-NT) due to cohort structure -- design finding, Axis 3.
 
 Full report: reviews/csdid-reviewer.md
 
-### Bacon (WARN)
+### Bacon (impl=WARN: metadata flag mismatch; TvT diagnostics -> Axis 3)
 
-- Timing-group comparisons dominate: 88.6% of TWFE weight comes from Earlier vs Later Treated (59.5%) and Later vs Earlier Treated (29.1%), with only 11.4% from Treated vs Untreated.
-- Substantial treatment effect heterogeneity: TvU weighted average estimate = 9.15 vs timing-group weighted averages of 1.91 (Earlier vs Later) and 3.38 (Later vs Earlier). The cleanest comparison (against never-treated) yields much larger effects.
-- Cohort 1969 shows negative estimates in some timing pairs (vs 1967: -1.33; vs 1968: -8.46), though these have small weights (< 0.5%).
+- Axis-2 concern: run_bacon=false in metadata despite bacon.csv existing and being valid. Minor metadata inconsistency.
+- TvT timing-group weight = 88.6% (EarlierVsLater 59.5% + LaterVsEarlier 29.1%); TvU = 11.4%. TvU < 30% is a D-ROBUST signal, but large timing-group weight exposes TWFE to heterogeneity contamination -- Axis 3 design finding.
+- TvU weighted avg = 9.15 vs timing-group avg approx 2.5: substantial heterogeneity by cohort timing. Cohort 1969 shows negative estimates in some pairs (vs 1967: -1.33; vs 1968: -8.46) with small weights -- Axis 3 design finding.
 
 Full report: reviews/bacon-reviewer.md
 
-### HonestDiD (PASS)
+### HonestDiD (impl=PASS; M thresholds -> Axis 3 D-FRAGILE)
 
-- CS-NT estimate is robust at Mbar=0 (no pre-trend violations assumed): first-post lb = 0.32, ub = 3.97; avg lb = 0.30, ub = 1.99; peak lb = 1.03, ub = 4.39. All three targets exclude zero.
-- TWFE estimate is not robust even at Mbar=0 (first-post lb = -0.80), but this reflects imprecision rather than pre-trend evidence -- the TWFE is simply underpowered.
-- Robustness breaks down at Mbar approx 0.25 for CS-NT, meaning results are robust to pre-trend violations no larger than 25% of observed pre-period variation. Given flat observed pre-trends (max |t-stat| = 1.02), this is a plausible assumption.
+- CS-NT is robust at M=0: first-post lb=0.32, ub=3.97; avg lb=0.30, ub=1.99; peak lb=1.03, ub=4.39. All three targets exclude zero.
+- CS-NT breaks at M approx 0.25 for first-post and avg targets -- M in [0.1, 0.5] -> D-FRAGILE design signal.
+- TWFE not robust even at M=0 (first-post lb=-0.80) -- reflects imprecision (large SEs), not pre-trend evidence.
 
 Full report: reviews/honestdid-reviewer.md
 
 ### de Chaisemartin (NOT_NEEDED)
 
-- Standard absorbing binary staggered design. Treatment (Medicare certification) is permanent and binary. CDH estimator adds no diagnostic value beyond CS-DID for this design.
+- Standard absorbing binary staggered design; CDH estimator adds no information beyond CS-DID.
 
 Full report: reviews/dechaisemartin-reviewer.md
+
+---
+## Three-axis rating
+
+| Axis | Score | Basis |
+|---|---|---|
+| Axis 1 -- Fidelity | F-NA | PDF absent; original_result={}; paper-auditor NOT_APPLICABLE |
+| Axis 2 -- Implementation | I-MOD | 1 impl WARN (Spec A CS-NT=0/NA, Pattern 42 candidate) + 1 metadata WARN (run_bacon flag mismatch); no FAIL |
+| Axis 3 -- Design credibility | D-FRAGILE | M_avg=0 breaks at 0.25; TvU avg 9.15 vs timing avg 2.5; pre-trends flat but imprecise |
+
+**Final rating: MODERATE** (F-NA x I-MOD -> use implementation alone -> MODERATE)
+
+---
+
+## Three-way controls decomposition
+
+| Spec | TWFE | CS-DID NT | Status |
+|---|---|---|---|
+| (A) both with controls | 1.221 (SE 0.888) | 0 (SE NA) | FAIL -- Spec A CS-NT convergence failure (Pattern 42 candidate) |
+| (B) both without controls | 1.206 (SE 0.892) | not available as standalone aggregate | -- |
+| (C) TWFE with, CS without (headline) | 1.221 (SE 0.888) | 0.995 (SE 0.404) | current default |
+
+Key ratios:
+- Total gap (Spec C headline): (1.221 - 0.995) / 1.221 = +18.5% (TWFE larger; imprecision-driven)
+- Covariate margin (TWFE side): (1.221 - 1.206) / 1.221 = +1.2% (controls add negligible information)
+- Spec A status: FAIL (CS-NT+controls returns 0/NA). Matched-protocol estimator margin cannot be computed.
+
+Verbal interpretation: The 18.5% TWFE vs CS-NT gap (Spec C) is driven almost entirely by the estimator choice, not covariates (TWFE covariate margin = 1.2%). Spec A collapse prevents confirmation via matched protocol; the gap is consistent with forbidden-comparison variance inflation in TWFE rather than control-variable confounding.
 
 ---
 
 ## Material findings (sorted by severity)
 
-WARN items:
+Implementation concerns (Axis 2):
 
-1. [WARN -- TWFE] Forbidden comparison contamination. With 85% of treated units adopting in 1967, TWFE uses the dominant early adopter as implicit control for all later cohorts. This is a known source of heterogeneity bias in staggered TWFE, manifested as large SEs (0.888) relative to CS-NT (0.404).
+1. [WARN -- CS-DID, Axis 2] Spec A CS-NT (att_cs_nt_with_ctrls) returns 0/NA. Likely Pattern 42: 3 direct-level time-varying controls plus extreme cohort imbalance (85% in 1967) cause propensity score separation in the doubly-robust estimator. Spec A CS-NYT runs successfully (2.452, status=OK). Requires investigation and re-run.
 
-2. [WARN -- CS-DID] CS-NYT severely underpowered. Not-yet-treated control group is near-empty for late cohorts (1970-1973 < 1% each), producing SE = 2.222 (5x the CS-NT SE). The NYT estimator should not be used as a robustness check in this setting.
+2. [WARN -- Bacon, Axis 2] Metadata inconsistency: run_bacon=false but bacon.csv exists and is valid. Decomposition should be formally enabled or documented as supplementary.
 
-3. [WARN -- CS-DID] att_cs_nt_with_ctrls anomaly. Returns 0/NA, indicating a likely silent failure in the controlled CS-NT specification. This specification should be re-run and the error investigated.
+Design findings (Axis 3 -- informational, do not affect rating):
 
-4. [WARN -- Bacon] Treatment effect heterogeneity by timing. TvU 2x2 DiDs average ~9.15 in postneonatal mortality reduction; timing-group 2x2 DiDs average ~2.5. This large gap signals that the population-level ATT differs substantially depending on which units serve as controls.
+3. [Design finding] HonestDiD: CS-NT robust at M=0 but breaks at M approx 0.25. Robustness is real but narrow. Flat pre-trends (max |t|=1.02) make M=0.25 a plausible upper bound.
 
-5. [WARN -- Bacon] run_bacon=false in metadata despite staggered design and existing bacon.csv. Should be reconciled.
+4. [Design finding] Bacon: TvU avg 9.15 vs timing-group avg approx 2.5. Large heterogeneity between clean and contaminated comparisons. TWFE aggregate dominated by timing-group comparisons (88.6% weight).
 
-6. [WARN -- TWFE] TWFE headline result is not statistically significant (p approx 0.17). If the paper claims TWFE significance, this is a key replication finding.
+5. [Design finding] Cohort imbalance (1967=85% treated units) makes TWFE and CS aggregation sensitive to a single cohort. CS-NYT severely underpowered for late cohorts.
 
 ---
 
 ## Recommended actions
 
-- For the repo-custodian agent: Populate original_result in data/metadata/262.json with the paper reported TWFE coefficient, SE, and exact table/column reference. This enables fidelity auditing in future runs.
+- For the repo-custodian: Investigate att_cs_nt_with_ctrls=0/NA. Re-run Spec A CS-NT and check R template logs for Pattern 42 propensity separation. Update results.csv if corrected.
 
-- For the repo-custodian agent: Investigate the att_cs_nt_with_ctrls = 0, se = NA anomaly. Re-run the CS-NT with controls specification and check R template logs for convergence warnings. Update results.csv with corrected value.
+- For the repo-custodian: Populate original_result in data/metadata/262.json with the paper reported TWFE coefficient, SE, and table/column reference once the PDF is located. This will enable a full fidelity audit and potentially upgrade F-NA to F-HIGH.
 
-- For the repo-custodian agent: Consider setting run_bacon: true in metadata (the decomposition data already exists). Reconcile the metadata note about Pattern 49.
+- For the repo-custodian: Reconcile run_bacon flag -- either set run_bacon=true (decomposition ran successfully) or document bacon.csv as supplementary.
 
-- For the pattern-curator: Add a named pattern for extreme early-cohort dominance in staggered DiD (85%+ of treated units in earliest cohort), distinct from Pattern 49 (IW variance explosion). This pattern produces: (1) TWFE dominated by forbidden comparisons, (2) CS-NYT underpowered, (3) large gap between TvU and timing-group Bacon components.
-
-- For the user (methodological judgement): The most defensible estimate for this paper is the CS-NT ATT (0.995 deaths per 1,000 births, SE 0.404, significant at 5%), not the headline TWFE. HonestDiD supports modest confidence under plausible parallel trends assumptions. Communicate to readers that TWFE is non-significant but robust CS-NT is significant -- this is an important finding of the reanalysis.
-
----
-
-## Fidelity axis
-
-paper-auditor: NOT_APPLICABLE -- PDF not found (pdf/262.pdf does not exist) and original_result in metadata is empty. Fidelity axis cannot be evaluated. Rating is based on methodology alone.
+- For the user (methodological judgement): The most defensible headline estimate is CS-NT (0.995, SE 0.404, t=2.46, significant at 5%), not the TWFE (1.221, SE 0.888, p approx 0.17). HonestDiD supports moderate confidence (robust at M=0, breaks at M approx 0.25). Communicate both estimates to readers.
 
 ---
 

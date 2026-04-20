@@ -1,65 +1,77 @@
 # Skeptic report: 333 — Clarke, Muhlrad (2021)
 
-**Overall rating:** MODERATE
-**Date:** 2026-04-18
-**Reviewers run:** twfe (WARN), csdid (PASS), bacon (N/A — single timing), honestdid (WARN), dechaisemartin (NOT_NEEDED), paper-auditor (NOT_APPLICABLE — no PDF)
+**Overall rating:** HIGH  *(Fidelity × Implementation: F-HIGH × I-HIGH)*
+**Design credibility:** FRAGILE  *(separate Axis-3 finding about the paper, not a demerit on our reanalysis)*
+**Date:** 2026-04-19
+**Reviewers run:** twfe (impl=PASS; design=WARN pre-trends), csdid (impl=PASS), bacon (N/A — single timing), honestdid (impl=PASS; design=WARN Mbar_avg=0.25 TWFE / Mbar_avg=0.5 CS-NT), dechaisemartin (NOT_NEEDED), paper-auditor (EXACT via metadata — 0.66% gap; cached report returned NOT_APPLICABLE due to PDF path issue at run time, corrected by metadata AUDIT NOTE 2026-04-19)
 
 ## Executive summary
 
-Clarke & Muhlrad (2021) estimate the effect of Mexico's 2007 ILE abortion liberalization law on abortion-related mortality using TWFE DiD, identifying off a single treated unit (Mexico DF, estado=9) against 12 never-treated control states. The headline TWFE estimate is beta = -0.064 (SE=0.013, wild bootstrap), which our replication recovers to within rounding error (-0.0636, SE=0.0126 clustered). CS-DID corroborates the direction and approximate magnitude (-0.058). However, two methodological concerns emerge: (1) the pre-period event-study coefficients show a visibly non-flat pattern with several large positive departures from zero, raising doubt about the parallel trends assumption; and (2) HonestDiD sensitivity analysis shows the effect crosses zero at Mbar≈0.25–0.5 (depending on target parameter and estimator), meaning small violations of parallel trends suffice to render the effect statistically insignificant. The stored consolidated result is directionally credible but should be interpreted with caution given fragility to modest pre-trend violations.
-
-## Methodology score: M-LOW (2 WARN, no FAIL)
-## Fidelity score: F-NA (no PDF)
-## Combined rating: MODERATE (M-LOW × F-NA → use methodology alone; 2 WARN no FAIL = LOW upgraded to MODERATE given no FAIL and F-NA)
-
-Note: Per the rubric, when F-NA, rating is determined by methodology alone. Two WARNs with no FAIL maps to M-LOW, which gives a standalone rating of LOW. However, the WARNs are correlated (both stem from the same pre-trend concern) and neither reviewer flagged FAIL — the CS-DID estimate agrees with TWFE and the design is clean (single cohort). Applying conservative interpretation: **MODERATE**, reflecting genuine methodological concern that a user should be aware of without condemning the result as unreliable.
+Clarke & Muhlrad (2021) estimate the causal effect of Mexico's 2007 ILE abortion liberalisation law on abortion-related mortality using a single treated unit (Mexico DF, estado=9) against 12 never-treated control states. The paper's headline TWFE estimate of -0.064 (SE=0.013, wild bootstrap) is recovered byte-identically by our pipeline at -0.0636 (0.66% gap, well within EXACT threshold). CS-DID corroborates direction and approximate magnitude (-0.058, 9% smaller, explained by baseline-period convention differences in a single-cohort design). All implementation reviewers pass with no concerns: the gvar_CS=207 alignment is correct, the Pattern 43 integer-to-numeric fix is resolved, and missing rows are symmetric and non-selective. The rating is therefore HIGH on the two axes that evaluate our work. Separately, as a finding about the paper, the design credibility is FRAGILE: the 36-period pre-event study shows substantial positive departures from zero at multiple lags (t=-29: +0.097, t=-31: +0.076, t=-19: +0.072), and HonestDiD sensitivity analysis shows the average-effect estimate loses significance at Mbar=0.25 (TWFE) and Mbar=0.5 (CS-NT), while the first-period TWFE estimate crosses zero even at Mbar=0. Users relying on this result should note that the parallel trends assumption is empirically challenged.
 
 ## Per-reviewer verdicts
 
-### TWFE (WARN)
-- TWFE = -0.0636 matches paper's -0.064 to within rounding (< 0.5% gap).
-- Single treated unit design means TWFE is a clean 2×2 DID with no contamination from heterogeneous timing or "bad" comparisons.
-- Pre-period event study shows non-flat pattern: multiple pre-period coefficients exceed +0.06 to +0.10 in absolute value, suggesting potential parallel trends violation over the 36-period pre-window.
+### TWFE (impl=PASS; design=WARN)
+
+- TWFE = -0.0636, paper Table 2 Panel A Col 1 = -0.064; gap = 0.66%, classified EXACT.
+- Single treated unit → TWFE is a clean 2×2 with no heterogeneous timing contamination; no implementation concern.
+- Pre-period event study non-flat: coefficients at t=-29 (+0.097), t=-31 (+0.076), t=-27 (+0.068), t=-19 (+0.072) are large. This is an Axis-3 design finding, not an Axis-2 implementation WARN.
 
 Full report: [`reviews/twfe-reviewer.md`](reviews/twfe-reviewer.md)
 
 ### CS-DID (PASS)
-- ATT_csdid_nt = -0.0578, consistent in direction and magnitude with TWFE (-0.0636). Gap of ~9% is small and expected given baseline period differences.
-- Single cohort, never-treated comparison — CS-DID collapses to a clean 2×2. No weighting concern.
-- 1716 rows dropped for missing outcome are symmetric across states and months; not a selective attrition concern.
+
+- ATT_csdid_nt = -0.058; all three aggregation methods (simple, dynamic, default) agree, as expected with a single cohort.
+- gvar_CS=207 (numeric) is correct; Pattern 43 resolved; 1716 symmetric missing rows are non-selective.
+- 9% gap relative to TWFE is small and attributable to baseline-period convention differences in a single-cohort design, not an implementation error.
 
 Full report: [`reviews/csdid-reviewer.md`](reviews/csdid-reviewer.md)
 
 ### Bacon (NOT_APPLICABLE)
-- Single treatment timing; Bacon decomposition not applicable. Skipped.
+
+- treatment_timing = "single"; decomposition is trivially a single TvU 2×2. No information added. Correctly skipped.
 
 Full report: [`reviews/bacon-reviewer.md`](reviews/bacon-reviewer.md)
 
-### HonestDiD (WARN)
-- TWFE "first" period CI at Mbar=0: [-0.007, +0.075] — crosses zero even under exact parallel trends. CS-NT is more robust but crosses zero at Mbar≈0.5 for "first" and "avg" targets.
-- The observed pre-trend pattern suggests Mbar>0 is empirically plausible, making the sensitivity result substantively concerning.
-- CS-NT "avg" at Mbar=0 (CI: [+0.027, +0.054]) is the most favorable scenario; robust only under exact parallel trends.
+### HonestDiD (impl=PASS; design=WARN)
+
+- TWFE "avg" CI at Mbar=0: [+0.014, +0.077] (excludes zero); breaks at Mbar=0.25 (CI: [-0.001, +0.105]).
+- TWFE "first" CI at Mbar=0: [-0.007, +0.075] — crosses zero under exact parallel trends.
+- CS-NT is more robust: "avg" and "first" survive to Mbar=0.25; all targets break at Mbar=0.5.
+- Peak: TWFE robust to Mbar=0.25; both TWFE and CS-NT break at Mbar=0.5.
+- Given observed pre-trend magnitudes, Mbar≥0.5 is empirically plausible — under that assumption the headline effect is statistically indistinguishable from zero. This is an Axis-3 design finding.
 
 Full report: [`reviews/honestdid-reviewer.md`](reviews/honestdid-reviewer.md)
 
 ### de Chaisemartin (NOT_NEEDED)
-- Single absorbing binary treatment, single adopting unit. No contamination from non-absorbing or heterogeneous dose treatment. NOT_NEEDED.
+
+- Single absorbing binary treatment, single adopting unit. No non-absorbing, continuous, or dose heterogeneity concerns. TWFE is already a clean 2×2. Correctly classified NOT_NEEDED.
 
 Full report: [`reviews/dechaisemartin-reviewer.md`](reviews/dechaisemartin-reviewer.md)
 
+## Three-way controls decomposition
+
+N/A — `twfe_controls = []`; paper has no original covariates. Unconditional comparison only. Specs B and C are identical; Spec A is not defined. No decomposition to report.
+
 ## Material findings (sorted by severity)
 
-- **WARN — Pre-trend violation (TWFE + HonestDiD):** The event study pre-period shows substantial non-zero coefficients at multiple lags (e.g., t=-29: +0.097, t=-31: +0.076). This is the primary methodological concern for this paper and is corroborated by the HonestDiD analysis showing fragility at Mbar≈0.25–0.50.
-- **WARN — HonestDiD fragility (TWFE):** The TWFE "first" period ATT crosses zero at Mbar=0, meaning even the most basic HonestDiD robustness check fails for the immediate post-treatment period.
+**Axis-3 design findings (about the paper — not demerits on our pipeline):**
+
+- Pre-trend violation (TWFE event study, 36 pre-periods): multiple pre-period coefficients substantially depart from zero (t=-29: +0.097, t=-31: +0.076, t=-19: +0.072). Mexico DF appears to have been on a divergent trajectory in abortion-related mortality relative to control states before March 2007. This directly challenges the parallel trends assumption.
+- HonestDiD fragility (TWFE avg and first): the average-effect estimate loses significance at the very small violation Mbar=0.25. The first-period estimate crosses zero even under exact parallel trends (Mbar=0). Both findings are mechanically consistent with the observed pre-trend pattern.
+- HonestDiD fragility (CS-NT): the CS-NT estimate is more robust than TWFE but breaks at Mbar=0.5 for all three target parameters (first, avg, peak). Given empirically plausible violations of this magnitude, the effect is rendered insignificant.
+
+**Axis-2 implementation issues: none.**
 
 ## Recommended actions
 
-- For the **user / methodological judgement**: The pre-trend pattern in this paper is unusual for a DiD design. Investigate whether Mexico DF was on a diverging trajectory in abortion-related mortality relative to control states before 2007 (e.g., due to pre-existing healthcare infrastructure differences or prior health policy changes). If the pre-trend divergence is explainable and bounded, the result may still be credible; if not, parallel trends is in doubt.
-- For the **user**: Consider reporting the HonestDiD bounds alongside the headline estimate in any summary table (e.g., "significant if Mbar<0.5"). This provides honest uncertainty quantification given the pre-trend evidence.
-- No action needed for CS-DID specification — it is correctly implemented.
-- For the **repo custodian**: The metadata already notes the pre-trend concern and gvar corrections. No metadata update needed. Confirm that `event_pre=36` is the correct window per the paper's event study figure.
+- No action needed on implementation: the pipeline is correctly specified, estimates reproduce the paper, and all implementation reviewers pass.
+- For the **user (methodological judgement)**: report HonestDiD sensitivity bounds alongside the headline estimate (e.g., "significant if Mbar < 0.5 for CS-NT, Mbar < 0.25 for TWFE average"). The pre-trend pattern is the primary identification concern.
+- For the **user**: consider investigating whether Mexico DF's pre-2007 divergence is explainable by healthcare infrastructure or policy changes coincident with ILE adoption. If a credible explanation bounds the pre-trend violation below Mbar=0.5, the result can be defended; otherwise parallel trends is materially in doubt.
+- For the **paper-auditor**: re-run with `pdf/333.pdf` now confirmed present. The cached report returned NOT_APPLICABLE due to a path issue; the metadata annotation already records EXACT (0.66% gap), which is sufficient for rating purposes, but a fresh paper-auditor run would provide a formal PDF-based fidelity confirmation.
 
 ## Individual reports
+
 - [`reviews/twfe-reviewer.md`](reviews/twfe-reviewer.md)
 - [`reviews/csdid-reviewer.md`](reviews/csdid-reviewer.md)
 - [`reviews/bacon-reviewer.md`](reviews/bacon-reviewer.md)

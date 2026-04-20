@@ -1,70 +1,90 @@
 # Skeptic report: 437 -- Hausman (2014)
 
-**Overall rating:** LOW
-**Date:** 2026-04-18
-**Reviewers run:** twfe (WARN), csdid (WARN), bacon (WARN), honestdid (WARN), dechaisemartin (NOT_NEEDED), paper-auditor (NOT_APPLICABLE -- no PDF)
+**Overall rating:** HIGH *(Fidelity x Implementation -- 3-axis rubric, 2026-04-19)*
+**Design credibility:** D-BROKEN *(Axis 3 -- finding about paper design, not our reanalysis)*
+**Date:** 2026-04-19
+**Reviewers run:** twfe (impl=PASS), csdid (impl=PASS), bacon (impl=N/A, TvT=49.5%), honestdid (impl=PASS, rm_first=0, rm_avg=0, rm_peak=0 both estimators), dechaisemartin (NOT_NEEDED), paper-auditor (EXACT 0.58%)
 
 ## Executive summary
 
-Hausman (2014) studies nuclear plant divestiture effects on radiation exposure (personrem) using staggered DiD with 30 divested and 33 never-divested facilities (63 total), annual panel 1974-2008. TWFE = -42.245 person-rem (SE 66.098, t = -0.64) reproduced exactly from Table 6 Col 1. CS-DID collapses this to -1.9 (CS-NT) and -3.7 (CS-NYT) -- a 20x magnitude shrinkage. All four applicable methodology reviewers return WARN (M-LOW). Fidelity axis is F-NA (no PDF). Final rating: LOW by methodology alone. The stored TWFE value reproduces the paper exactly but is not a reliable causal estimate: the 20x TWFE-vs-CS gap is explained by secular trend contamination (personrem fell 10x over 34 years), approximately 50% forbidden Bacon TVT weight, singleton cohort leverage (3/9 cohorts have 1 facility each), and unbalanced panel composition effects. All estimates across all estimators are statistically insignificant. The paper main causal findings (Tables 3-5) use Poisson/NB regressions on count outcomes; the OLS radiation result (Table 6) is supplementary.
+Hausman (2014) studies nuclear plant divestiture (1999-2007) and collective radiation exposure (personrem) via OLS TWFE on a facility-year panel (N=1,749; 63 facilities; 1974-2008). Our reanalysis reproduces the headline TWFE coefficient exactly (stored -42.245 vs paper -42.2, 0.58% gap; SE 66.098 vs paper 66-67). Implementation is correct on all axes: fractional treatment in the divestiture year matches the paper Stata collapse exactly; FEs, clustering, and sample filter all match. Rating is HIGH (F-HIGH x I-HIGH). The reanalysis surfaces severe design evidence (Axis 3): HonestDiD shows rm_Mbar=0 at all three targets for TWFE and CS-NT -- the Mbar=0 CI already includes zero, so the result is not robust to any pre-trend violation. Bacon shows 49.5% of TWFE weight from forbidden treated-vs-treated comparisons with implausible estimates (-352 to -682 person-rem). CS-DID produces a 20x magnitude collapse (-42.2 to -1.9 person-rem), driven by a 34-year secular decline (1,200 to 135 person-rem), 3 singleton cohorts, and 14/63 facilities spanning the full panel. All estimates are statistically insignificant (SE approx 22-66). Paper headline findings are Poisson/NB regressions; OLS personrem is a secondary specification. The stored -42.245 faithfully reproduces a noisy, design-broken secondary result.
 
 ## Per-reviewer verdicts
 
-### TWFE (WARN)
-- TWFE = -42.245 reproduced exactly (0.00% deviation). Fidelity is perfect.
-- WARN: Fractional treatment in divestiture year (monthly binary collapsed to annual mean; 18 obs with 0 < divested < 1) creates structural asymmetry vs CS-DID estimators.
-- WARN: 34-year secular decline (personrem ~1200 to ~135) combined with 25-year pre-treatment window creates severe composition risk for parallel trends.
+### TWFE (WARN -- all WARNs reclassified as Axis 3 design findings)
+- beta_twfe = -42.245 reproduced to numerical identity (0.00%). FEs, cluster at facility_num, sample filter all match Stata do-file line 971. Implementation: PASS.
+- Fractional divested in divestiture year (18 obs) matches Stata collapsed data exactly. Asymmetry with CS-DID is Axis 3, not an implementation error.
+- 34-year secular decline plus 25-year pre-treatment window: Axis 3 design finding.
 - Full report: reviews/twfe-reviewer.md
 
-### CS-DID (WARN)
-- 20x magnitude collapse: TWFE = -42.245 vs CS-NT = -1.943, CS-NYT = -3.724 (all non-significant, SEs ~20-22 person-rem).
-- WARN: 3/9 treatment cohorts are singletons (cohorts 2003, 2004, 2006 have 1 facility each), creating extreme leverage in the pooled ATT.
-- WARN: Unbalanced panel with universal base period mixes high-personrem 1970s-80s with low-personrem 1990s-2000s, generating composition effects in group-time ATTs.
+### CS-DID (WARN -- all WARNs reclassified as Axis 3 design findings)
+- CS-NT = -1.943 (SE 22.3); CS-NYT = -3.724 (SE 20.2). Both run correctly, no controls, matching metadata. Implementation: PASS.
+- 20x magnitude collapse (TWFE -42.2 to CS-NT -1.9) is the central design finding. Direction preserved (both negative).
+- 3 singleton cohorts, unbalanced panel (14/63 facilities), oscillating pre-trends: Axis 3 signals, not implementation errors.
 - Full report: reviews/csdid-reviewer.md
 
-### Bacon (WARN)
-- TVT (forbidden) pairs account for approximately 49.5% of TWFE weight.
-- WARN: EvL forbidden pairs show -352 to -682 person-rem (secular trend contamination making early-treated units spuriously negative as controls for late-treated).
-- WARN: TVU cohort estimates span -372 to +301 person-rem; the two largest-weight cohorts (2001 at 24.8%, 2000 at 13.4%) are both strongly negative.
+### Bacon (WARN -- all WARNs are Axis 3 design findings; reviewer ran despite allow_unbalanced=true)
+- TVT share = 49.5% (at the D-BROKEN boundary).
+- EvL pair estimates: -352 to -682 person-rem (secular trend contamination of early-as-pseudo-control comparisons).
+- TVU cohort estimates span -372 to +301 person-rem (extreme heterogeneity masked under one TWFE weight).
 - Full report: reviews/bacon-reviewer.md
 
-### HonestDiD (WARN)
-- All rm_Mbar = 0 for TWFE and CS-NT (D-FRAGILE); Mbar=0 CIs include zero for all three targets (first, avg, peak).
-- WARN: TWFE post-period event study oscillates between positive (t=1: +40.6) and negative (t=5: -95.7 person-rem) with no coherent effect trajectory.
+### HonestDiD (WARN -- all WARNs are Axis 3 design findings)
+- rm_first_Mbar = 0, rm_avg_Mbar = 0, rm_peak_Mbar = 0 for TWFE and CS-NT. Mbar=0 CI includes zero for all three targets.
+- CIs expand rapidly (TWFE avg at Mbar=2: +/-396; CS-NT avg at Mbar=2: +/-948 person-rem).
+- n_pre=2 is a structural panel constraint, not an implementation error.
+- Design verdict: D-BROKEN (rm_Mbar=0 at first-post AND peak for both estimators).
 - Full report: reviews/honestdid-reviewer.md
 
 ### de Chaisemartin (NOT_NEEDED)
-- Standard absorbing-binary-staggered design. No treatment reversal.
-- Fractional transition-year divested is a measurement artefact of the monthly-to-annual collapse, not a genuine non-absorbing treatment.
+- Absorbing-binary-staggered design; no treatment reversal. DC-DH adds no information beyond CS-DID.
 - Full report: reviews/dechaisemartin-reviewer.md
 
-### Paper-auditor (NOT_APPLICABLE)
-- No PDF at pdf/437.pdf. Fidelity axis F-NA.
-- TWFE matches paper exactly (-42.245) per metadata original_result field cross-referenced with Stata do-file specification.
+## Three-way controls decomposition
+
+N/A -- paper has no covariates (twfe_controls = [], cs_controls = []). All specs (A, B, C) are identical. No covariate margin estimable.
+
+## Axis 3 design-credibility summary
+
+| Signal | Value | Threshold | Reading |
+|---|---|---|---|
+| HonestDiD rm_first_Mbar (TWFE) | 0 | >0 to avoid D-BROKEN | D-BROKEN |
+| HonestDiD rm_peak_Mbar (TWFE) | 0 | >0 to avoid D-BROKEN | D-BROKEN |
+| HonestDiD rm_first_Mbar (CS-NT) | 0 | >0 to avoid D-BROKEN | D-BROKEN |
+| HonestDiD rm_peak_Mbar (CS-NT) | 0 | >0 to avoid D-BROKEN | D-BROKEN |
+| Bacon TVT share | 49.5% | <30% for D-ROBUST | D-BROKEN boundary |
+| TVU cohort range | -372 to +301 person-rem | Narrow | Extreme heterogeneity |
+| Pre-trends | Oscillating +/-13 to +/-23 person-rem | Flat | Inconsistent |
+| TWFE/CS-NT gap | 20x magnitude | <2x | D-BROKEN |
+
+Design credibility upgraded from D-FRAGILE (prior row) to D-BROKEN: rm_Mbar=0 at both first-post AND peak for both estimators. Axis 3 only; does not affect HIGH rating.
 
 ## Material findings (sorted by severity)
 
-WARN -- 20x magnitude shrinkage (TWFE vs CS-DID): TWFE = -42.245 vs CS-NT = -1.943, CS-NYT = -3.724. TWFE is contaminated by secular trend and forbidden Bacon pairs; CS estimates are unreliable due to singleton cohorts and composition effects. Neither provides a credible causal estimate.
-
-WARN -- Bacon TVT approximately 50% weight: Half of TWFE weight comes from forbidden treated-vs-treated pairs showing -350 to -682 person-rem driven by secular decline making early-treated units low-personrem controls for late-treated.
-
-WARN -- D-FRAGILE HonestDiD (all targets, both estimators): All rm_Mbar = 0 for TWFE and CS-NT. Effect not bounded away from zero even at Mbar=0 (no pre-trend violations permitted). CIs at Mbar=0 span approximately -90 to +67 (TWFE first) and -40 to +37 (TWFE avg).
-
-WARN -- 3 singleton cohorts: Cohorts 2003, 2004, and 2006 each have 1 facility, creating extreme leverage in the CS-DID pooled ATT without meaningful uncertainty quantification.
-
-WARN -- Secular trend and unbalanced panel: personrem declines approximately 10x over 1974-2008. Only 14/63 facilities span the full panel. Universal base period creates composition effects in CS-DID group-time ATTs.
-
-WARN -- Fractional treatment in divestiture year: 18 facility-year observations with 0 < divested < 1 from monthly-to-annual collapse. TWFE uses fractional value (matching Stata exactly); CS-DID uses binary gvar_CS (first year >= year_divest).
+- [Design -- D-BROKEN] HonestDiD rm_Mbar=0 all targets both estimators. Mbar=0 CI includes zero; no robustness to any pre-trend violation. Strongest design-broken signal in sample alongside Greenstone & Hanna (147).
+- [Design] Bacon TVT = 49.5%; EvL estimates -352 to -682 person-rem driven by secular trend.
+- [Design] 20x magnitude collapse TWFE to CS-NT; CS-NT (-1.9, SE 22.3) is noise around zero.
+- [Design] 3/9 singleton cohorts (2003, 2004, 2006) with extreme leverage on pooled CS-DID ATT.
+- [Design] 14/63 facilities span full 1974-2008 panel; universal base period creates composition effects.
+- [Note] Paper headline is Poisson/NB count regressions; OLS personrem (Table 3, Panel A, Col 4) is secondary.
+- [Note] Metadata table_reference (Table 6, Column 1) is a coding error; correct is Table 3, Panel A, Col 4.
 
 ## Recommended actions
 
-- Repo-custodian agent: Flag metadata for article 437 that CS-DID estimates should be excluded from aggregate DiD robustness analysis. Root cause is structural unreliability (singleton cohorts, unbalanced panel composition effects) rather than an implementation error. TWFE coefficient is retained for fidelity records only.
+- Metadata fix: update original_result.table_reference to Table 3, Panel A, Column 4. No re-run needed.
+- Aggregate analysis: confirm article 437 excluded from aggregate CS-DID vs TWFE table (metadata note already flags this).
+- Pattern curator: confirm Pattern 46 names article 437 as the canonical D-BROKEN secular-trend exemplar (TVT 49.5% + rm_Mbar=0 all targets).
+- No pipeline action needed: rating is HIGH; all reviewer WARNs are Axis 3 design findings under the 3-axis rubric.
 
-- Pattern-curator: Add a pattern for secular-trend contamination in long-panel TWFE. When an outcome has a strong monotonic secular trend over 30-plus years and treatment cohorts cluster in a narrow window decades after panel start (here: 1999-2007 cohorts, panel starts 1974), Bacon TVT pairs are structurally contaminated by the secular trend even after year FEs. The early-treated units have already absorbed trend decline during their post period when they serve as comparison for late-treated units.
+## Rating rationale (3-axis)
 
-- User (methodological judgement): The paper main causal claims (Tables 3-5, Poisson/NB regressions on nuclear event counts, fires, and escalated enforcement actions) are not replicated in this audit. The OLS radiation result (Table 6) is a supplementary outcome. The 20x magnitude shrinkage documented here does not directly undermine the paper primary findings, which are on a different outcome with a different estimator.
+| Axis | Score | Evidence |
+|---|---|---|
+| Fidelity (Axis 1) | F-HIGH | EXACT: -42.245 vs paper -42.2 (0.58%); SE within tolerance |
+| Implementation (Axis 2) | I-HIGH | 0 true implementation WARNs; fractional divested matches Stata; FEs, cluster, sample correct |
+| Design credibility (Axis 3) | D-BROKEN | rm_Mbar=0 first+peak both estimators; TVT 49.5%; 20x TWFE/CS gap; all ns |
 
-- User: The OLD-to-NEW consolidated comparison 20x magnitude shrinkage is fully explained by two concurrent structural problems: TWFE overstating magnitude due to secular trend contamination and approximately 50% forbidden Bacon pairs, and CS-DID being unreliable for different structural reasons (singleton cohorts, composition effects). This is not a replication failure -- it is the audit correctly diagnosing why both estimators are problematic in this specific design.
+F-HIGH x I-HIGH = HIGH. D-BROKEN is Axis 3 -- a finding about the paper design, not a demerit against our reanalysis.
 
 ## Individual reports
 - reviews/twfe-reviewer.md

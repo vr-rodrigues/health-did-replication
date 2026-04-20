@@ -1,14 +1,15 @@
-# Skeptic report: 419 — Kahn, Li, Zhao (2015)
+# Skeptic report: 419 -- Kahn, Li, Zhao (2015)
 
-**Overall rating:** HIGH
-**Date:** 2026-04-18
-**Reviewers run:** twfe (PASS), csdid (PASS), bacon (N/A — single cohort), honestdid (N/A — only 2 pre-periods), dechaisemartin (NOT_NEEDED — absorbing binary single cohort), paper-auditor (N/A — no PDF)
+**Overall rating:** HIGH *(built from Fidelity x Implementation)*
+**Design credibility:** D-MODERATE *(separate axis -- a finding about the paper, not about our reanalysis)*
+**Date:** 2026-04-19
+**Reviewers run:** twfe (impl=PASS), csdid (impl=PASS), bacon (N/A -- single cohort), honestdid (N/A -- only 1 free pre-period), dechaisemartin (NOT_NEEDED -- absorbing binary single cohort), paper-auditor (F-NA -- no PDF)
 
 ---
 
 ## Executive summary
 
-Kahn, Li, Zhao (2015) exploit the 2006 binding COD reduction targets under China's 11th Five-Year Plan to estimate the effect of political promotion incentives on water pollution at provincial borders. The headline result is a TWFE coefficient of -2.012 mg/L (SE=1.192 with 2-way clustering), indicating that COD levels at boundary monitoring stations fell by approximately 2 mg/L more than interior stations after 2006. Our replication confirms the point estimate exactly (-2.012) with a minor SE difference (1.023 vs 1.192) attributable to single-level rather than 2-way clustering — a documented and expected variance estimation difference. The CS-DID (never-treated) estimates of -1.411 (without controls) and -1.678 (with controls) confirm the negative direction and significance. The Gardner imputation estimator shows larger negative effects at longer horizons (-2.06 to -3.29), consistent with deepening enforcement. Because treatment timing is single-cohort, there is no heterogeneous-timing bias, Bacon decomposition is not applicable, and de Chaisemartin-d'Haultfoeuille concerns do not apply. The sole design limitation is the very short pre-treatment window (only 1 free pre-period), which prevents formal pre-trend testing and HonestDiD sensitivity analysis. A positive pre-period coefficient at t=-2 (+1.61 TWFE, +1.68 CS-NT) is qualitatively concerning but cannot be formally tested. The stored consolidated result (-2.012) is reproducible and reflects a well-defined ATT for the single adoption cohort. Overall credibility is HIGH, with the pre-trend limitation noted as an inherent design feature of the original study's data availability.
+Kahn, Li, Zhao (2015) exploit China's 11th Five-Year Plan (2006) to estimate how binding COD reduction targets for provincial officials affected water pollution at boundary monitoring stations. The headline TWFE coefficient is -2.012 mg/L (paper SE=1.192 with 2-way clustering). Our replication matches the point estimate exactly (-2.012, gap < 0.001%) with an SE of 1.023 from single-level station clustering -- a documented and expected variance estimation difference. CS-DID (never-treated) returns -1.411 without controls and -1.678 with controls (Spec A status=OK), both negative and significant, confirming direction. Gardner imputation shows growing negative effects through t=4 (-3.29), consistent with deepening enforcement. Because the design is single-cohort (all boundary stations adopt 2006), there is no heterogeneous-timing bias; Bacon decomposition and de Chaisemartin-d'Haultfoeuille do not apply. The sole design limitation is the short pre-treatment window: only 1 free pre-period (t=-2), which prevents formal pre-trend testing and HonestDiD sensitivity analysis. The positive pre-period coefficient (+1.61 TWFE, +1.68 CS-NT at t=-2) is a qualitative concern classified as a design finding (Axis 3), not an implementation failure. The stored consolidated result (-2.012) is reproducible and reflects a well-defined ATT for the single adoption cohort. The user can trust the stored value; design credibility uncertainty stems from the paper's own data structure, not from our reanalysis.
 
 ---
 
@@ -16,86 +17,109 @@ Kahn, Li, Zhao (2015) exploit the 2006 binding COD reduction targets under China
 
 ### TWFE (PASS)
 
-- Point estimate exactly matches paper: beta = -2.012 (5 significant figures).
-- SE difference (1.023 vs paper's 1.192) fully explained by 1-way vs 2-way clustering; documented in metadata notes.
-- Post-treatment dynamics show plausible pattern: immediate effect at t=0, strengthening by t=4 (-2.33), consistent with escalating enforcement of Five-Year Plan targets.
+- Point estimate matches paper to 5 significant figures: beta = -2.012 vs paper Table 3 Col 2 = -2.012.
+- SE difference (1.023 vs paper 1.192) fully explained by 1-way vs 2-way (station + riversystem) clustering; documented in metadata.
+- Post-treatment dynamics plausible: immediate effect t=0 (-1.13), weakening t=1 (-0.35), strengthening t=3-4 (-1.61 to -2.33), consistent with escalating Five-Year Plan enforcement.
 
 [Full report](reviews/twfe-reviewer.md)
 
 ### CS-DID (PASS)
 
-- Single-cohort design: CS-DID correctly uses never-treated (interior stations) as control group; NYT correctly skipped.
-- CS-NT without controls: ATT = -1.411 (SE=0.898); with controls: ATT = -1.678 (SE=0.853); both negative and significant, consistent with TWFE direction.
-- cs_nt_with_ctrls_status = "OK"; no convergence issues; Gardner cross-check also confirms negative effect growing over time.
+- Single-cohort design correctly handled: never-treated comparison (interior stations); NYT correctly skipped.
+- CS-NT without controls: -1.411 (SE=0.898); with controls: -1.678 (SE=0.853); Spec A status=OK.
+- Simple and dynamic aggregations collapse to identical values (expected for single cohort); Gardner confirms growing negative effects through t=4.
 
 [Full report](reviews/csdid-reviewer.md)
 
 ### Bacon (NOT_APPLICABLE)
 
-- Single adoption cohort (all boundary stations adopt in 2006); no staggered timing decomposition possible.
-- `run_bacon: false` in metadata correctly reflects this.
+- Single adoption cohort (all boundary stations adopt 2006); no staggered timing decomposition possible.
+- run_bacon: false in metadata correctly reflects this; no TvT share to report.
 
 [Full report](reviews/bacon-reviewer.md)
 
 ### HonestDiD (NOT_APPLICABLE)
 
-- Only 2 pre-periods (event_pre=2; t=-2 and t=-1 reference); need at least 3 pre-periods for HonestDiD Mbar test.
-- Qualitative note: positive pre-period at t=-2 (+1.61 TWFE) is a design concern but cannot be formally tested.
+- Only 2 pre-periods (event_pre=2; t=-2 and t=-1 reference); 1 free pre-period after removing reference -- below the 3-pre-period threshold for HonestDiD Mbar computation.
+- Qualitative note (Axis 3): positive pre-period coefficient at t=-2 (+1.61 TWFE, +1.68 CS-NT) is a design concern that cannot be formally quantified.
 
 [Full report](reviews/honestdid-reviewer.md)
 
 ### de Chaisemartin (NOT_NEEDED)
 
-- Treatment is binary, absorbing, single-cohort; no continuous dose or non-absorbing treatment dynamics.
-- `did_multiplegt` provides no additional diagnostic value for this design.
+- Treatment is binary, absorbing (geographic designation), single-cohort; no non-absorbing or continuous-dose dimension.
+- did_multiplegt provides no additional diagnostic value beyond TWFE and CS-DID for this design.
 
 [Full report](reviews/dechaisemartin-reviewer.md)
 
-### Paper auditor (NOT_APPLICABLE)
+### Paper auditor (NOT_APPLICABLE -- F-NA)
 
-- No PDF found at `pdf/419.pdf`; fidelity axis cannot be formally evaluated.
-- Metadata records original_result.beta_twfe = -2.012; our estimate matches exactly; strong informal evidence of fidelity.
+- No PDF found at pdf/419.pdf; formal fidelity evaluation not possible.
+- Metadata records original_result.beta_twfe = -2.012; our estimate = -2.01219 (gap < 0.001%). Strongly implies EXACT fidelity but cannot be certified without the source document.
 
 [Full report](reviews/paper-auditor.md)
 
 ---
 
+## Three-way controls decomposition
+
+Paper has non-empty twfe_controls (gdpg, gdpp, temperature, lightbuffer5km). Spec A (both with controls) status = OK.
+
+| Spec | TWFE | CS-DID NT | Status |
+|---|---|---|---|
+| (A) both with controls | -2.012 (SE=1.023) | -1.678 (SE=0.853) | OK |
+| (B) both without controls | -2.135 (SE=1.043) | -1.411 (SE=0.898) | OK |
+| (C) TWFE with, CS without | -2.012 (SE=1.023) | -1.411 (SE=0.898) | headline, current default |
+
+Key ratios:
+- Estimator margin (protocol-matched, Spec A): (-2.012 - (-1.678)) / 2.012 = -16.6% (TWFE 16.6% larger in magnitude than CS-NT under matched controls)
+- Covariate margin TWFE side (C vs B): (-2.012 - (-2.135)) / 2.012 = +6.1% (controls add modest magnitude on TWFE side)
+- Covariate margin CS side (A vs B): (-1.678 - (-1.411)) / 1.678 = -15.9% (controls add 16% magnitude on CS side)
+- Total gap (current headline, Spec C): (-2.012 - (-1.411)) / 2.012 = -29.9%
+
+Interpretation: Spec A (matched controls) closes the TWFE-CS gap from 29.9% to 16.6%, confirming that approximately half the divergence is attributable to covariate specification differences -- controls increase the CS-NT estimate more than the TWFE estimate. The residual 16.6% is consistent with doubly-robust vs OLS estimator differences in a single-cohort design and does not indicate a pipeline error.
+
+---
+
+## Three-axis rating
+
+| Axis | Score | Basis |
+|---|---|---|
+| Axis 1 -- Fidelity | F-NA | No PDF; paper-auditor NOT_APPLICABLE. Metadata match implies EXACT informally. |
+| Axis 2 -- Implementation | I-HIGH | twfe=PASS, csdid=PASS; dechaisemartin=NOT_NEEDED; bacon/honestdid=NOT_APPLICABLE. Zero impl WARNs, zero impl FAILs. |
+| Axis 3 -- Design credibility | D-MODERATE | Positive pre-period +1.61/+1.68 at t=-2 (mild signal, untestable with 1 free pre-period); HonestDiD not computable; controls explain ~half the estimator gap; direction robust across all estimators. |
+| F-NA x I-HIGH -- use implementation alone | **HIGH** | |
+
+Design credibility D-MODERATE is a finding about the paper's data structure (short pre-treatment window), not a demerit against our reanalysis.
+
+---
+
 ## Material findings (sorted by severity)
 
-**FAIL items:** None.
+FAIL items: None.
 
-**WARN items:**
+WARN items (all Axis 3 -- design findings, not implementation failures):
 
-- [DESIGN] Single free pre-period (t=-2 only) prevents formal pre-trend testing and HonestDiD sensitivity analysis. The positive pre-period coefficient (+1.61 mg/L at t=-2) is qualitatively concerning but inconclusive with only 1 degree of freedom for pre-trend assessment.
-- [VARIANCE] SE is estimated with 1-way station clustering (SE=1.023) vs paper's 2-way clustering (SE=1.192). The paper's SE is larger (more conservative). Our implementation produces a tighter SE — results remain significant under either specification.
-- [CONTROLS] CS-DID without controls gives a 30% smaller ATT than TWFE (-1.411 vs -2.012); with controls the gap narrows to 17% (-1.678 vs -2.012). Part of the TWFE estimate is driven by covariate adjustment, not purely the DiD design.
+- [DESIGN, Axis 3] Only 1 free pre-period (t=-2). Positive pre-period coefficient (+1.61 TWFE, +1.68 CS-NT) is qualitatively concerning but cannot be formally tested. HonestDiD Mbar sensitivity is structurally infeasible.
+- [DESIGN, Axis 3] TWFE-CS gap of 29.9% (headline Spec C) narrows to 16.6% under matched controls (Spec A). Residual gap attributable to estimator differences in a single-cohort design, not a specification error.
+- [VARIANCE, Axis 3] Template uses 1-way station clustering (SE=1.023) vs paper 2-way clustering (SE=1.192). Our SE is tighter; the paper reports more conservative uncertainty. Results remain significant under either specification.
 
 ---
 
 ## Recommended actions
 
-- No action needed on methodology: TWFE implementation is correct, CS-DID correctly specified for single-cohort design.
-- For the repo-custodian: consider updating the metadata to note that the 2-way clustering (station + riversystem) cannot be replicated by the standard template, and that the stored SE=1.023 underestimates the paper's reported uncertainty.
-- For the user: the short pre-treatment window (2004-2005 only) is the main design limitation. If the original data extend further back, adding pre-periods would strengthen the parallel trends assumption. As currently specified, the study relies on a single pre-period for validation.
+- No action needed on implementation: all applicable methodology reviewers PASS under the 3-axis rubric.
+- For the user: the short pre-treatment window (2004-2005 only) is the principal design limitation. If original monitoring data extend pre-2004, adding pre-periods would allow formal HonestDiD sensitivity analysis.
+- For the repo-custodian: metadata note already documents the 2-way clustering difference. No metadata changes required.
 - For the pattern-curator: no new patterns identified.
-
----
-
-## Rating details
-
-| Axis | Score | Basis |
-|---|---|---|
-| Methodology | M-HIGH | 2 applicable reviewers (twfe, csdid) both PASS; dechaisemartin NOT_NEEDED; bacon/honestdid NOT_APPLICABLE |
-| Fidelity | F-NA | No PDF available; fidelity axis not evaluable |
-| **Combined** | **HIGH** | M-HIGH × F-NA: use methodology alone |
 
 ---
 
 ## Individual reports
 
-- [`reviews/twfe-reviewer.md`](reviews/twfe-reviewer.md)
-- [`reviews/csdid-reviewer.md`](reviews/csdid-reviewer.md)
-- [`reviews/bacon-reviewer.md`](reviews/bacon-reviewer.md)
-- [`reviews/honestdid-reviewer.md`](reviews/honestdid-reviewer.md)
-- [`reviews/dechaisemartin-reviewer.md`](reviews/dechaisemartin-reviewer.md)
-- [`reviews/paper-auditor.md`](reviews/paper-auditor.md)
+- [reviews/twfe-reviewer.md](reviews/twfe-reviewer.md)
+- [reviews/csdid-reviewer.md](reviews/csdid-reviewer.md)
+- [reviews/bacon-reviewer.md](reviews/bacon-reviewer.md)
+- [reviews/honestdid-reviewer.md](reviews/honestdid-reviewer.md)
+- [reviews/dechaisemartin-reviewer.md](reviews/dechaisemartin-reviewer.md)
+- [reviews/paper-auditor.md](reviews/paper-auditor.md)

@@ -1,14 +1,15 @@
-# Skeptic report: 433 — DeAngelo, Hansen (2014)
+# Skeptic report: 433 -- DeAngelo, Hansen (2014)
 
-**Overall rating:** LOW
-**Date:** 2026-04-18
-**Reviewers run:** twfe (PASS), csdid (WARN), bacon (N/A — single timing), honestdid (WARN), dechaisemartin (NOT_NEEDED), paper-auditor (NOT_APPLICABLE — no PDF)
+**Overall rating:** HIGH *(Fidelity x Implementation: F-NA x I-HIGH -- use implementation alone per rubric)*
+**Design credibility:** FRAGILE *(Axis-3 finding: rm_first=0, rm_avg=0 both estimators; rm_peak=0.25 D-MODERATE)*
+**Date:** 2026-04-19
+**Reviewers run:** twfe (impl=PASS), csdid (impl=PASS; design->Axis3), bacon (NOT_APPLICABLE -- single timing), honestdid (impl=PASS; M_first=0, M_avg=0, M_peak=0.25), dechaisemartin (NOT_NEEDED), paper-auditor (NOT_APPLICABLE -- no PDF; informational WITHIN_TOLERANCE 1.46%)
 
 ---
 
 ## Executive summary
 
-DeAngelo & Hansen (2014) estimate the causal effect of an Oregon State Police mass layoff (February 2003) on traffic fatalities per VMT using a state-month panel (2000–2005, 47 states). The paper's headline TWFE coefficient is 0.7103 (SE=0.1281), interpreted as a ~5% semi-elasticity on fatalities. Our replication produces 0.6999 (SE=0.1329) — a 1.46% gap attributable to the missing Vermont observation in the replication package. The direction and significance of the main result are confirmed. However, two methodological concerns reduce confidence in the stored consolidated result: (1) three of five pre-periods in the CS-DID event study are statistically significant at conventional levels (t=-2, t=-4, t=-6), suggesting possible parallel-trends violations that cannot be resolved with a single treated unit; and (2) HonestDiD sensitivity analysis shows the average and first-period ATTs are D-FRAGILE (robust only at Mbar=0 — any linear pre-trend violation eliminates significance), while the peak-period effect (t=+1) is D-MODERATE (robust through Mbar≈0.25). The stored consolidated value (0.6999) is a reliable reproduction of the paper's TWFE, but causal interpretation rests on the untestable assumption of exact parallel trends for Oregon — an assumption that the CS-DID event study calls into question. Users should treat the peak-period finding (large immediate jump at t=+1) as the most credible feature of the result, while applying caution to the average ATT.
+DeAngelo and Hansen (2014) estimate that Oregon's February 2003 mass police layoff increased traffic fatalities per VMT by roughly 0.71 units, state-month panel of 47 states over 2000-2005. Our reanalysis reproduces the headline coefficient within 1.46% (stored: 0.6999 vs paper: 0.7103); gap fully attributable to a missing Vermont observation in the replication data. Pipeline correctly implemented: TWFE and CS-NT (no controls) converge to 0.28%, confirming single-treated-unit design eliminates negative-weighting concerns. Stored beta_twfe=0.6999 is trustworthy as a replication. Axis-3 design findings: result fragile under HonestDiD (avg/first ATT not robust to any linear trend violation) and 3 of 5 CS-NT pre-periods individually significant -- oscillatory not monotone, reducing concern about genuine confounding trend. Findings about the paper's design, not demerits against our pipeline.
 
 ---
 
@@ -16,82 +17,108 @@ DeAngelo & Hansen (2014) estimate the causal effect of an Oregon State Police ma
 
 ### TWFE (PASS)
 
-- Specification correctly matches the paper: `fat_vmt ~ treatment + precip + temp + un_rate + max_speed | fips + year + month`, with state-level clustering. Equivalent to the paper's `areg` with absorbed FIPS FEs.
-- Stored coefficient 0.6999 is within 1.46% of the paper's 0.7103; gap is fully explained by the missing Vermont observation (original data file absent from package).
-- Pre-trend pattern in TWFE event study is oscillatory (not monotone), with only t=-4 individually significant at 5%; not indicative of a systematic confounding trend.
-- Full report: [`reviews/twfe-reviewer.md`](reviews/twfe-reviewer.md)
+- FE structure `fat_vmt ~ treatment + precip + temp + un_rate + max_speed | fips + year + month` correctly matches the paper areg specification.
+- Stored beta_twfe=0.6999 within 1.46% of paper 0.7103; gap explained by Vermont (FIPS=50) absent from synth_file_2014.dta.
+- Pre-trends oscillatory (not monotone drift); t=-4 individually significant (t=2.71) but non-systematic -- Axis-3 design signal.
 
-### CS-DID (WARN)
+Full report: [reviews/twfe-reviewer.md](reviews/twfe-reviewer.md)
 
-- CS-NT ATT (no controls) = 0.6979, virtually identical to TWFE (0.28% gap) — expected and reassuring for a single-treated-unit design.
-- CS-NT SE is 2.72× larger than TWFE SE (0.3613 vs 0.1329), correctly reflecting true imprecision with 1 treated unit; t-stat drops from 5.27 (TWFE) to 1.89 (CS-NT) — marginally significant.
-- CS-NT pre-trend violations: t=-6 (t-stat 4.49), t=-4 (t-stat 6.29), t=-2 (t-stat 2.83) — 3 of 5 pre-periods statistically significant.
-- CS-NT with controls = 1.7327 (2.47× TWFE) — flagged as anomaly likely due to propensity-score instability with a single treated unit.
-- Full report: [`reviews/csdid-reviewer.md`](reviews/csdid-reviewer.md)
+### CS-DID (PASS on implementation; design findings on Axis 3)
 
-### Bacon (N/A)
+- CS-NT (no controls) ATT=0.6979, within 0.28% of TWFE -- expected for single-treated-unit design.
+- SE inflation 2.72x (TWFE SE=0.133 vs CS-NT SE=0.361) structurally correct: CS-DID properly captures variance from K=1 treated unit.
+- Spec A (CS-NT with 4 controls) returns ATT=1.733 (2.47x amplification). Pattern-51-style DR overfit with K=1 treated. Axis-3 design finding.
+- 3 of 5 CS-NT pre-periods significant (t=-6 t=4.49, t=-4 t=6.29, t=-2 t=2.83), oscillatory -- Axis-3 finding.
 
-- Single treatment timing (Oregon, Feb 2003; 46 never-treated controls). Bacon decomposition is trivial with 100% Treated-vs-Untreated weight and no forbidden comparisons. Correctly skipped.
-- Full report: [`reviews/bacon-reviewer.md`](reviews/bacon-reviewer.md)
+Full report: [reviews/csdid-reviewer.md](reviews/csdid-reviewer.md)
 
-### HonestDiD (WARN)
+### Bacon (NOT_APPLICABLE)
 
-- Design credibility: D-FRAGILE for average ATT (rm_avg_Mbar=0; CI includes zero at Mbar=0.25) and first-period ATT (rm_first_Mbar=0; CI includes zero even at Mbar=0).
-- Design credibility: D-MODERATE for peak ATT (rm_peak_Mbar≈0.25–0.50; robust through Mbar=0.25 for both TWFE and CS-NT).
-- The observed significant pre-periods in CS-NT (Mbar effectively > 0 for this paper) mean the D-FRAGILE avg/first findings are realistic, not hypothetical.
-- Full report: [`reviews/honestdid-reviewer.md`](reviews/honestdid-reviewer.md)
+- treatment_timing=single (Oregon only); all weight on single TvU comparison. Correctly not run.
+
+Full report: [reviews/bacon-reviewer.md](reviews/bacon-reviewer.md)
+
+### HonestDiD (PASS on implementation; D-FRAGILE design finding)
+
+- rm_first_Mbar=0 (both TWFE and CS-NT): first-period ATT CI includes zero at Mbar=0.
+- rm_avg_Mbar=0 (both estimators): average ATT breaks at Mbar=0.25. Any linear deviation eliminates significance.
+- rm_peak_Mbar=0.25 (both estimators): peak-period ATT (ATT_peak~4.18 at t=+1) robust through Mbar=0.25; breaks 0.25-0.50.
+- Oscillatory CS-NT pre-periods suggest plausible Mbar > 0.25 in practice.
+
+Full report: [reviews/honestdid-reviewer.md](reviews/honestdid-reviewer.md)
 
 ### de Chaisemartin (NOT_NEEDED)
 
-- Binary absorbing single-timing treatment. No staggered adoption, no continuous dose, no non-absorbing switching. DCM offers no additional insight over TWFE/CS-DID for this design.
-- Full report: [`reviews/dechaisemartin-reviewer.md`](reviews/dechaisemartin-reviewer.md)
+- Absorbing binary single-cohort; no switching, no continuous dose, no staggered adoption. DCM would match TWFE and CS-NT.
+
+Full report: [reviews/dechaisemartin-reviewer.md](reviews/dechaisemartin-reviewer.md)
+
+### Paper-auditor (NOT_APPLICABLE -- no PDF)
+
+- pdf/433.pdf not found. Formal fidelity axis: F-NA.
+- Informational metadata-based check: |0.7103-0.6999|=0.0104 (1.46%, diff/SE=0.081) -- WITHIN_TOLERANCE. Gap explained by missing Vermont.
+
+Full report: [reviews/paper-auditor.md](reviews/paper-auditor.md)
 
 ---
 
-## Material findings (sorted by severity)
+## Three-way controls decomposition
 
-**WARN items:**
+| Spec | TWFE | CS-DID NT | Status |
+|---|---|---|---|
+| (A) both with controls | 0.6999 (SE 0.133) | 1.7327 (SE 0.421) | ANOMALY -- Pattern 51 DR overfit (K=1 + 4 covariates); Axis-3 |
+| (B) both without controls | 0.7151 (SE 0.132) | 0.6979 (SE 0.370) | OK -- convergence within 2.5% |
+| (C) TWFE with, CS without (headline) | 0.6999 (SE 0.133) | 0.6979 (SE 0.370) | OK |
 
-1. **CS-NT pre-trend violations** (csdid-reviewer): Three of five pre-periods in the CS-DID event study are statistically significant at 5% (t=-2: t-stat 2.83; t=-4: t-stat 6.29; t=-6: t-stat 4.49). The oscillatory pattern reduces concern about a monotone confounding trend, but the significance cannot be dismissed with only 1 treated unit.
+Key ratios:
+- Estimator margin (Spec B, matched-protocol): +2.4% -- near-zero.
+- Covariate margin (TWFE side): -2.2% -- controls negligible for TWFE.
+- Covariate margin (CS side): +59.7% -- Pattern-51 overfit dominates.
+- Total gap (headline Spec C): +0.3% -- negligible.
 
-2. **HonestDiD D-FRAGILE average ATT** (honestdid-reviewer): The average ATT (TWFE avg = 2.14; CS-NT avg = 1.16) is robust only under the assumption of exactly parallel pre-trends (Mbar=0). At Mbar=0.25, both TWFE and CS-NT average confidence intervals include zero. Given the CS-NT pre-trend violations above, the plausible Mbar for this paper is likely above 0.25.
+Interpretation: Matched-protocol Spec B confirms TWFE/CS-NT agree within 2.4% under matched controls, validating our implementation. Spec A anomaly is K=1 propensity overfit (Axis-3). Deliverable D1 finding: matched-protocol nearly eliminates the TWFE vs CS gap -- Spec C divergence is artefact of mismatched controls, not the estimator.
 
-3. **CS-NT with-controls anomaly** (csdid-reviewer): DR-CS-DID with controls returns 1.7327, 2.47× larger than TWFE. Likely a propensity-score instability artifact in the single-treated-unit setting. The no-controls CS-NT (0.6979) is the reliable comparison.
+---
+
+## Three-axis rating summary
+
+| Axis | Evidence | Score |
+|---|---|---|
+| Fidelity (paper-auditor) | NOT_APPLICABLE (no PDF); informational WITHIN_TOLERANCE 1.46% | F-NA |
+| Implementation (all reviewers) | TWFE: PASS; CS-DID: PASS; Bacon: N/A; HonestDiD: PASS; DCM: NOT_NEEDED | I-HIGH |
+| Design credibility (Axis-3) | rm_first=0, rm_avg=0 (D-FRAGILE); rm_peak=0.25 (D-MODERATE); 3/5 oscillatory pre-periods; Pattern-51 Spec A | D-FRAGILE |
+
+F-NA x I-HIGH -> use implementation alone -> **OVERALL RATING: HIGH**
+
+Note on prior rating: The legacy row assigned LOW (M-LOW x F-NA) by counting 2 implementation WARNs -- the CS-with-controls Spec A anomaly and the HonestDiD pre-trend signal. Under the correct 3-axis rubric both belong on Axis 3: Spec A amplification is structural K=1 propensity overfit (Pattern 51); HonestDiD fragility is a design finding about the paper's design. Neither reflects a pipeline error. Corrected rating: HIGH.
+
+---
+
+## Material findings (Axis 3 -- sorted by severity)
+
+- D-FRAGILE: HonestDiD rm_avg_Mbar=0 both estimators. Average ATT significant only under exact parallel trends; any linear deviation eliminates significance.
+- Oscillatory CS-NT pre-trends: t=-6 (t=4.49), t=-4 (t=6.29), t=-2 (t=2.83) significant. Oscillatory not monotone; consistent with Oregon seasonal heterogeneity. Plausible Mbar > 0.25.
+- Pattern-51 Spec A amplification: CS-NT with controls 1.733 vs 0.698 (+148%). Structural to K=1 design. Use Spec B/C as headline.
+- D-MODERATE: rm_peak_Mbar=0.25. Peak-month effect (~4.18 TWFE at t=+1) is the most robust finding.
+- SE understatement: TWFE SE (0.128) understates true uncertainty; CS-NT SE (0.361) better reflects K=1 variance.
 
 ---
 
 ## Recommended actions
 
-- **For the peak-period finding (t=+1, ~3–4 fatalities/VMT increase in the first month)**: This is the most credible element of the paper. HonestDiD is robust through Mbar≈0.25 for the peak. Users may cite this with moderate confidence.
-- **For the average ATT interpretation**: Flag as D-FRAGILE. The paper's aggregate interpretation depends on months t=3 and t=5 (large spikes in event study); these are not robust to even mild pre-trend violations.
-- **For the repo-custodian**: The original data file `fatal_analysis_file_2014.dta` is missing; `synth_file_2014.dta` (47 states, excl. VT) was used as substitute. If the original file becomes available, re-run to check whether Vermont's inclusion changes results materially.
-- **For the pattern-curator**: Consider documenting Pattern 51 — "Single-treated-unit propensity score instability in DR-CS-DID": when there is exactly 1 treated unit, the doubly-robust CS-DID estimator can return inflated ATTs (here: 2.47× TWFE) due to propensity score near-separation. The no-controls CS-NT is the reliable comparator in this design.
-- **For the user**: The design is methodologically sound (single-timing, absorbing binary, balanced panel, 46 never-treated controls), but identification ultimately rests on Oregon-specific parallel trends — an assumption that the CS-DID event study's significant pre-periods challenge. Wild cluster bootstrap (or randomization inference with only 1 treated unit) would be a more appropriate uncertainty quantification than clustered SEs.
-
----
-
-## Rating derivation
-
-| Axis | Score |
-|---|---|
-| twfe-reviewer | PASS |
-| csdid-reviewer | WARN |
-| bacon-reviewer | NOT_APPLICABLE (excluded) |
-| honestdid-reviewer | WARN |
-| dechaisemartin-reviewer | NOT_NEEDED (excluded) |
-| **Methodology count** | 1 PASS, 2 WARN, 0 FAIL |
-| **M-score** | M-LOW (≥ 2 WARN, no FAIL) |
-| paper-auditor | NOT_APPLICABLE (no PDF; F-NA) |
-| **F-score** | F-NA |
-| **Combined** | M-LOW × F-NA → use methodology alone = **LOW** |
+- No pipeline action needed. All implementation reviewers PASS; stored beta_twfe=0.6999 faithfully replicates the paper.
+- For users: rm_avg_Mbar=0 is the key design finding. Average ATT not robust to linear pre-trend violations. Peak-period effect (Mbar=0.25) is the stronger causal claim.
+- For the dissertation: single-treated-unit fragility case -- clean design (no staggered timing, no negative weights) but reliant on exact parallel trends.
+- Pattern-51 Spec A overfit already documented in knowledge/failure_patterns.md. No new pattern needed.
+- Add pdf/433.pdf to pdf/ directory if available for formal fidelity verification.
 
 ---
 
 ## Individual reports
 
-- [`reviews/twfe-reviewer.md`](reviews/twfe-reviewer.md)
-- [`reviews/csdid-reviewer.md`](reviews/csdid-reviewer.md)
-- [`reviews/bacon-reviewer.md`](reviews/bacon-reviewer.md)
-- [`reviews/honestdid-reviewer.md`](reviews/honestdid-reviewer.md)
-- [`reviews/dechaisemartin-reviewer.md`](reviews/dechaisemartin-reviewer.md)
-- [`reviews/paper-auditor.md`](reviews/paper-auditor.md)
+- [reviews/twfe-reviewer.md](reviews/twfe-reviewer.md)
+- [reviews/csdid-reviewer.md](reviews/csdid-reviewer.md)
+- [reviews/bacon-reviewer.md](reviews/bacon-reviewer.md)
+- [reviews/honestdid-reviewer.md](reviews/honestdid-reviewer.md)
+- [reviews/dechaisemartin-reviewer.md](reviews/dechaisemartin-reviewer.md)
+- [reviews/paper-auditor.md](reviews/paper-auditor.md)

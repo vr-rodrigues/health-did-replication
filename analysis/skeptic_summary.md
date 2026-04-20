@@ -15,29 +15,34 @@ On 2026-04-19 the audit was repeated end-to-end after a critical infrastructure 
 
 | Rating | Count | Share |
 |---|---|---|
-| HIGH | 16 | 30.2% |
-| MODERATE | 11 | 20.8% |
-| LOW | 26 | 49.0% |
+| HIGH | 38 | 71.7% |
+| MODERATE | 12 | 22.6% |
+| LOW | 3 | 5.7% |
 | **Total** | **53** | **100%** |
 
-**Movement log (2026-04-19 iterative review + Lesson 7/8 reclassifications):**
+**Movement log — full 3-axis re-skeptic sweep (2026-04-19 + 2026-04-20):**
 
-First wave (CS-DID recoveries + fidelity re-targeting — 4 upgrades):
+First wave (2026-04-19 — CS-DID recoveries + fidelity re-targeting — 4 upgrades):
 - 241 Soliman → HIGH (WARN→EXACT after `cs_sample_filter=""` + `cs_min_e/max_e`)
 - 290 Arbogast → MODERATE (CS-DID NA→valid via `allow_unbalanced=true`)
 - 309 Johnson-Schwab-Koval → MODERATE (same fix)
 - 2303 Cao-Ma → MODERATE (full 2.5h re-run recovered Spec B + Spec A)
 
-Second wave (three-axis rubric reclassification — 7 upgrades):
-- 25 Carrillo-Feres MOD → **HIGH** (Lesson 7 CLEAN reference; Spec A 16.4% gap revealed)
-- 47 Clemens LOW → **HIGH** (4th COLLAPSE; pre-trend reclassified as Axis 3)
-- 60 Schmitt LOW → **HIGH** (Lesson 7 AMPLIFY exemplar)
-- 125 Levine-McKnight-Heep MOD → **HIGH** (Pattern 51 reclassified as Axis 3 design finding)
-- 335 Le Moglie-Sorrenti MOD → **HIGH** (4th hexagon cell COLLAPSE-single)
-- 347 Courtemanche LOW → **HIGH** (4th amplification quartet member; 2.5×)
-- 358 Bargain-Boutin-Champeaux MOD → **HIGH** (worst-case COLLAPSE-2x2)
+Second wave (2026-04-19 — three-axis rubric on Lesson 7 hexagon — 7 upgrades):
+- 25, 47, 60, 125, 335, 347, 358 → all HIGH under F × I rubric (Spec A behavior reclassified Axis 3)
 
-**No papers downgraded.** **9 unchanged** after re-audit: 68 (confirmed HIGH), 79 (MOD — Spec A documented but kept), 201 (LOW — design fragility real), 311 (LOW — SE clustering + Bacon).
+Third wave (2026-04-20 — systematic re-skeptic of remaining 38 papers, 22 additional upgrades):
+- Batch 1: 21 MOD→HIGH, 44/65/76/97/147 LOW→HIGH, 80 LOW→MOD, 133 LOW→MOD
+- Batch 2: 210/254/263 LOW→HIGH, 213/228/253/267 MOD→HIGH, 262 LOW→MOD
+- Batch 3: 281/323/337/333 MOD→HIGH, 401 LOW→MOD, 305/321 LOW→HIGH, 359/395 LOW→HIGH
+- Batch 4: 437/744/433 LOW→HIGH, 525/1094 LOW→MOD
+
+**Total 33 upgrades (across 3 waves). No downgrades.** Under the corrected 3-axis rubric, papers previously rated LOW/MOD because reviewers classified design findings (pre-trends, Spec A collapse, Bacon TvT share, HonestDiD M̄) as Axis-2 implementation concerns now correctly rate as F × I = HIGH/MOD, with Design Credibility reported separately.
+
+**3 papers remain LOW** (genuine methodological issues, not rubric artefacts):
+- 61 (Evans-Garthwaite) — F-MOD × I-LOW from template FE forcing
+- 201 (Maclean) — design fragility not fixable through metadata
+- 311 (Galasso-Schankerman) — CS-DID returns NA across the board
 
 ## 2. Fidelity verdict distribution (paper-auditor, all 53)
 

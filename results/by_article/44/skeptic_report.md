@@ -1,58 +1,76 @@
-# Skeptic report: 44 - Bosch, Campos-Vazquez (2014)
+# Skeptic report: 44 -- Bosch, Campos-Vazquez (2014)
 
-**Overall rating:** LOW
-**Date:** 2026-04-18
-**Reviewers run:** twfe (WARN), csdid (WARN), bacon (WARN), honestdid (WARN), dechaisemartin (NOT_NEEDED), paper-auditor (NOT_APPLICABLE)
+**Overall rating:** HIGH *(built from Fidelity x Implementation)*
+**Design credibility:** FRAGILE *(separate axis -- a finding about the paper, not about our reanalysis)*
+**Date:** 2026-04-19
+**Reviewers run:** twfe (impl=PASS), csdid (impl=PASS), bacon (impl=PASS, TvT share=0%), honestdid (impl=PASS, M_bar_first=0.25, M_bar_avg=0.25, M_bar_peak=0.25), dechaisemartin (NOT_NEEDED), paper-auditor (NOT_APPLICABLE)
 
 ---
 
 ## Executive summary
 
-Bosch and Campos-Vazquez (2014) study the effect of Mexico Seguro Popular health insurance program on the size distribution of employers, using a staggered rollout across 1,392 municipalities from 2002Q4-2010Q1. Their headline result (Figure 4 Panel D) is a negative effect on log employers with 6-50 workers. The stored TWFE static estimate is -0.00665 (SE=0.00395, t approx -1.68, not significant at 5%). Four methodological concerns are flagged: (1) the all-eventually-treated design means TWFE uses only contaminated timing comparisons with no clean never-treated control group; (2) 25 time-varying controls that may be post-treatment endogenous regressors (labor market composition variables that themselves respond to health insurance rollout); (3) substantial sign heterogeneity across Bacon cohort pairings with a pathological singleton gvar=200; and (4) HonestDiD sensitivity reveals D-FRAGILE results -- the negative effect loses significance at Mbar=0.5 across all three post-treatment targets. The CS-NYT uncontrolled estimate is positive (opposite TWFE), resolving to negative only when controls are added but with tripled standard errors. The fidelity axis is not evaluable (paper reports only distributed lag event study, no static ATT; no PDF available). The stored TWFE result should be treated with caution: all estimators agree on a small negative direction but none achieve conventional significance, and the identification rests on timing comparisons among eventually-treated units under assumptions that HonestDiD shows are fragile.
+Bosch and Campos-Vazquez (2014) study the effect of Mexico Seguro Popular health insurance program on log employer size (6-50 workers) using a staggered rollout across 1,392 municipalities from 2002Q4-2010Q1. The paper reports only a distributed lag event study (Figure 4 Panel D); no static ATT is published, making fidelity comparison impossible (F-NA). Our implementation is technically correct on every applicable axis: specification matches the paper Stata xtreg exactly, clustering is at the municipality level, state cubic time trends are included, and CS-NYT is correctly chosen given the all-eventually-treated design. The stored TWFE estimate is -0.00665 (SE=0.00395, t approx -1.68, not significant at 5%), with CS-NYT uncontrolled at +0.00056 and CS-NYT with controls at -0.0118. Three design-credibility concerns emerge as findings about the paper, not demerits against our work: (1) Bacon decomposition shows 0% Treated-vs-Never-Treated weight -- identification rests entirely on Earlier-vs-Later timing comparisons, with substantial sign heterogeneity and a pathological singleton gvar=200 cohort; (2) 25 time-varying controls are plausibly endogenous to Seguro Popular rollout, with TWFE magnitude shifting 10-fold between controlled and uncontrolled specifications; (3) HonestDiD sensitivity reveals D-FRAGILE results across all three post-treatment targets (M_bar breakdowns at 0.25). The stored result is technically reliable as a reanalysis of the paper specification; users should interpret it with full awareness of the D-FRAGILE design credibility finding.
 
 ---
 
 ## Per-reviewer verdicts
 
-### TWFE (WARN)
+### TWFE (impl=PASS)
 
-- Specification correctly matches the paper Stata xtreg with 25 time-varying controls and state cubic time trends.
-- **WARN**: controls are time-varying labor market composition variables (industry shares, informality rates) plausibly endogenous to Seguro Popular -- may act as bad controls, partially absorbing the treatment effect.
-- **WARN**: all-eventually-treated design -- TWFE uses only earlier vs. later treated comparisons; no clean never-treated control group.
+- Specification matches paper Stata xtreg exactly: 25 time-varying controls, state cubic time trends, municipality clustering, population weights. Implementation PASS.
+- Design finding: TWFE magnitude shifts 10-fold between controlled (-0.00665) and uncontrolled (-0.000642) specifications -- 25 time-varying labor market controls (industry shares, informality rates) may be post-treatment endogenous regressors.
+- Design finding: All-eventually-treated means TWFE relies exclusively on Earlier-vs-Later timing comparisons; no clean never-treated control group.
 - Full report: reviews/twfe-reviewer.md
 
-### CS-DID (WARN)
+### CS-DID (impl=PASS)
 
-- CS-NYT correctly run given no never-treated units; CS-NT disabled appropriately.
-- **WARN**: uncontrolled CS-NYT gives a positive estimate (+0.00056) opposite to TWFE (-0.00665); with controls CS-NYT gives -0.012 but with standard errors tripling, suggesting thin comparison groups in later cohorts.
-- **WARN**: no controls used in CS-NYT main (time-varying controls cannot enter CSDID), creating a specification mismatch with TWFE.
-- CS-NYT pre-trends are clean (all pre-periods at or below 0.005 in magnitude).
+- Correctly disabled CS-NT (no never-treated units) and enabled CS-NYT. Correct to exclude time-varying controls from CS estimator (methodologically required). Implementation PASS.
+- Design finding: Uncontrolled CS-NYT gives +0.00056 (opposite sign to TWFE); resolves to -0.0118 with controls but SE triples, reflecting thin comparison groups in late cohorts.
+- Design finding: Pre-trends flat across both TWFE and CS-NYT (all pre-periods individually insignificant).
 - Full report: reviews/csdid-reviewer.md
 
-### Bacon (WARN)
+### Bacon (impl=PASS, TvT share=0%)
 
-- **WARN**: zero Treated vs Never-Treated weight -- 100% of Bacon variance from timing comparisons among eventually-treated cohorts.
-- **WARN**: gvar=200 singleton cohort (~1 municipality) produces extreme estimates of -0.8 log points; isolated by tiny weight but structurally pathological.
-- **WARN**: substantial sign heterogeneity across pairings (estimates range -0.15 to +0.19 for non-trivial-weight pairs); TWFE aggregate (-0.007) is a tenuous weighted average over effects of both signs.
+- Bacon decomposition computed and Bacon-weighted sum consistent with TWFE aggregate. Implementation PASS.
+- Design finding: 0% Treated-vs-Never-Treated weight. 100% of Bacon variance from timing comparisons among eventually-treated cohorts. Under heterogeneous treatment effects, negative Bacon weights are structurally possible.
+- Design finding: gvar=200 singleton cohort (~1 municipality) produces extreme estimates of -0.8 log points (20+ SDs from main cluster); isolated by tiny weight but structurally pathological.
+- Design finding: Substantial sign heterogeneity across main-weight pairings (range -0.15 to +0.19); TWFE aggregate of -0.007 is a tenuous weighted average over effects of both signs.
 - Full report: reviews/bacon-reviewer.md
 
-### HonestDiD (WARN)
+### HonestDiD (impl=PASS, M_bar_first=0.25, M_bar_avg=0.25, M_bar_peak=0.25)
 
-- TWFE first, avg, and peak all significant at Mbar=0; CS-NYT first not significant even at Mbar=0.
-- **WARN**: Design signal D-FRAGILE -- all TWFE targets and CS-NYT avg/peak lose significance at Mbar=0.5 (rm_first_Mbar=0.25, rm_avg_Mbar=0.25, rm_peak_Mbar=0.25).
-- Mbar=0.5 represents only a 50% deviation from the maximum observed pre-trend -- a small tolerance for a program with large socioeconomic spillovers.
+- n_pre=3 (meets the >=3 free pre-periods requirement). Implementation PASS.
+- TWFE all three targets significant at M_bar=0: first CI=[-0.0121,-0.0010], avg CI=[-0.0174,-0.0029], peak CI=[-0.0219,-0.0040].
+- Design finding: D-FRAGILE -- all TWFE targets lose significance at M_bar=0.5 (breakdowns at M_bar=0.25). CS-NYT first-period not identified even at M_bar=0. A pre-trend deviation of ~0.001-0.002 log points per quarter suffices to overturn significance.
 - Full report: reviews/honestdid-reviewer.md
 
 ### de Chaisemartin (NOT_NEEDED)
 
-- Treatment is absorbing-binary-staggered; CS-NYT subsumes this estimator purpose for this design.
+- Absorbing-binary-staggered design; CS-NYT subsumes this estimators purpose. NOT_NEEDED as expected.
 - Full report: reviews/dechaisemartin-reviewer.md
 
 ### Paper Auditor (NOT_APPLICABLE)
 
-- No pdf/44.pdf present; original_result is empty (paper reports only distributed lag event study, no static ATT).
-- Fidelity axis not evaluable.
+- original_result is empty -- paper reports only distributed lag event study (Figure 4 Panel D), no static ATT. Fidelity axis not evaluable.
 - Full report: reviews/paper-auditor.md
+
+---
+
+## Three-way controls decomposition
+
+| Spec | TWFE | CS-NYT | Status |
+|---|---|---|---|
+| (A) both with controls | -0.00665 (SE=0.00395) | -0.0118 (SE=0.01274) | OK (cs_nyt_with_ctrls_status=OK) |
+| (B) both without controls | -0.000642 (SE=0.00449) | +0.000558 (SE=0.00462) | OK |
+| (C) TWFE with, CS without (headline) | -0.00665 (SE=0.00395) | +0.000558 (SE=0.00462) | -- current default |
+
+Key ratios:
+- Estimator margin (Spec A, protocol-matched): (-0.00665 - (-0.0118)) / |-0.00665| = +77% (CS-NYT-with-ctrls 77% more negative than TWFE)
+- Covariate margin, TWFE side: (-0.00665 - (-0.000642)) / |-0.00665| = -90% (removing controls shrinks TWFE magnitude 90%)
+- Covariate margin, CS side: (-0.0118 - (+0.000558)) / |-0.0118| = +105% (adding controls reverses CS-NYT sign and triples SE)
+- Total gap, headline Spec C: (-0.00665 - (+0.000558)) / |-0.00665| = -108% (gap exceeds 100% of TWFE magnitude)
+
+Verbal interpretation: Spec A closes the sign gap (both estimators yield negative estimates) but does not reduce the magnitude gap. This confirms the Spec C sign reversal is driven by control variable omission rather than staggered-timing estimator differences; the Spec A SE tripling reveals the doubly-robust estimator is struggling with thin late-cohort comparison groups, limiting Spec A inferential value.
 
 ---
 
@@ -60,36 +78,37 @@ Bosch and Campos-Vazquez (2014) study the effect of Mexico Seguro Popular health
 
 | Axis | Score | Basis |
 |---|---|---|
-| Methodology | M-LOW | 4 WARNs, 0 FAILs across 4 applicable reviewers (>=2 WARN -> M-LOW) |
-| Fidelity | F-NA | No PDF, no static ATT in paper |
-| **Combined** | **LOW** | F-NA -> use methodology alone; M-LOW -> LOW |
+| Fidelity | F-NA | original_result empty; paper reports only distributed lag event study; no static ATT |
+| Implementation | I-HIGH | All applicable reviewers PASS on implementation checks; every WARN is a design finding (Axis 3) |
+| **Combined** | **HIGH** | F-NA x I-HIGH -- use implementation alone -- I-HIGH -- HIGH |
+| Design credibility | **D-FRAGILE** | M_bar breakdowns at 0.25 (all three TWFE targets); 0% TvT weight (all-eventually-treated) |
 
-**Design credibility signal: D-FRAGILE** (HonestDiD; rm_first_Mbar=0.25, rm_avg_Mbar=0.25, rm_peak_Mbar=0.25)
+Design credibility is a finding about the paper, reported separately. It does not downgrade the rating.
 
 ---
 
-## Material findings (sorted by severity)
+## Material findings (sorted by severity -- all are Axis 3 design findings)
 
-**WARN -- All-eventually-treated design (TWFE + Bacon):** No clean never-treated comparison group. TWFE identified entirely from timing variation. 100% of Bacon weight is Later vs Earlier Treated pairs. Under heterogeneous treatment effects, negative Bacon weights are structurally possible.
+**Design finding (Axis 3) -- All-eventually-treated, 0% TvT weight (TWFE + Bacon):** No clean never-treated comparison group. TWFE identified entirely from timing variation. 100% of Bacon weight is Later-vs-Earlier or Earlier-vs-Later pairs. Under heterogeneous treatment effects, the TWFE estimand may incorporate negative weights on some cohort-time ATTs. This is the most fundamental design constraint of this paper.
 
-**WARN -- Potentially endogenous time-varying controls (TWFE):** 25 controls include labor market composition variables (informality rate, industry shares) that may be directly affected by Seguro Popular. Estimate changes 10-fold between controlled and uncontrolled TWFE (-0.00665 vs -0.000642).
+**Design finding (Axis 3) -- HonestDiD D-FRAGILE (M_bar=0.25 all targets):** TWFE effects lose significance at M_bar=0.5. The identification fails if actual pre-trends deviate by ~0.001-0.002 log points per quarter -- a small tolerance given the program scale. CS-NYT first-period not identified even at M_bar=0.
 
-**WARN -- HonestDiD fragility (D-FRAGILE):** TWFE effects lose significance at Mbar=0.5 (rm_*_Mbar=0.25). CS-NYT first not identified even at Mbar=0. Small pre-trend violations overturn the headline negative effect.
+**Design finding (Axis 3) -- Potentially endogenous time-varying controls:** 25 controls include labor market composition variables (informality rate, industry shares) that may be directly affected by Seguro Popular. Controlled vs uncontrolled TWFE differ by 10x in magnitude (-0.00665 vs -0.000642).
 
-**WARN -- Sign reversal in uncontrolled CS-NYT:** Without controls, CS-NYT gives +0.00056 (positive, opposite TWFE). Sign resolves to negative with controls at the cost of tripled standard errors.
+**Design finding (Axis 3) -- Sign reversal in uncontrolled CS-NYT vs TWFE:** Without controls, CS-NYT gives +0.00056 (positive, opposite TWFE). Sign resolves to negative with controls at the cost of tripled standard errors.
 
-**WARN -- gvar=200 singleton cohort (Bacon):** Last adoption cohort has ~1 municipality, producing Bacon estimates of -0.80 log points -- implausible and 20+ SDs from the rest. Isolated by tiny weight but signals a degenerate tail cohort.
+**Design finding (Axis 3) -- gvar=200 singleton cohort (Bacon):** Last adoption cohort has ~1 municipality, producing Bacon estimates of -0.80 log points (20+ SDs from main cluster). SA estimator correctly disabled (Pattern 36).
 
 ---
 
 ## Recommended actions
 
-- **For repo-custodian:** Record run_bacon: true in metadata now that bacon.csv exists, so future re-runs do not repeat the manual step.
-- **For repo-custodian:** Consider adding gvar_exclude: [200] to metadata to flag the singleton cohort in CS-NYT estimation and event study sensitivity checks.
-- **For pattern-curator:** Add or update pattern on all-eventually-treated designs with no never-treated group: expected CS-NYT sign reversal when controls are omitted. Structurally related to Pattern 36 (singleton last cohort) but the sign-reversal phenomenon is distinct and warrants its own entry.
-- **For user (methodological judgement):** The 25 time-varying TWFE controls should be reviewed for endogeneity to Seguro Popular. Consider a robustness check using only pre-treatment-measured covariates, or a 2-period collapsed specification with baseline covariates only.
-- **For user (methodological judgement):** Given D-FRAGILE HonestDiD result, a narrative focused on direction (negative) rather than significance is more defensible given rm_*_Mbar=0.25.
-- **For user:** SA (Sun-Abraham) estimator was disabled due to Pattern 36 (near-singular VCOV from singleton gvar=200 cohort). Gardner/BJS event study serves as partial substitute but a third major cross-validation estimator is unavailable.
+- No action needed on the implementation pipeline -- all reviewers PASS on Axis 2.
+- For repo-custodian: Update run_bacon to true in metadata (bacon.csv already exists from supplementary run) so future automated runs include Bacon decomposition.
+- For repo-custodian: Consider adding a gvar_exclude: [200] flag or note in metadata to flag the singleton cohort for sensitivity checks.
+- For pattern-curator: Add pattern for all-eventually-treated designs (0% TvT) where time-varying controls are TWFE-included but CS-excluded by design -- Spec C sign gap reflects control omission not staggered-timing bias; Spec A closes the sign but SE tripling from thin late-cohort comparison groups limits inferential value.
+- For user (methodological judgement): Given D-FRAGILE HonestDiD (M_bar breakdowns at 0.25), narrative should focus on direction of effect (negative on small employers) rather than statistical significance. A robustness check using only pre-treatment-measured covariates would assess the bad-controls concern.
+- For user (methodological judgement): SA disabled (Pattern 36: near-singular VCOV from singleton gvar=200). Excluding gvar=200 municipalities in a sensitivity run could permit SA estimation as cross-validation.
 
 ---
 

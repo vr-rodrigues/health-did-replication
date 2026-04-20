@@ -1,75 +1,114 @@
-# Skeptic report: 263 — Axbard, Deng (2024)
+# Skeptic report: 263 -- Axbard, Deng (2024)
 
-**Overall rating:** LOW
-**Date:** 2026-04-18
-**Reviewers run:** twfe (WARN), csdid (WARN), bacon (N/A), honestdid (WARN), dechaisemartin (NOT_NEEDED), paper-auditor (N/A — no PDF, no original_result)
+**Overall rating:** HIGH  *(built from Fidelity x Implementation; upgraded from LOW under old conflated rubric)*
+**Design credibility:** D-FRAGILE  *(separate axis -- a finding about the paper, not about our reanalysis)*
+**Date:** 2026-04-19
+**Reviewers run:** twfe (impl=PASS; design-WARN reclassified Axis 3), csdid (impl=PASS; Pattern-50 reclassified Axis 3), bacon (NOT_APPLICABLE), honestdid (impl=PASS; Mbar_avg=0 TWFE; breaks Mbar=0.25), dechaisemartin (NOT_NEEDED), paper-auditor (EXACT +0.86%)
 
 ---
 
 ## Executive summary
 
-Axbard and Deng (2024) study the effect of air pollution monitoring on enforcement actions against firms in China, using a DiD design where treated firms are those located within 10 km of newly installed air monitors, with a single treatment date of Q1 2015. The TWFE estimate (β=0.00333, SE=0.000556, t≈5.99) is strongly significant and pre-trends are clean. However, three methodological concerns each rise to WARN level: (1) the demanding FE structure (firm + time + 531 industry×time + 21 province×time dummies) cannot be replicated in CS-DID, causing a 7x SE inflation (Pattern 50) that renders the CS-NT estimate individually insignificant, though directionally consistent; (2) HonestDiD shows the avg-ATT becomes statistically fragile at Mbar=0.25 — a modest parallel trends violation — reflecting the design's limited power given the small effect magnitude; and (3) the TWFE itself conditions on so many FEs that the identifying variation is narrow and the parallel trends assumption is effectively untestable at this granularity. The stored consolidated result (β=0.00333) is the correct TWFE replication of the paper's Table 1a Col 1. SA and Gardner estimators confirm the direction and approximate magnitude. Users should treat this result as credible but not confirmed by the semiparametric robustness checks.
+Axbard and Deng (2024) study the effect of air pollution monitoring on enforcement actions against Chinese firms, using a single-cohort DiD: treated firms are those within 10 km of a newly installed air monitor, all treated simultaneously in Q1 2015. The stored TWFE estimate (beta = 0.00333, SE = 0.000556) reproduces the paper Table 1 Panel A Col 1 to within 0.86% -- well inside the EXACT threshold. All implementation choices (FE structure, clustering at city_id, sample filter, no controls) are correct. SA and Gardner estimators confirm the direction and approximate magnitude. The credibility rating is HIGH under the 3-axis rubric.
+
+The design-credibility finding (D-FRAGILE) is a separate axis: HonestDiD shows the avg-ATT loses significance at Mbar = 0.25 for both TWFE and CS-NT, reflecting small effect magnitude relative to pre-trend uncertainty. CS-NT SEs are 6.8x wider than TWFE (Pattern 50) because CS-DID cannot absorb the paper's 531 industry-time + 21 province-time FEs -- a structural limitation of the paper's specification, not a pipeline error. Users should treat beta = 0.00333 as the correct replication estimate; HonestDiD fragility and Pattern 50 SE inflation are Axis 3 design-credibility findings about the paper.
 
 ---
 
 ## Per-reviewer verdicts
 
-### TWFE (WARN)
-- β=0.00333 (SE=0.000556, t≈5.99) faithfully replicates the paper's `reghdfe` specification including all four FE layers.
-- Pre-period event-study coefficients (t=-5 to t=-2) are all small and insignificant — no evidence of pre-trends.
-- WARN: The `industry^time` (~531 dummies) and `prov_id^time` (~21 dummies) FEs create a near-collinear conditioning environment where parallel trends is empirically untestable at the required granularity.
-- Full report: [`reviews/twfe-reviewer.md`](reviews/twfe-reviewer.md)
+### TWFE (impl=PASS; design-WARN reclassified Axis 3)
+- beta = 0.00333 (SE = 0.000556, t ~= 5.99); FE structure, clustering, and sample filter faithfully reproduce the Stata reghdfe spec.
+- Pre-period coefficients (t = -5 to t = -2) all small and insignificant -- clean parallel trends.
+- WARN about high-dimensional FEs making parallel trends untestable is an Axis 3 design finding; zero Axis 2 implementation WARNs.
+- Full report: reviews/twfe-reviewer.md
 
-### CS-DID (WARN)
-- CS-NT ATT=0.00260 (SE=0.00376, t≈0.69) — directionally consistent with TWFE but individually insignificant.
-- SE inflation is 6.8x relative to TWFE, root cause is structural (Pattern 50): CS-DID cannot absorb the high-dimensional interacted FEs.
-- SA and Gardner estimators confirm TWFE direction and magnitude, isolating the problem to CS-NT FE mismatch.
-- Full report: [`reviews/csdid-reviewer.md`](reviews/csdid-reviewer.md)
+### CS-DID (impl=PASS; Pattern-50 SE inflation reclassified Axis 3)
+- CS-NT ATT = 0.00260 (SE = 0.003758) -- directionally consistent with TWFE (78% of magnitude), individually insignificant (t ~= 0.69).
+- SE ratio CS/TWFE ~= 6.8x. Root cause: Pattern 50 -- 531 industry-time + 21 province-time FEs cannot be absorbed in the did package; adding via xformla collapses ATT to 0. Structural, not a coding error.
+- cs_nt_with_ctrls_status = N/A_no_twfe_controls -- correctly skipped (no baseline controls).
+- Full report: reviews/csdid-reviewer.md
 
-### Bacon (N/A)
-- Not applicable: single treatment timing (no staggered adoption); no decomposition needed or meaningful.
-- Full report: [`reviews/bacon-reviewer.md`](reviews/bacon-reviewer.md)
+### Bacon (NOT_APPLICABLE)
+- Single treatment timing (all firms treated Q1 2015); no staggered adoption variance to decompose.
+- Full report: reviews/bacon-reviewer.md
 
-### HonestDiD (WARN)
-- At Mbar=0 (exact parallel trends), avg and peak ATTs exclude zero for both TWFE and CS-NT.
-- Result becomes statistically fragile at Mbar=0.25 — even a mild violation of parallel trends renders avg-ATT insignificant.
-- Pre-trends are clean; fragility reflects small effect size relative to precision, not evidence of pre-trend contamination.
-- Full report: [`reviews/honestdid-reviewer.md`](reviews/honestdid-reviewer.md)
+### HonestDiD (impl=PASS; breakdown values reclassified Axis 3)
+- At Mbar = 0: avg-ATT (TWFE) CI = [+0.00079, +0.00453] excludes zero; peak CI = [+0.00207, +0.00615].
+- Breakdown: avg-ATT and peak-ATT lose significance at Mbar = 0.25 for TWFE; CS-NT peak barely survives at Mbar = 0.25.
+- rm_first_Mbar = 0, rm_avg_Mbar = 0, rm_peak_Mbar = 0 (TWFE); CS-NT rm_peak_Mbar = 0.25.
+- Pre-trends clean; low breakdown reflects small effect magnitude, not contamination. Axis 3 design finding.
+- Full report: reviews/honestdid-reviewer.md
 
 ### de Chaisemartin (NOT_NEEDED)
-- Standard absorbing binary single-timing design — no forbidden comparisons, no dose heterogeneity.
-- de Chaisemartin estimator adds no incremental insight beyond CS-DID for this design.
-- Full report: [`reviews/dechaisemartin-reviewer.md`](reviews/dechaisemartin-reviewer.md)
+- Standard absorbing binary single-timing design; DIDmultiplegtDYN adds no incremental insight.
+- Full report: reviews/dechaisemartin-reviewer.md
 
-### Paper auditor (N/A)
-- No PDF found at `pdf/263.pdf`; `original_result` is empty `{}`. Fidelity axis not evaluable.
+### Paper auditor (EXACT)
+- Stored beta_twfe = 0.003328 vs paper Table 1 Panel A Col 1 = 0.0033. Relative delta = +0.86%, SE delta = -0.66%. Both within 1% EXACT threshold.
+- Fidelity score: F-HIGH.
+
+---
+
+## Three-way controls decomposition
+
+N/A -- twfe_controls = [] and cs_controls = []. Paper has no original covariates; unconditional comparison only.
+
+---
+
+## Design credibility: D-FRAGILE (Axis 3 findings)
+
+| Target | Estimator | Mbar=0 CI | Mbar=0.25 CI | Breakdown Mbar |
+|---|---|---|---|---|
+| first | TWFE | [-0.00129, +0.00291] incl 0 | [-0.00155, +0.00326] incl 0 | < 0 |
+| avg | TWFE | [+0.00079, +0.00453] excl 0 | [-0.00025, +0.00577] incl 0 | 0.25 |
+| peak | TWFE | [+0.00207, +0.00615] excl 0 | [-0.00023, +0.00837] incl 0 | 0.25 |
+| avg | CS-NT | [+0.00035, +0.00354] excl 0 | [-0.00015, +0.00437] incl 0 | 0.25 |
+| peak | CS-NT | [+0.00070, +0.00488] excl 0 | [+0.000021, +0.00581] barely excl 0 | ~0.25-0.5 |
+
+rm_Mbar summary: TWFE first=0, avg=0, peak=0; CS-NT first=0, avg=0, peak=0.25. Bacon TvT share: N/A (single timing). Pre-trends: flat and clean.
+
+Design credibility = D-FRAGILE. Rule applied: rm_avg_Mbar < 0.5 for both estimators -> D-FRAGILE. Pre-trends clean; fragility reflects effect size and precision, not contamination.
+
+---
+
+## Three-axis synthesis
+
+| Axis | Score | Basis |
+|---|---|---|
+| Fidelity (paper-auditor) | F-HIGH | EXACT (+0.86%) |
+| Implementation (Axis 2) | I-HIGH | 0 implementation WARNs or FAILs; all WARNs reclassified Axis 3 design findings |
+| Design credibility (Axis 3) | D-FRAGILE | avg-ATT rm_Mbar = 0; breaks Mbar=0.25; Pattern 50 SE inflation structural |
+
+**Final rating: HIGH (F-HIGH x I-HIGH).** The prior LOW rating (2026-04-18) used the old conflated rubric that counted Pattern 50 SE inflation and HonestDiD fragility as implementation demerits. Under the 3-axis rubric both are Axis 3 design findings. No implementation error exists; fidelity is exact.
 
 ---
 
 ## Material findings (sorted by severity)
 
-**WARN (3 active):**
+All findings are Axis 3 (design findings about the paper, not implementation errors):
 
-1. **[WARN — csdid] Pattern 50 FE mismatch causes 7x SE inflation in CS-NT.** The paper's identifying specification requires industry×time and province×time FEs that CS-DID cannot absorb. CS-NT point estimate is directionally consistent (0.0026 vs TWFE 0.0033) but statistically insignificant (t≈0.69). This is a structural limitation of semiparametric estimators versus high-dimensional FE TWFE, not a misspecification.
+1. **[D-FRAGILE -- HonestDiD] avg-ATT breaks at Mbar = 0.25.** A parallel-trends violation equal to 25% of observed pre-trends renders the average effect indistinguishable from zero. Absolute threshold is tiny (~0.0003 additional slope); fragility reflects effect size and precision, not contamination.
 
-2. **[WARN — honestdid] HonestDiD breakdown at Mbar=0.25 for avg-ATT.** The avg treatment effect loses significance at a modest 25% pre-trend violation. Given very small absolute pre-trends, this reflects sensitivity inherent to a small-magnitude effect rather than evidence of contamination.
+2. **[Pattern 50 -- csdid] CS-NT SE inflation 6.8x from FE structure mismatch.** The paper's 531 industry-time + 21 province-time FEs cannot be absorbed by the did package. CS-NT ATT = 0.0026 is directionally correct but not significant. SA and Gardner estimators confirm TWFE direction and magnitude.
 
-3. **[WARN — twfe] High-dimensional FEs make parallel trends empirically untestable.** The 550+ interacted FE dummies condition on so much variation that the parallel trends assumption — while visually supported by the event study — cannot be formally verified at the required industry×province×time granularity.
+3. **[Design -- twfe] Parallel trends untestable at industry-x-province-x-time granularity.** After conditioning on ~550 interacted FEs, identifying variation is narrow; visual pre-trend check passes but formal testing at this granularity is infeasible.
+
+No implementation failures or WARNs.
 
 ---
 
 ## Recommended actions
 
-- **For repo-custodian:** Populate `original_result` in `data/metadata/263.json` with the paper's Table 1a Col 1 numeric estimate (β and SE from the Stata reghdfe output) to enable future paper-auditor fidelity checks.
-- **For pattern-curator:** Pattern 50 (high-dimensional FE structure causing CS-NT SE inflation) is confirmed and active for article 263. Consider strengthening the pattern description with this case: single-timing design, 531 industry×time + 21 province×time dummies, SE ratio ≈ 7x.
-- **For user (methodological judgement):** The TWFE result is internally credible and confirmed by SA and Gardner estimators. The 7x CS-NT SE inflation should be noted as a caveat in any meta-analysis that pools CS-NT SEs across articles — article 263 will be an outlier on that dimension. Consider whether the paper's Conley spatial HAC SEs (an alternative robustness check not replicated here) would alter the inference.
-- **For user:** Treat the stored β=0.00333 as the correct replication of the paper's point estimate. Mark this article as LOW credibility in the meta-analysis primarily because of the structural FE mismatch that prevents semiparametric confirmation, not because the TWFE estimate is suspect.
+- No implementation action needed. beta = 0.00333 is the correct replication estimate.
+- For dissertation write-up: report D-FRAGILE verdict and Mbar = 0.25 breakdown in the article-level commentary. Recommend SA/Gardner as preferred semiparametric corroboration given Pattern 50 precludes meaningful CS-NT inference.
+- For pattern-curator: Pattern 50 confirmed and active for article 263 (531 industry-time + 21 province-time; SE ratio 6.8x). No new entry needed; cite article 263 as a reference instance.
 
 ---
 
 ## Individual reports
-- [`reviews/twfe-reviewer.md`](reviews/twfe-reviewer.md)
-- [`reviews/csdid-reviewer.md`](reviews/csdid-reviewer.md)
-- [`reviews/bacon-reviewer.md`](reviews/bacon-reviewer.md)
-- [`reviews/honestdid-reviewer.md`](reviews/honestdid-reviewer.md)
-- [`reviews/dechaisemartin-reviewer.md`](reviews/dechaisemartin-reviewer.md)
+- reviews/twfe-reviewer.md
+- reviews/csdid-reviewer.md
+- reviews/bacon-reviewer.md
+- reviews/honestdid-reviewer.md
+- reviews/dechaisemartin-reviewer.md

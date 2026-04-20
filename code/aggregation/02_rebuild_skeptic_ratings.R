@@ -20,6 +20,15 @@ audit_root   <- file.path(base_dir, "results", "by_article")
 old <- read.csv(ratings_file, stringsAsFactors = FALSE, check.names = FALSE)
 cat(sprintf("Loaded %d rows from old skeptic_ratings.csv\n", nrow(old)))
 
+# Dedupe: keep the last-appended row per id (agents append rather than replace,
+# so the most recent audit result is at the bottom).
+if (anyDuplicated(old$id) > 0) {
+  n_before <- nrow(old)
+  old <- old[!duplicated(old$id, fromLast = TRUE), ]
+  cat(sprintf("Deduped: %d → %d rows (kept last occurrence per id)\n",
+              n_before, nrow(old)))
+}
+
 # Save the original rating to use as fallback for malformed rows where
 # the per-axis fields aren't parseable (legacy rows where author_label has
 # internal commas predating the 3-axis schema).
