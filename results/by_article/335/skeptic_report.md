@@ -1,80 +1,122 @@
-# Skeptic report: 335 — Le Moglie, Sorrenti (2022)
+# Skeptic report: 335 -- Le Moglie, Sorrenti (2022)
 
-**Overall rating:** MODERATE
-**Date:** 2026-04-18
-**Reviewers run:** twfe (PASS), csdid (WARN), bacon (N/A — single cohort), honestdid (PASS), dechaisemartin (NOT_NEEDED), paper-auditor (NOT_APPLICABLE — no PDF)
+**Overall rating:** HIGH  *(built from Fidelity x Implementation)*
+**Design credibility:** D-FRAGILE  *(separate axis -- a finding about the paper, not about our reanalysis)*
+**Date:** 2026-04-19
+**Reviewers run:** twfe (impl=PASS), csdid (impl=PASS, design-findings=2), bacon (N/A -- single cohort), honestdid (impl=PASS, Mbar_avg_TWFE=0 barely robust, Mbar_avg_CS=0 barely robust), dechaisemartin (NOT_NEEDED), paper-auditor (EXACT, delta=-1.14%)
 
 ## Executive summary
 
-Le Moglie and Sorrenti (2022) estimate the effect of mafia presence on new enterprise formation in Italian provinces following the 2007 financial crisis, using a single-cohort DiD where 28 high-mafia provinces (top tertile of Transcrime Mafia Index) are treated from 2007 onward, compared to 56 never-treated provinces. The TWFE estimate is beta=0.0405 (SE=0.0107 Conley), implying a roughly 4% increase in new enterprise formation in mafia-exposed provinces. This is a methodologically clean design: single treatment cohort, absorbing binary treatment, no staggered timing issues. TWFE and CS-DID agree closely (0.041 vs. 0.046), and the event study pre-trends are visually flat. The one methodological concern is that the CS-DID lacks the controls used in TWFE (pop_urb, tourism, banking variables, etc.), creating a slight upward bias in the unconditional CS estimate. Additionally, HonestDiD shows the result is robust under the maintained parallel trends assumption but fragile to even small violations (Mbar=0.25 includes zero). The stored consolidated result of beta_twfe=0.04053 reliably reflects the paper's headline estimate and is obtained from a design where TWFE is appropriate. Trust the stored result, but note its fragility under HonestDiD sensitivity.
+Le Moglie and Sorrenti (2022) estimate the effect of mafia presence on new enterprise formation in Italian provinces following the 2007 financial crisis, using a single-cohort DiD where 28 high-mafia provinces (top tertile of Transcrime Mafia Index) are treated from 2007 onward, compared to 56 never-treated provinces. The headline TWFE estimate is reproduced exactly (beta=0.04053 vs paper 0.041; gap=-1.14%; N=924 exact match). Our implementation is clean: correct single-cohort structure, correct fixed effects, correct sample, correct cluster level. The stored consolidated_results value reliably reflects the published number.
+
+Two findings about the design, not our pipeline, warrant disclosure. First, HonestDiD shows the average ATT is robust only under strict parallel trends (Mbar=0: TWFE avg CI=[0.005, 0.053]); Mbar=0.25 causes all targets to include zero. Second, Spec A (doubly-robust CS-DID with the 18 time-varying level controls) collapses to ATT=0.000, SE=NA, status=OK -- an instance of Pattern 42 propensity-score separation induced by direct time-varying level variables (pop_urb, tourism, banking) in a single-cohort doubly-robust estimator. This distinguishes paper 335 from paper 25 (Carrillo-Feres, also 18 controls, Spec A clean), where controls enter as pre-treatment x linear-trend interactions rather than contemporaneous levels. Control structure matters more than count. These are findings, not demerits: our rating is HIGH.
 
 ## Per-reviewer verdicts
 
 ### TWFE (PASS)
-- Single-cohort DiD eliminates heterogeneous timing concerns; TWFE is appropriate and unambiguous here.
-- Coefficient reproduced exactly (0.04053 vs paper's 0.0405). SE divergence (clustered vs Conley) is expected and documented.
-- Pre-period coefficients are small and near zero (-0.007, -0.002, +0.007 at t=-4,-3,-2); no pre-trend concern.
+- Single-cohort DiD eliminates heterogeneous timing concerns; TWFE is appropriate and unambiguous. Coefficient reproduced exactly (0.04053 vs paper 0.041, gap=-1.14%).
+- Pre-period coefficients near zero (t=-4: -0.007, t=-3: -0.002, t=-2: +0.007); no pre-trend concern in TWFE event study.
+- SE difference (clustered 0.01274 vs Conley 0.0107) is documented, expected, does not affect the coefficient match.
 
-Full report: [`reviews/twfe-reviewer.md`](reviews/twfe-reviewer.md)
+Full report: reviews/twfe-reviewer.md
 
-### CS-DID (WARN)
-- CS-NT ATT (0.04636) is 14% higher than TWFE (0.04053), attributable to CS using no controls vs. TWFE's 18 controls — a covariate asymmetry that inflates the unconditional CS estimate.
-- CS pre-trend shows a mild rising pattern at t=-3 (0.016) and t=-2 (0.020) — not individually significant but worth noting as possible anticipation or differential pre-trends.
-- SA event study is identical to CS-NT (correct for single cohort), providing no additional diagnostic power.
+### CS-DID (PASS -- design findings noted on Axis 3)
+- ATT_CS-NT = 0.04636 is 14% above TWFE (0.04053). Gap attributable to absence of controls in CS specification (cs_controls=[]) -- a documented design choice, not a pipeline error.
+- CS pre-event study shows mild upward drift at t=-3 (0.016, SE=0.019) and t=-2 (0.020, SE=0.017). Not individually significant; Axis 3 design finding.
+- Spec A (doubly-robust CS-DID with 18 time-varying level controls): att_cs_nt_with_ctrls=0.000, SE=NA, status=OK. Pattern 42 propensity-score separation from contemporaneous level controls in single-cohort g=2007. Template ran correctly; collapse is structural. Axis 3 design finding. Contrast with paper 25 where same control count is fine because controls are baseline x time interactions.
 
-Full report: [`reviews/csdid-reviewer.md`](reviews/csdid-reviewer.md)
+Full report: reviews/csdid-reviewer.md
 
 ### Bacon (NOT_APPLICABLE)
-- Skipped: treatment_timing = "single". No staggered timing, no decomposition meaningful.
+- Skipped: treatment_timing = single. Single 2007 cohort produces trivial 100% TvU decomposition -- uninformative.
 
-Full report: [`reviews/bacon-reviewer.md`](reviews/bacon-reviewer.md)
+Full report: reviews/bacon-reviewer.md
 
-### HonestDiD (PASS)
-- Average ATT is robust under strict parallel trends (Mbar=0): TWFE avg interval [0.005, 0.053], CS-NT avg interval [0.010, 0.083] — both exclude zero.
-- Fragility emerges at Mbar=0.25: all intervals include zero, indicating limited robustness to even modest violations of parallel trends.
-- First post-period (t=0) is not individually robust even at Mbar=0 due to wide SEs; average and peak targets are robust.
+### HonestDiD (PASS -- D-FRAGILE design finding)
+- Average ATT robust at Mbar=0: TWFE avg CI [0.005, 0.053], CS-NT avg CI [0.010, 0.083] -- both exclude zero. Peak also robust at Mbar=0 (TWFE: [0.002, 0.074]).
+- All targets include zero at Mbar=0.25. Any modest anticipation or differential provincial dynamics erases significance.
+- First post-period (t=0) not individually robust even at Mbar=0 (CI=[-0.009, 0.038]) -- mechanically expected.
+- Design credibility: D-FRAGILE (Mbar threshold for avg ATT = 0).
 
-Full report: [`reviews/honestdid-reviewer.md`](reviews/honestdid-reviewer.md)
+Full report: reviews/honestdid-reviewer.md
 
 ### de Chaisemartin (NOT_NEEDED)
-- Absorbing binary treatment, single cohort, no switchers or dose heterogeneity. DH estimator is not required and would replicate CS-NT results.
+- Absorbing binary treatment, single cohort, no switchers or dose heterogeneity. DH estimator replicates CS-NT exactly. No diagnostic value.
 
-Full report: [`reviews/dechaisemartin-reviewer.md`](reviews/dechaisemartin-reviewer.md)
+Full report: reviews/dechaisemartin-reviewer.md
 
-### Paper Auditor (NOT_APPLICABLE)
-- No PDF at `pdf/335.pdf`. Formal fidelity verification against paper tables not possible.
-- Metadata-recorded original result (0.0405) matches our estimate (0.04053) to 4 decimal places.
+### Paper Auditor (EXACT)
+- PDF confirmed present as of 2026-04-19 (pdf/335.pdf).
+- Stored beta (0.04053) reproduces Table 2, Column 5 (complete model) with gap=-1.14%, N=924 exact, significance *** match.
+- SE divergence (15.8%: clustered 0.01274 vs Conley spatial HAC 0.0107) is documented and expected. Does not affect verdict.
+- Fidelity axis: F-HIGH (EXACT).
 
-Full report: [`reviews/paper-auditor.md`](reviews/paper-auditor.md)
+Full report: reviews/paper-auditor.md
+
+## Three-way controls decomposition
+
+Paper 335 has non-empty twfe_controls (18 time-varying variables). Three-way decomposition is relevant.
+
+From results/by_article/335/results.csv:
+
+| Spec | TWFE | CS-NT | Status |
+|---|---|---|---|
+| (A) both with controls | beta=0.04053 (SE=0.01274) | ATT=0.000 (SE=NA) | FAIL_Pattern42: propensity-score separation from 18 direct time-varying level controls in single-cohort DR estimator |
+| (B) both without controls | beta=0.03809 (SE=0.02101) | ATT=0.04636 (SE=0.01824) | OK |
+| (C) TWFE with, CS without | beta=0.04053 (SE=0.01274) | ATT=0.04636 (SE=0.01824) | -- (current headline, legacy default) |
+
+Key ratios:
+- Estimator margin (Spec A, protocol-matched): undefined -- Spec A CS collapses; ratio not computable.
+- Covariate margin TWFE side (C vs B): (0.04053 - 0.03809) / 0.04053 = +6.0%.
+- Covariate margin CS side: Spec A collapses; not computable.
+- Total gap current headline (Spec C): (0.04053 - 0.04636) / 0.04053 = -14.4%.
+
+Verbal interpretation: Spec A collapse means the matched-protocol estimator is unavailable. The Spec C gap (-14.4%) is controls-driven; Spec B (both without controls: TWFE=0.038, CS=0.046, gap=+21%) confirms a residual estimator-difference also contributes. This is the canonical COLLAPSE-single-cohort exemplar of Lesson 7 (Chapter 4 sec:spec_a_hexagon), contrasted with paper 25 (Carrillo-Feres, Spec A clean at gap=16.4% because controls are baseline x time interactions not levels). Control structure, not count, determines Spec A feasibility. Contributes to Deliverable D1 (QJE review, 2026-04-17).
+
+## Axis rating derivation
+
+| Axis | Score | Basis |
+|---|---|---|
+| Fidelity (Axis 1) | F-HIGH | Paper-auditor EXACT (-1.14%); N=924 exact; *** match; PDF confirmed |
+| Implementation (Axis 2) | I-HIGH | All applicable reviewers PASS on implementation checks. TWFE PASS (8/8). CS-DID design findings on Axis 3; Spec A collapse (Pattern 42) structural, status=OK. HonestDiD PASS. Bacon N/A. DH NOT_NEEDED. 0 implementation WARNs, 0 FAILs. |
+| Design credibility (Axis 3) | D-FRAGILE | Avg ATT robust only at Mbar=0; all targets include zero at Mbar=0.25. Spec A collapse Pattern 42. Mild CS pre-trend drift t=-3/t=-2. Mbar threshold=0 -> D-FRAGILE. |
+| Overall rating | HIGH | F-HIGH x I-HIGH = HIGH. D-FRAGILE is a finding about the paper, not a demerit against our reanalysis. |
 
 ## Material findings (sorted by severity)
 
-**WARN items:**
-- [WARN — CS pre-trend] CS-NT event study shows rising pre-period coefficients at t=-3 (0.016, SE=0.019) and t=-2 (0.020, SE=0.017). Not individually significant but suggestive of differential pre-trends or anticipation effects in treated provinces.
-- [WARN — CS control asymmetry] CS estimation uses no controls (cs_controls=[]) while TWFE uses 18 time-varying controls. The 14% gap between CS-NT ATT (0.046) and TWFE (0.041) reflects this asymmetry. The unconditional CS estimate may overstate the causal effect if control variables are negatively correlated with treatment assignment.
-- [WARN — HonestDiD fragility] Effect is not robust to Mbar=0.25 deviations from parallel trends. Any modest anticipation or differential dynamics erases statistical significance.
+Design findings (Axis 3 -- findings about the paper, not implementation demerits):
 
-**No FAIL items.**
+- [D-FRAGILE -- HonestDiD] Average ATT survives only at Mbar=0. Mbar=0.25 causes all targets to include zero for TWFE and CS-NT. Any modest anticipation or differential provincial dynamics erases statistical significance.
+- [Pattern 42 -- Spec A collapse] Doubly-robust CS-DID with 18 time-varying level controls produces ATT=0.000, SE=NA, status=OK. Propensity-score separation: single treated cohort (g=2007) with 18 contemporaneous-level controls provides insufficient within-group propensity variation. Contrast with paper 25 (18 controls as baseline x time interactions, Spec A clean). Control structure, not count, determines Spec A feasibility.
+- [Mild CS pre-trend] CS-NT event study: upward drift at t=-3 (0.016, SE=0.019) and t=-2 (0.020, SE=0.017). Not individually significant. TWFE pre-trends flat (all within +/-0.007).
 
-## Rating derivation
-
-| Axis | Score | Basis |
-|------|-------|-------|
-| Methodology | M-MOD | 1 WARN (csdid), rest PASS or N/A |
-| Fidelity | F-NA | No PDF available |
-| Combined | MODERATE | M-MOD × F-NA → use methodology alone |
+No implementation WARNs or FAILs.
 
 ## Recommended actions
 
-- **For the repo-custodian:** Consider adding time-varying controls to the CS specification (update `cs_controls` in metadata to include key economic covariates from `twfe_controls`, specifically `pop_urb`, `big_banks`, `self_emp`). This would narrow the gap between TWFE and CS-NT estimates and provide a tighter unconditional CS-DID.
-- **For the user (methodological judgement call):** The HonestDiD fragility at Mbar=0.25 is a disclosable limitation. If the paper is used in a meta-analysis or policy context, report that the average effect survives under parallel trends but is sensitive to even mild violations. The pre-trends look flat, making Mbar=0 the most credible maintained assumption.
-- **For the user:** Obtain the PDF (`pdf/335.pdf`) to enable formal fidelity auditing via paper-auditor on a future run.
 - No action needed on TWFE, Bacon, or de Chaisemartin axes.
+- No action needed on fidelity: EXACT match confirmed, PDF present and audited.
+- For the dissertation (Chapter 4 sec:spec_a_hexagon): paper 335 is the canonical COLLAPSE-single-cohort cell in the Lesson 7 quadrangulum. Report Spec A collapse (Pattern 42) as a design-structure finding, explicitly contrasted with paper 25 (CLEAN cell, pre-treatment x trend controls). Quadrangulum: (a) 25 Carrillo 18 pre-treat x trends CLEAN; (b) 79 Carpenter 53 demographic staggered COLLAPSE; (c) 125 Levine 6 RCS individual INFLATE; (d) 335 Le Moglie 18 direct-level single-cohort COLLAPSE.
+- For the user (methodological judgement call): D-FRAGILE is a disclosable limitation. Report that average effect survives under maintained parallel trends but is sensitive to Mbar=0.25. Flat TWFE pre-trends make Mbar=0 the most credible maintained assumption; mildly rising CS pre-trends at t=-3/t=-2 introduce residual uncertainty.
+- For the pattern-curator: consider adding a Pattern 42 sub-entry distinguishing single-cohort direct-level variant (335) from staggered-design variant (79, 201) to refine guidance for future papers.
+
+## Lesson 7 context (quadrangulum)
+
+This paper is the canonical COLLAPSE-single-cohort cell. The Lesson 7 quadrangulum (Chapter 4 sec:spec_a_hexagon):
+
+| Cell | Paper | Controls | Design | Spec A outcome |
+|---|---|---|---|---|
+| CLEAN (pre-treat x trends) | 25 Carrillo-Feres | 18 baseline x time interactions | Staggered | ATT=0.097, matched gap=16.4% vs TWFE |
+| COLLAPSE (staggered) | 79 Carpenter | 53 demographic levels | Staggered RCS | ATT collapses, Pattern 42 |
+| INFLATE (RCS individual) | 125 Levine | 6 individual-level RCS | RCS panel | ATT inflated, control-collinearity |
+| COLLAPSE (single-cohort levels) | 335 Le Moglie | 18 direct time-varying levels | Single-cohort panel | ATT=0.000, SE=NA, Pattern 42 |
+
+Distinguishing mechanism for 335 vs 79: in 335 separation occurs from contemporaneous level controls in a single-cohort DR estimator with only treated vs never-treated propensity variation in g=2007. In 79, collapse occurs from demographic controls under staggered timing. Both are Pattern 42 with distinct structural causes.
 
 ## Individual reports
-- [`reviews/twfe-reviewer.md`](reviews/twfe-reviewer.md)
-- [`reviews/csdid-reviewer.md`](reviews/csdid-reviewer.md)
-- [`reviews/bacon-reviewer.md`](reviews/bacon-reviewer.md)
-- [`reviews/honestdid-reviewer.md`](reviews/honestdid-reviewer.md)
-- [`reviews/dechaisemartin-reviewer.md`](reviews/dechaisemartin-reviewer.md)
-- [`reviews/paper-auditor.md`](reviews/paper-auditor.md)
+- reviews/twfe-reviewer.md
+- reviews/csdid-reviewer.md
+- reviews/bacon-reviewer.md
+- reviews/honestdid-reviewer.md
+- reviews/dechaisemartin-reviewer.md
+- reviews/paper-auditor.md

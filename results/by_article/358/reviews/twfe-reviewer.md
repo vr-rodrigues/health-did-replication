@@ -1,56 +1,39 @@
-# TWFE Reviewer Report — Article 358
-## Bargain, Boutin, Champeaux (2019)
+# TWFE Reviewer Report: 358 — Bargain, Boutin, Champeaux (2019)
 
 **Verdict:** PASS
-
-**Date:** 2026-04-18
-
----
+**Date:** 2026-04-19
+**Axis classification:** Implementation = PASS; Design finding = D-NA
 
 ## Checklist
 
-### 1. Design validity
+### 1. Design applicability
+- 2x2 DiD (two time periods: 2008 and 2014; single treatment event: 2011 Arab Spring).
+- TWFE with two periods is algebraically equivalent to a clean DiD estimator. No negative-weighting or heterogeneous-timing pathology is possible. No forbidden comparisons.
+- The paper uses `areg` with municipality FE and clustered SEs at municipality level (ID_2). Our `feols` with same FE and cluster structure is the correct replication.
 
-- **Two time periods only (2008 and 2014).** The treatment event is the 2011 Egyptian Arab Spring, a single shock. With exactly two periods and a single treatment event, TWFE is equivalent to a clean 2x2 DiD. No staggered adoption problem arises.
-- Treatment variable `post_group` is a pre-computed dummy equal to 1 for post-period (year=2014) observations in treated municipalities (above-median protest intensity governorates). This correctly encodes a DiD interaction.
-- Data structure is repeated cross-section, which is appropriate for `areg` with municipality FE in the original paper and for `feols` in the replication.
+### 2. Coefficient fidelity
+- Paper Table 1 Column 4: beta = 4.181, SE = 1.058.
+- Our result: beta = 4.18087, SE = 1.05256.
+- Coefficient gap: 0.003% (EXACT under any tolerance threshold).
+- SE gap: 0.3% (attributable to feols small-sample degrees-of-freedom adjustment vs. Stata areg; not a concern).
 
-### 2. Fixed effects structure
+### 3. Fixed-effects structure
+- Spec C (headline): TWFE with 30 controls (the paper's full specification). Municipality FE + post indicator absorbed.
+- Spec B (no controls): beta = 4.951 (+18.5% vs Spec C); confirms the 30 controls matter for magnitude but not for direction.
+- No spurious additional FEs detected.
 
-- Municipality FE (`ID_2`) plus time variation absorbed by the `post` control variable. With only 2 years, this is equivalent to a two-way FE specification.
-- Cluster-robust SEs at municipality level (`cluster(ID_2)`) — 272 municipalities, well above the 42-cluster rule-of-thumb.
-- Additional FEs: none declared. Consistent with original `areg` spec.
+### 4. Cluster level
+- Cluster at ID_2 (municipality, N=272). Matches paper exactly. No ambiguity.
 
-### 3. Controls
+### 5. Pre-trend testability
+- Structural constraint: 2 time periods → 0 pre-periods available. Pre-trend testing is architecturally impossible, not a replication flaw.
 
-- 30 control variables including socioeconomic characteristics and post × covariate interactions. This is a rich control set consistent with the paper's Table 1 Model 4 (baseline with full interactions).
-- Including post × covariate interactions in TWFE with only 2 periods is methodologically sound — it allows treatment effect heterogeneity to be absorbed rather than biasing the TWFE coefficient.
+### 6. Event study
+- `has_event_study=false` in metadata. No event study in original paper. None run by template.
 
-### 4. Coefficient replication
+### 7. Implementation verdict
+- All structural checks PASS. Coefficient reproduced exactly. No implementation concerns.
 
-- Replication: beta = 4.181, SE = 1.053
-- Paper: beta = 4.181, SE = 1.058
-- Coefficient: exact match to 3 decimal places.
-- SE: trivial difference (0.5%) attributable to small-sample degrees-of-freedom correction in feols vs. Stata areg. Not a concern.
-
-### 5. Negative weights / heterogeneous treatment effect bias
-
-- **Not applicable.** With two time periods and a single treatment cohort, TWFE = 2x2 DiD. No negative-weighting pathology from staggered adoption is possible.
-- The Bacon decomposition is meaningless here (and was correctly skipped).
-
-### 6. Pre-trends
-
-- No pre-period data available (only 2008 and 2014). Pre-trend testing is structurally impossible. This is a limitation of the data, not of the replication specification.
-- The parallel trends assumption is untestable — standard disclaimer applies.
-
-### 7. Sample
-
-- N = 27,782 observations, consistent with the paper's declared sample.
-
----
-
-## Summary
-
-The TWFE specification is correctly implemented. The 2x2 DiD structure with a single treatment event means the classic modern DiD critiques (negative weights, heterogeneous timing) are structurally irrelevant. The coefficient replicates exactly. The only methodological caveat — inability to test pre-trends — is inherent to the two-period data structure, not a flaw in the analysis.
-
-**Verdict: PASS**
+### 8. Spec A note (for context)
+- Spec A (TWFE with 30 ctrls + CS-NT with 30 ctrls): TWFE side produces 4.181 as expected.
+- The CS-NT side of Spec A collapses to 0 (Pattern 42 — see csdid-reviewer report). This is an estimator behavior finding, not a TWFE implementation issue.

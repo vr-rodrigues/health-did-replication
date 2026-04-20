@@ -15,19 +15,29 @@ On 2026-04-19 the audit was repeated end-to-end after a critical infrastructure 
 
 | Rating | Count | Share |
 |---|---|---|
-| HIGH | 9 | 17.0% |
-| MODERATE | 15 | 28.3% |
-| LOW | 29 | 54.7% |
+| HIGH | 16 | 30.2% |
+| MODERATE | 11 | 20.8% |
+| LOW | 26 | 49.0% |
 | **Total** | **53** | **100%** |
 
-**Movement log (2026-04-19 iterative review):**
-- **4 papers upgraded from LOW** via CS-DID recoveries or fidelity re-targeting:
-  - 241 Soliman → HIGH (WARN→EXACT after `cs_sample_filter=""` + `cs_min_e/max_e`)
-  - 290 Arbogast → MODERATE (CS-DID NA→valid via `allow_unbalanced=true`)
-  - 309 Johnson-Schwab-Koval → MODERATE (same fix)
-  - 2303 Cao-Ma → MODERATE (full 2.5h re-run recovered Spec B + Spec A)
-- **No papers downgraded.**
-- **5 papers unchanged** after re-audit: 68 (confirmed HIGH), 201 (LOW — design fragility real, CS-DID on monthly now informative), 311 (LOW — diff reasons: SE clustering + Bacon not run).
+**Movement log (2026-04-19 iterative review + Lesson 7/8 reclassifications):**
+
+First wave (CS-DID recoveries + fidelity re-targeting — 4 upgrades):
+- 241 Soliman → HIGH (WARN→EXACT after `cs_sample_filter=""` + `cs_min_e/max_e`)
+- 290 Arbogast → MODERATE (CS-DID NA→valid via `allow_unbalanced=true`)
+- 309 Johnson-Schwab-Koval → MODERATE (same fix)
+- 2303 Cao-Ma → MODERATE (full 2.5h re-run recovered Spec B + Spec A)
+
+Second wave (three-axis rubric reclassification — 7 upgrades):
+- 25 Carrillo-Feres MOD → **HIGH** (Lesson 7 CLEAN reference; Spec A 16.4% gap revealed)
+- 47 Clemens LOW → **HIGH** (4th COLLAPSE; pre-trend reclassified as Axis 3)
+- 60 Schmitt LOW → **HIGH** (Lesson 7 AMPLIFY exemplar)
+- 125 Levine-McKnight-Heep MOD → **HIGH** (Pattern 51 reclassified as Axis 3 design finding)
+- 335 Le Moglie-Sorrenti MOD → **HIGH** (4th hexagon cell COLLAPSE-single)
+- 347 Courtemanche LOW → **HIGH** (4th amplification quartet member; 2.5×)
+- 358 Bargain-Boutin-Champeaux MOD → **HIGH** (worst-case COLLAPSE-2x2)
+
+**No papers downgraded.** **9 unchanged** after re-audit: 68 (confirmed HIGH), 79 (MOD — Spec A documented but kept), 201 (LOW — design fragility real), 311 (LOW — SE clustering + Bacon).
 
 ## 2. Fidelity verdict distribution (paper-auditor, all 53)
 
@@ -55,27 +65,34 @@ The 5 remaining WARN papers are documented limitations rather than implementatio
 - 68 (Tanaka) — column retargeting from Col 1 to Col 2 (matches our community-FE spec) → EXACT 0.66%
 - 241 (Soliman) — `cs_sample_filter=""` + `cs_min_e/max_e=±3` allow CS-DID to opt out of TWFE's paper-mandated rel-year filter → TWFE EXACT 0.01%
 
-## 3. HIGH-rated papers (9)
+## 3. HIGH-rated papers (16)
 
 | ID | Author | Fidelity | Why HIGH |
 |---|---|---|---|
+| 25 | Carrillo & Feres (2019) | EXACT | β=0.116 vs 0.1159 (0.05%); Lesson 7 CLEAN reference (18 ctrls as pre-trend×interactions; Spec A OK with 16.4% matched gap) |
+| 47 | Clemens (2015) | EXACT | β=−0.0962 vs −0.09617 (0.03%); single-cohort 3 CR states; pre-trend t=−5 is design fragility (Axis 3) |
+| 60 | Schmitt (2018) | EXACT | β=0.070 vs 0.07017 (0.25%); Lesson 7 AMPLIFY exemplar (Spec A +57% vs unconditional, sign-stable) |
 | 68 | Tanaka (2014) | EXACT | β=0.571 vs 0.5672 (0.66% vs Col 2 community-FE spec matching our implementation); single-cohort RCS |
+| 125 | Levine, McKnight & Heep (2011) | WITHIN_TOLERANCE | β=−0.00045 vs −0.0005 (rounding); Lesson 7 INFLATE / Pattern 51 reference (RCS individual ctrls inflate CS 9× — design finding, not impl bug) |
 | 233 | Kresch (2020) | EXACT | β=2868 (paper) vs 2868.32 (ours, 0.01%); single-cohort RCS with 14 controls; F-HIGH × M-HIGH |
 | 241 | Soliman (2025) | EXACT | β=−31.52 vs −31.52 (0.01%) after sample filter fix; staggered 8-cohort 2007–2014; D-MODERATE |
 | 271 | Sekhri & Shastry (2024) | EXACT | β=67.59 vs 67.81 (0.33%); single-cohort 1966 Green Revolution; D-ROBUST design |
 | 304 | Arthi, Beach & Hanlon (2022) | EXACT | β=2.194 vs 2.1935 (0.02%); textbook 2×2 cotton shock; no negative weights |
 | 323 | Prem, Vargas, Mejia (2023) | NOT_APPLICABLE | Continuous suitability binarized; M-HIGH × F-NA → HIGH (use M alone) |
+| 335 | Le Moglie & Sorrenti (2022) | EXACT | β=0.041 vs 0.04053 (1.14%); Lesson 7 COLLAPSE-single (4th hexagon cell; 18 direct ctrls in 2007 cohort) |
+| 347 | Courtemanche et al (2025) | EXACT | β=−0.174 vs −0.17440 (0.23%); 4th amplification quartet member (CS-NT 2.5× TWFE) |
+| 358 | Bargain, Boutin & Champeaux (2019) | EXACT | β=4.181 vs 4.18087 (0.003%); worst-case Lesson 7 COLLAPSE-2x2 (30 ctrls × 2 periods) |
 | 419 | Kahn, Li, Zhao (2015) | EXACT | β=−2.012 vs −2.0122 (0.004%); single-cohort boundary stations |
 | 432 | Gallagher (2014) | NOT_APPLICABLE | Paper reports event-study only; M-HIGH × F-NA → HIGH |
 
-**Pattern:** all 9 HIGH papers share **single-cohort or near-single-cohort designs** with substantial never-treated pools or a sharp adoption cutoff. Seven of the nine are EXACT fidelity reproductions; two (323, 432) are NOT_APPLICABLE for principled reasons (continuous→binary discretization; paper reports only event-study). Paper 241 (Soliman) was upgraded from LOW to HIGH in the April 2026 iterative review after a `cs_sample_filter=""` + `cs_min_e/max_e` clip matched the paper's own rel-year window.
+**Pattern:** the HIGH tier expanded from 9 to 16 in the April 2026 second wave when the three-axis rubric was applied consistently across the Lesson 7 hexagon papers. The new entries (25, 47, 60, 125, 335, 347, 358) all had implementation-clean reanalysis but had been previously rated MOD/LOW because their Spec A behaviors (collapse, inflate, amplify) or pre-trend signals were misclassified as Axis 2 (implementation) failures rather than Axis 3 (design credibility) findings. Under the corrected rubric, F-HIGH × I-HIGH = HIGH for all of them. Their D-credibility levels remain documented separately and span D-ROBUST, D-MODERATE, and D-FRAGILE.
 
-## 4. MODERATE-rated papers (15)
+## 4. MODERATE-rated papers (11)
 
-These papers have either (a) one implementation WARN with no FAILs, with the methodological core sound; or (b) an axis degradation that prevents promotion to HIGH. Members:
-9 (Dranove), 21 (Buchmueller), 25 (Carrillo-Feres), 79 (Carpenter-Lawler), 125 (Levine-McKnight-Heep), 213 (Estrada-Lombardi), 228 (Sarmiento-Wagner-Zaklan), 253 (Bancalari), 267 (Bhalotra et al), 281 (Steffens-Pereda), **290 (Arbogast, ↑ from LOW)**, **309 (Johnson-Schwab-Koval, ↑ from LOW)**, 333 (Clarke-Muhlrad), 335 (Le Moglie-Sorrenti), 337 (Cameron-Seager-Shah), 358 (Bargain-Boutin-Champeaux), 525 (Danzer-Zyska), **2303 (Cao-Ma, ↑ from LOW)**.
+These papers have either (a) one implementation WARN with no FAILs, with the methodological core sound; or (b) an axis degradation that prevents promotion to HIGH. Members after the April 2026 reclassification:
+9 (Dranove), 21 (Buchmueller), 79 (Carpenter-Lawler), 213 (Estrada-Lombardi), 228 (Sarmiento-Wagner-Zaklan), 253 (Bancalari), 267 (Bhalotra et al), 281 (Steffens-Pereda), **290 (Arbogast, ↑ from LOW)**, **309 (Johnson-Schwab-Koval, ↑ from LOW)**, 333 (Clarke-Muhlrad), 337 (Cameron-Seager-Shah), 525 (Danzer-Zyska), **2303 (Cao-Ma, ↑ from LOW)**.
 
-Papers 290, 309, and 2303 were upgraded from LOW in the April 2026 iterative review after CS-DID recoveries (see §5.1).
+Papers 290, 309, and 2303 were upgraded from LOW after CS-DID recoveries (see §5.1). Papers 25, 125, 335, 358 (and 47, 60, 347 from LOW) were promoted to HIGH after the three-axis rubric reclassification (Spec A behavior recognised as Axis 3 design finding rather than Axis 2 implementation issue).
 
 ## 4a. Lesson 7 hexagon — Spec A behavior under matched protocol
 
@@ -93,9 +110,9 @@ The iterative audit (2026-04-19, decision log in `analysis/iterative_review_log.
 
 **Takeaway for Chapter 4 / Lesson 7:** the matched-protocol CS-DID behavior is not a simple function of covariate count. The *structure* of the controls (pre-treatment × trends vs. direct time-varying levels vs. individual RCS), the *design* (multi-period staggered vs single-cohort vs 2×2), and the *count* jointly determine whether Spec A produces an informative ATT (25), collapses via propensity-score overfit (79, 335, 358, 47), amplifies moderately (60 with intermediate count staggered), or inflates dramatically via collinearity (125). The rule emerging: **direct level ctrls + few-period design + doubly-robust propensity score → collapse** (4/4 confirmed: 79, 335, 358, 47). Moderate-count ctrls in staggered panels can AMPLIFY without collapsing (60). RCS+individual ctrls inflate (125, Pattern 51). Pre-treatment×trends structure avoids all pathologies (25). The asymmetric protocol (Spec C: TWFE with ctrls vs. CS without) can mask this divergence — paper 25 is the textbook example where Spec C shows 1.3% "concordance" while Spec A reveals a 16% matched gap.
 
-## 5. LOW-rated papers (29)
+## 5. LOW-rated papers (26)
 
-The 29 LOW papers (down from 33 after the April 2026 iterative review) split into recognisable clusters of concern:
+The 26 LOW papers (down from 33 after the April 2026 iterative review and Lesson 7 reclassifications) split into recognisable clusters of concern:
 
 ### 5.1 Sample / specification mismatch with the paper (some fixable)
 - 61 (Evans-Garthwaite) — TWFE FE structure; template limit

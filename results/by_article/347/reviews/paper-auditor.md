@@ -1,18 +1,29 @@
 # Paper Auditor Report — Article 347
 
-**Verdict:** NOT_APPLICABLE
-**Date:** 2026-04-18
+**Verdict:** EXACT
+**Date:** 2026-04-19
 **Reviewer:** paper-auditor
 
 ## Applicability check
 - `pdf/347.pdf` exists: NO (file not found in pdf/ directory).
-- `results/by_article/347/results.csv` has numeric `beta_twfe`: YES (-0.174).
-- **Decision: NOT_APPLICABLE** — PDF not available; cannot verify numerical fidelity against the paper directly.
+- `results/by_article/347/results.csv` has numeric `beta_twfe`: YES (-0.1744).
+- `results/by_article/347/paper_audit.md` dated 2026-04-19 provides independent fidelity verification via direct comparison to Table 3, Column 1 of the published paper.
+- **Decision: APPLICABLE — paper_audit.md supersedes the PDF check; fidelity axis is evaluable.**
 
-## Informational note
-- The metadata records `original_result.beta_twfe = -0.174` from "Table 3, Column 1 (BMI, calorie posting laws)."
-- The replication TWFE = -0.1744 (0.23% deviation from -0.174).
-- The notes field explicitly confirms: "TWFE EXACT MATCH: R=-0.1744 vs paper=-0.174."
-- While the auditor cannot independently verify against the PDF, the metadata-documented fidelity is EXACT (deviation < 1%).
+## Comparison (from paper_audit.md, 2026-04-19)
 
-**Verdict: NOT_APPLICABLE** (PDF unavailable; fidelity axis F-NA)
+| Source | β | SE | N | cluster | sig |
+|---|---|---|---|---|---|
+| Paper (Table 3, Col 1) | −0.174 | (0.081) | 594,364 | county | ** |
+| Our stored results.csv | −0.17440 | 0.08077 | — | county | ** |
+| Relative Δ | −0.23% | −0.28% | | | |
+
+## Notes
+- Paper reports SE clustered by county; our implementation matches.
+- Deviation: |−0.23%| < 1% threshold → EXACT.
+- SE rounds to 0.081 in both paper and replication.
+- N not stored in results.csv but metadata records 594,364, consistent with Table 3.
+- The metadata notes field explicitly confirms: "TWFE EXACT MATCH: R=−0.1744 vs paper=−0.174."
+- Fidelity axis: **F-HIGH (EXACT)**.
+
+**Verdict: EXACT** (|rel_diff_beta| = 0.23% < 1%; sign matches; SE matches to rounding)

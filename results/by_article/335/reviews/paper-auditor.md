@@ -1,22 +1,27 @@
 # Paper Auditor Report — Article 335
 # Le Moglie, Sorrenti (2022) — "Revealing 'Mafia Inc.'?"
 
-**Verdict:** NOT_APPLICABLE
-**Date:** 2026-04-18
+**Verdict:** EXACT
+**Date:** 2026-04-19
 
 ## Applicability Assessment
 
 Paper-auditor requires:
-- `pdf/{id}.pdf` exists: NO — `pdf/335.pdf` not found.
+- `pdf/{id}.pdf` exists: YES — `pdf/335.pdf` confirmed present as of 2026-04-19.
 - `results/by_article/335/results.csv` has numeric `beta_twfe`: YES (0.04053).
 
-Since the PDF is absent, numerical fidelity to the paper cannot be verified by reading the original table. Fidelity axis: F-NA.
+Fidelity axis: F-HIGH (EXACT).
 
-## Available fidelity check (from metadata)
-- Original result (from metadata): beta_twfe = 0.0405, SE = 0.0107
-- Source: Table 2, Column 5 (new_std_ln, complete model). Conley HAC SEs. N=924.
-- Our estimate: beta_twfe = 0.04053, SE = 0.01274 (clustered)
-- Coefficient match: |0.04053 - 0.0405| = 0.00003 — essentially exact.
-- SE divergence: clustered (0.01274) > Conley (0.0107) — documented and expected.
+## Comparison
 
-Note: While the coefficient matches exactly based on metadata-recorded values, formal paper auditing (reading the PDF table directly) is not possible without the PDF file.
+| Source | β | SE | N | cluster | sig |
+|---|---|---|---|---|---|
+| Paper (Table 2 Col 5) | 0.041 | (0.011) | 924 | Conley spatial HAC (200km, 11yr) | *** |
+| Our stored results.csv | 0.04053 | 0.01274 | 924 | province (id) clustered SE | *** |
+| Relative Δ | -1.14% | +15.8% | — | — | — |
+
+## Verdict rationale
+
+Our stored beta (0.04053) reproduces the paper's Table 2 Col 5 coefficient (0.041) with a relative difference of 1.14%, which is below the EXACT threshold when rounding is considered (0.041 rounded from 0.04053). N=924 matches exactly. Significance stars match (***). SE divergence (15.8%) reflects the documented difference between Conley spatial HAC and province-clustered SEs and does not affect the verdict.
+
+Source confirmed: paper states (p. 150) "we refer to the most complete specification in column 5 as the 'complete model.'" Our metadata correctly targets Table 2, Column 5.
