@@ -154,6 +154,16 @@ outfile <- file.path(out_dir, "table_4_7_margin_attribution.tex")
 writeLines(tex, outfile)
 cat(sprintf("Written %d lines to %s\n", length(tex), outfile))
 
+# Sync to overleaf + health_did_replication (01_chapter_statistics.R's sync
+# runs before this script and so doesn't pick up this file).
+for (dest in c(file.path(base_dir, "overleaf", "Tables"),
+               file.path(base_dir, "health_did_replication", "Tables"))) {
+  if (dir.exists(dirname(dest))) {
+    dir.create(dest, showWarnings = FALSE)
+    file.copy(outfile, file.path(dest, basename(outfile)), overwrite = TRUE)
+  }
+}
+
 cat("\n===== Margin-attribution summary (console) =====\n")
 for (m in margins) {
   v <- m$vals[m$mask]

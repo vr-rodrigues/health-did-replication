@@ -191,6 +191,16 @@ outfile <- file.path(out_dir, "table_3_selection_balance.tex")
 writeLines(tex, outfile)
 cat(sprintf("\nWritten %d lines to %s\n", length(tex), outfile))
 
+# Sync to overleaf + health_did_replication (01_chapter_statistics.R's sync
+# runs before this script and so doesn't pick up this file).
+for (dest in c(file.path(base_dir, "overleaf", "Tables"),
+               file.path(base_dir, "health_did_replication", "Tables"))) {
+  if (dir.exists(dirname(dest))) {
+    dir.create(dest, showWarnings = FALSE)
+    file.copy(outfile, file.path(dest, basename(outfile)), overwrite = TRUE)
+  }
+}
+
 cat("\n===== Balance summary =====\n")
 cat(sprintf("%-42s | %10s | %10s | %s\n", "Characteristic", "Reanalyzed", "Pool\\sample", "p"))
 for (r in rows) {
