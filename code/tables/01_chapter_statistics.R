@@ -179,7 +179,7 @@ lines <- c(lines, "\\midrule",
   sprintf("\\textbf{Total} & \\textbf{%d} & \\textbf{100.0} \\\\", total_j),
   "\\bottomrule", "\\end{tabular}",
   "\\begin{tablenotes}[flushleft]", "\\footnotesize",
-  "\\item Notes: This table reports the journals represented in the final sample of 56 reanalyzed articles.",
+  "\\item Notes: This table reports the journals represented in the final sample of 53 reanalyzed articles.",
   "\\end{tablenotes}", "\\end{threeparttable}", "\\end{table}")
 write_tex("table_3_3_journal_final.tex", lines)
 

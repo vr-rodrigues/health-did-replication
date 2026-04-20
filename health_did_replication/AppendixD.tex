@@ -1,7 +1,7 @@
 \section{Article Collection Pipeline}
 \label{AppendixD}
 
-This appendix documents the search, classification, and filtering process that produced the final sample of 56 articles. The pipeline combined bibliographic retrieval from OpenAlex, LLM-based classification of abstracts, automated replication package search across five repositories, and manual eligibility review. Figure~\ref{fig:collection_pipeline} summarizes the overall flow.
+This appendix documents the search, classification, and filtering process that produced the final sample of 53 articles. The pipeline combined bibliographic retrieval from OpenAlex, LLM-based classification of abstracts, automated replication package search across five repositories, and manual eligibility review. Figure~\ref{fig:collection_pipeline} summarizes the overall flow.
 
 \subsection{Bibliographic Retrieval}
 
@@ -27,7 +27,7 @@ After consolidation and DOI-based deduplication across all search sources, 431 a
 
 The 431 articles with replication materials entered manual review. Eligibility required that the replication package contain estimation code and data sufficient to re-run the main specification, that DiD be the primary identification strategy (not a robustness check), and that the article fall within health economics. Articles were excluded when replication data were restricted or unavailable for download, when the DiD specification could not be isolated from the provided code, or when the paper turned out to address a topic outside health economics despite passing the keyword and LLM filters.
 
-The review yielded 56 articles that met all criteria. Of these, 11 had been previously reanalyzed by hand and served as the calibration set described in Section~\ref{sec:calibration}. The remaining 45 were processed through the semi-automated estimation pipeline described in Appendix~\ref{AppendixC}.
+The review yielded 53 articles that met all criteria. Three additional candidates passed the manual review but were dropped when the reanalysis was attempted because their main specification could not be reproduced under the standardized protocol: one requires restricted-access mortality microdata that cannot be redistributed (\textcite{moorthy2025bluecollar}), one uses a multivariate policy-regressor baseline with state-specific linear trends (\textcite{myers2017power}), and one uses county-specific linear trends combined with interacted multi-dimensional fixed effects (\textcite{kuziemko2018managed}). These three articles are not part of the final sample. Of the 53 retained articles, 11 had been previously reanalyzed by hand and served as the calibration set described in Section~\ref{sec:calibration}. The remaining 42 were processed through the semi-automated estimation pipeline described in Appendix~\ref{AppendixC}.
 
 \subsection{Search Sources}
 
@@ -117,7 +117,7 @@ Across all six sources, after deduplication by DOI, 431 unique articles had loca
   {\textit{431 with replication located}};
 
 \node[lbl, right=1.8cm of final]  (n4)
-  {\textbf{56 articles}};
+  {\textbf{53 articles}};
 
 % --- Left annotation: reclassification ---
 \node[sidebox, left=1.8cm of llm] (reclass)

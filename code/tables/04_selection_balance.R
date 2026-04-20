@@ -1,6 +1,6 @@
 ###############################################################################
 # 04_selection_balance.R
-# Deliverable D6 (Pedro review): balance table comparing the 56 reanalyzed
+# Deliverable D6 (Pedro review): balance table comparing the 53 reanalyzed
 # articles against the larger DiD candidate pool on observable characteristics.
 #
 # Data source: ../_archive/phase1_consolidation_20260418/research_new_papers/
