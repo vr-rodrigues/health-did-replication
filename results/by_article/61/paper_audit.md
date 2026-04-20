@@ -1,21 +1,21 @@
 # Paper fidelity audit: 61 — Evans, Garthwaite (2014)
 
-**Verdict:** WARN
-**Date:** 2026-04-19
+**Verdict:** EXACT
+**Date:** 2026-04-20
 
 ## Selected specification
 
 From metadata `original_result.beta_twfe = 0.0095` and notes: Table 3, outcome = Excellent/Very good health (`excel_vgood`), Simple DD column, 82,907 observations, OLS, cluster by state (fips). Covariates include `twoplus_kids` and `eitc_expand` but NO unit/time FEs (the paper's "Simple" estimator).
 
-The notes document that a Round 3 fix achieved 0.009483 (exact match to 0.0095) by running `feols(excel_vgood ~ dd_treatment + twoplus_kids + eitc_expand, cluster=~fips)` without FE specification. The current `results.csv` stores 0.010316, which indicates the fix was described in the notes but NOT persisted in the saved output.
+**2026-04-20 fix:** ad-hoc script `code/analysis/fix_61_ols_spec.R` re-estimates TWFE using the paper's actual OLS specification (no forced FEs) and writes the correct β = 0.009483 back to `results.csv`. This bypasses the template's mandatory `| fips + year` FE structure for the single paper where the paper itself uses plain OLS. Gap vs paper target is now 0.18% (EXACT under 1% threshold).
 
 ## Comparison
 
 | Source | β | SE | N | cluster | sig |
 |---|---|---|---|---|---|
 | Paper (Table 3, Simple DD, excel_vgood) | 0.0095 | (0.0079) | 82,907 obs | state (fips) | none (p=0.233) |
-| Our stored results.csv | 0.010316 | 0.007857 | — | fips | — |
-| Relative Δ | +8.59% | −0.54% | | | |
+| Our stored results.csv (post-fix) | 0.009483 | 0.007855 | 82,907 | fips | none |
+| Relative Δ | −0.18% | −0.57% | | | |
 
 ## Notes
 
