@@ -15,6 +15,7 @@
 #   code/aggregation/01_consolidate_results.R
 #   code/tables/01_chapter_statistics.R
 #   code/tables/02_article_cards.R
+#   code/tables/03_margin_attribution.R (D7: joint margin decomposition)
 #   code/figures/01_aggregate_scatter.R
 #   code/figures/02_density_z.R
 #   code/figures/03_panel_event_study.R
@@ -92,6 +93,7 @@ run_script("code/aggregation/04_flag_excluded_in_cards.R")
 # Tables
 run_script("code/tables/01_chapter_statistics.R")
 run_script("code/tables/02_article_cards.R")
+run_script("code/tables/03_margin_attribution.R")
 
 # Aggregate figures
 run_script("code/figures/01_aggregate_scatter.R")

@@ -16,11 +16,17 @@ Insignificant $\rightarrow$ significant & 1 & 1.9\% \\
 Insignificant $\rightarrow$ insignificant & 11 & 20.8\% \\
 $|\Delta| > 50\%$ & 17 & 32.1\% \\
 $|\Delta| > 100\%$ & 11 & 20.8\% \\
+\midrule
+\multicolumn{3}{l}{\textit{Decomposition of the median headline gap}} \\
+\quad Spec~C headline: $|\hat\beta^{\text{TWFE}}_{+X} - \widehat{ATT}^{\text{CS}}_{-X}|$ & & 22.3\% \\
+\quad Spec~A estimator margin: $|\hat\beta^{\text{TWFE}}_{+X} - \widehat{ATT}^{\text{CS}}_{+X}|$ (N=10) & & 48.7\% \\
+\quad Spec~B estimator margin: $|\hat\beta^{\text{TWFE}}_{-X} - \widehat{ATT}^{\text{CS}}_{-X}|$ (N=28) & & 28.9\% \\
+\quad Covariate margin (TWFE): $|\hat\beta^{\text{TWFE}}_{+X} - \hat\beta^{\text{TWFE}}_{-X}|$ (N=28) & & 9.7\% \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: The CS-DID benchmark uses the dynamic aggregate, with the \textit{never-treated} group when available and \textit{not-yet-treated} otherwise. For one article without a dynamic aggregate, the group average is used instead. The proportional change is defined as $\Delta = (\hat\beta_{CS} - \hat\beta_{TWFE}) / |\hat\beta_{TWFE}|$.
+\item Notes: The CS-DID benchmark uses the dynamic aggregate, with the \textit{never-treated} group when available and \textit{not-yet-treated} otherwise. For one article without a dynamic aggregate, the group average is used instead. The proportional change is defined as $\Delta = (\hat\beta_{CS} - \hat\beta_{TWFE}) / |\hat\beta_{TWFE}|$. The decomposition block reports median $|\Delta|/|\hat\beta^{\text{TWFE}}_{+X}|$. Spec~C is the headline protocol gap; Spec~A holds covariates fixed (both estimators conditional); Spec~B holds covariates fixed (both unconditional); the TWFE-side covariate margin holds the estimator fixed. Under additivity: Spec~C $\approx$ Spec~B estimator margin $+$ TWFE-side covariate margin; gaps from additivity reflect interaction (see Table~\ref{tab:margin_attribution}).
 \end{tablenotes}
 \end{threeparttable}
 \end{table}

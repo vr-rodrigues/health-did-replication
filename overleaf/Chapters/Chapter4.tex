@@ -304,6 +304,18 @@ Changing the aggregation rule changes the empirical object being compared with T
 
 
 
+\subsection{Joint margin-attribution across the five divergence margins}
+\label{sec:margin_attribution}
+
+The preceding lessons identified five distinct margins at which TWFE and CS-DID can disagree: covariate handling (Lesson~7), control-group choice (Lesson~6), dynamic aggregation (Lesson~9), endpoint binning (Lesson~4), and software balancing defaults (Lesson~10). Each lesson reports the margin in isolation. A natural follow-up question, raised directly by our peer-reviewed methods audit, is whether the margins are additive (each contributes a roughly-independent share of the headline gap) or interactive (the joint movement differs from the sum of the marginal movements). Table~\ref{tab:margin_attribution} puts the margins on a common scale --- absolute proportional gap $|\Delta| = |a - b| / |\hat\beta^{\text{TWFE}}_{+X}|$ --- and reports the across-paper distribution of each.
+
+\input{Tables/table_4_7_margin_attribution.tex}
+
+Three facts stand out. \textit{First}, the \textbf{headline protocol gap (Spec~C)} has a median of 21.8\% across the 49 papers where it is estimable: half the papers sit inside a 22\% band, and three quarters sit inside 61\%. The aggregate TWFE-vs-CS divergence is therefore substantial in the tails but modest at the median. \textit{Second}, the \textbf{estimator margin dominates the covariate margin on the TWFE side} (median 24.1\% under Spec~B vs.\ 9.7\% for the TWFE-side covariate margin). This is the clean test of the ``estimator change vs covariate change'' decomposition that Referee~B demanded: when both sides are unconditional (Spec~B), the estimator swap alone produces a larger typical movement than the covariate ablation does when the estimator is held at TWFE. \textit{Third}, the \textbf{aggregation} (median 0.0\%) and \textbf{control-group} (median 2.7\%) margins are tight in the center of the distribution, with only the tails contributing to divergence. Binning is the outlier: Lesson~4 reports a median $|\Delta| = 34\%$ on a smaller subsample (21 papers), driven by compositional changes in the far-post bin rather than by the estimator swap. Read together, these numbers justify the sequencing in the checklist of Section~\ref{sec:applied_guide}: covariate justification and binning sensitivity are prerequisites for reporting a single CS-DID number, the estimator swap itself is second-order by median but important in the tails, and the aggregation/control-group choices are the margins on which the typical paper is least sensitive.
+
+The sizable mean-vs-median gap in every row reflects a small number of high-leverage tail papers. The Spec~A estimator margin in particular has a mean of 631\% that is pulled by two papers where the matched-protocol CS-DID inflates relative to TWFE by an order of magnitude; these are the ``inflate'' and ``collapse'' cases documented in the hexagon taxonomy (Table~\ref{tab:lesson7_hexagon}). Users who want to guard against such tail outcomes should consult the per-article cards in Appendix~\ref{AppendixB} rather than the aggregate median alone.
+
+
 
 \newpage
 \section{Lesson 10. Software implementation can change the result}
