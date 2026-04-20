@@ -31,29 +31,18 @@ rm -f "$DEP/code/audit/inspect_aggte.R" \
 
 # ── 1. Refresh overleaf/Figures from output/figures ─────────────────
 echo "=== 1/3 Refresh overleaf/Figures ==="
+# Only sync figures actually referenced in the text (see
+# code/audit/find_orphan_figures.sh to verify no orphans are being introduced).
 declare -A MAP=(
   ["agregado/agregado_dynamic_v3.pdf"]="figure_4_1_aggregate_scatter_dynamic.pdf"
-  ["agregado/agregado_dynamic.pdf"]="figure_4_1_aggregate_scatter_dynamic.pdf"
-  ["agregado/agregado_group.pdf"]="agregado_group.pdf"
-  ["agregado/agregado_group_v3.pdf"]="agregado_group.pdf"
-  ["agregado/agregado_simple.pdf"]="agregado_simple.pdf"
-  ["agregado/agregado_simple_v3.pdf"]="agregado_simple.pdf"
   ["agregado/density_z_dynamic.pdf"]="figure_4_2_density_z_dynamic.pdf"
-  ["agregado/density_z_group.pdf"]="density_z_group.pdf"
-  ["agregado/density_z_simple.pdf"]="density_z_simple.pdf"
   ["agregado/variacao_pct_dynamic.pdf"]="figure_4_3_variation_pct_dynamic.pdf"
-  ["agregado/variacao_pct_v2.pdf"]="figure_4_3_variation_pct_dynamic.pdf"
-  ["agregado/variacao_pct_group.pdf"]="variacao_pct_group.pdf"
-  ["agregado/variacao_pct_simple.pdf"]="variacao_pct_simple.pdf"
   ["agregado/panel_es_6cases.pdf"]="figure_4_4_panel_event_study_6cases.pdf"
   ["agregado/panel_binning_76.pdf"]="figure_4_5_panel_binning_76.pdf"
   ["agregado/density_covariates_zscore.pdf"]="figure_4_7_density_covariates.pdf"
   ["agregado/panel_csdid_controls_133.pdf"]="figure_4_8_panel_controls_133.pdf"
-  ["agregado/panel_csdid_controls_133_v2.pdf"]="figure_4_8_panel_controls_133.pdf"
   ["agregado/panel_graduated_sensitivity.pdf"]="figure_4_9_graduated_sensitivity.pdf"
-  ["agregado/figure_4_1_headline_composite.pdf"]="figure_4_1_headline_composite.pdf"
   ["agregado/figure_4_1_aggregate_scatter_matched.pdf"]="figure_4_1_aggregate_scatter_matched.pdf"
-  ["agregado/figure_4_3_variation_pct_matched.pdf"]="figure_4_3_variation_pct_matched.pdf"
 )
 for dst in "${!MAP[@]}"; do
   src="$OUT/figures/${MAP[$dst]}"
@@ -61,15 +50,29 @@ for dst in "${!MAP[@]}"; do
 done
 [ -f "$OUT/figures/figure_4_10_sensitivity_210.pdf" ] && \
   cp "$OUT/figures/figure_4_10_sensitivity_210.pdf" "$OV/Figures/sensitivity/event_study_sensitivity_210.pdf"
+
+# Sync only the per-article event-study + HonestDiD figures actually
+# referenced by AppendixB. Matches id_{num}_event_study.pdf and
+# id_{num}_honest_did_v3.pdf strictly; variants (sensitivity, sem_binning,
+# com_controles, exclusao) and unsampled papers (357, 382) are excluded.
+USED=$(grep -rhoE 'Figures/(event_study|honestdid)/id_[0-9]+_[a-z_0-9]+\.pdf' \
+       "$OV/../overleaf" "$WP" 2>/dev/null | sort -u)
 for f in "$OUT"/figures/appendix_event_studies/*.pdf; do
-  [ -f "$f" ] && cp "$f" "$OV/Figures/event_study/$(basename "$f")"
+  base=$(basename "$f")
+  if echo "$USED" | grep -qxF "Figures/event_study/$base"; then
+    cp "$f" "$OV/Figures/event_study/$base"
+  fi
 done
 for f in "$OUT"/figures/appendix_honestdid/*.pdf; do
-  [ -f "$f" ] && cp "$f" "$OV/Figures/honestdid/$(basename "$f")"
+  base=$(basename "$f")
+  if echo "$USED" | grep -qxF "Figures/honestdid/$base"; then
+    cp "$f" "$OV/Figures/honestdid/$base"
+  fi
 done
-for f in "$OUT"/figures/appendix_bacon/*.pdf; do
-  [ -f "$f" ] && cp "$f" "$OV/Figures/bacon/$(basename "$f")"
-done
+# NOTE: bacon/ and esw/ subdirectories are intentionally NOT synced — the
+# per-paper Bacon decomposition and ESW weights PDFs are not referenced in
+# any .tex file. They remain available in results/by_article/{id}/ for
+# readers consulting the replication package directly.
 echo "  [OK] overleaf/Figures refreshed"
 
 # ── 2. Refresh health_did_replication/Figures (mirror overleaf) ────

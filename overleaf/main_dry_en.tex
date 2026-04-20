@@ -47,6 +47,11 @@
 \usepackage{caption}
 \usepackage{xcolor}
 
+% Placeholder macro for headline numbers awaiting the matched-protocol
+% pipeline completion. Renders in red bold until replaced with final text.
+% Grep the source for \PH{ to find every pending number.
+\newcommand{\PH}[1]{\textcolor{red}{\textbf{#1}}}
+
 \usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex}
 \addbibresource{example.bib}
 \usepackage[autostyle=true]{csquotes}
@@ -204,12 +209,12 @@ Rambachan--Roth (HonestDiD) sensitivity framework.
 
 The exercise follows each paper's own preferred specification and replaces only
 the estimator, so any divergence is attributable to methodology rather than to
-redesign. Across all 56 articles, the sign of the effect is preserved in 53 cases
-and significantly reverses in only 3. The more interesting changes happen on
-other margins. Standard errors rise by roughly 40\% on average under
-heterogeneity-robust estimation, 12 articles lose conventional statistical
-significance, and the magnitude of the point estimate moves by more than 20\% in
-the majority of staggered-adoption designs. Bacon decompositions show that
+redesign. Across the 53 comparable articles, the sign of the effect is preserved in 47 cases
+and reverses in 6. The more interesting changes happen on
+other margins. Standard errors rise by a median of 36\% under
+heterogeneity-robust estimation, 14 articles lose conventional statistical
+significance, and the magnitude of the point estimate moves by more than 50\% in
+32\% of designs (21\% move by more than 100\%). Bacon decompositions show that
 treated-versus-treated comparisons account for a substantial share of the
 identifying variation in staggered TWFE specifications, which is consistent with
 the mechanism emphasized by the theory literature. HonestDiD sensitivity

@@ -12,7 +12,7 @@ For each article, we select \emph{one} outcome and \emph{one} specification. The
   \item \textbf{Largest sample.} If more than one candidate remains, the specification with the largest $N$.
   \item \textbf{Tiebreakers:}
     \begin{enumerate}[label=(\alph*)]
-      \item most aggregated variable;
+      \item most aggregated outcome variable (e.g., all-cause mortality over cause-specific categories);
       \item most parsimonious specification in time-varying covariates;
       \item documented random selection.
     \end{enumerate}
@@ -240,9 +240,9 @@ When the article reports only a dynamic event study without a static ATT, we re-
 
 \textcite{arthi2022recessions}
 & Total census mortality rate (Table 2, col.~1)
-& Rule i --- Baseline specification. Classic 2$\times$2 DiD: 538 districts, 2 periods (1851, 1861). No controls.
+& Rule iii(b) --- fewer time-varying covariates. The authors declare column~3 as their \emph{preferred} all-age specification (see quote), but column~1 is the authors' labelled \emph{baseline} column and carries the cleanest 2$\times$2 contrast (538 districts, 2 periods, no controls). Under the protocol, ``preferred'' and ``baseline'' both trigger Rule~i, so the tie-breaker resolves to Rule~iii(b), which selects the specification with fewer time-varying covariates. This is a documented departure from author-declared preference.
 & 0
-& ``our preferred all-age results in column~3 of Table~2 imply that the cotton shock generated 24,418 excess deaths'' (p.~247) \\
+& ``our preferred all-age results in column~3 of Table~2 imply that the cotton shock generated 24,418 excess deaths'' (p.~247); column~1 labelled ``baseline'' in the same table. \\
 
 \textcite{brodeur2025shootings}
 & Log employment/population (Table 2, col.~1)

@@ -178,6 +178,10 @@ HonestDiD, replication, health economics.
 %======================================================================
 
 %======================================================================
+
+%======================================================================
+
+%======================================================================
 %  MAIN TEXT (chapters 1-5 of the dissertation, inlined)
 %======================================================================
 
@@ -186,9 +190,9 @@ HonestDiD, replication, health economics.
 
 Two-way fixed-effects (TWFE) has been the default estimator for difference-in-differences (DiD) in applied health economics for decades. Over the past five years, the methodological literature has shown that TWFE can produce estimates that look like causal parameters but combine cohort-time contrasts in ways the researcher did not intend \parencite{goodman2021difference,sun2021estimating,callaway2021difference,roth2023s}. The question this paper asks is narrow and empirical: \textit{when we replace TWFE with a modern heterogeneity-robust estimator in published health-economics DiD studies, how often --- and on what margin --- do the conclusions change?}
 
-We re-estimate the headline result of 56 published health-economics DiD studies under a standardized modern-estimator protocol. After excluding 3 articles whose published specifications cannot be reproduced under our standardized template (\textcite{myers2017power}, \textcite{moorthy2025bluecollar}, and \textcite{kuziemko2018managed}; see Appendix~\ref{AppendixD}), the comparable subsample contains 53 articles. The sign of the effect is preserved in \PH{47} of the 53 cases and reverses in \PH{6}. Statistical significance is lost in \PH{12} of the originally significant estimates, and the standard error rises by a median of \PH{36\%}. The within-paper proportional shift in the point estimate ranges from \PH{$-1{,}112\%$} in \textcite{levine2011effective} to \PH{$+314\%$} in \textcite{bancalari2024unintended}. Modern DiD estimators rarely overturn published health-policy conclusions. They routinely weaken them.
+We re-estimate the headline result of 56 published health-economics DiD studies under a standardized modern-estimator protocol. After excluding 3 articles whose published specifications cannot be reproduced under our standardized template (\textcite{myers2017power}, \textcite{moorthy2025bluecollar}, and \textcite{kuziemko2018managed}; see Appendix~\ref{AppendixD}), the comparable subsample contains 53 articles. The sign of the effect is preserved in 47 of the 53 cases and reverses in 6. Statistical significance is lost in 14 of the originally significant estimates, and the standard error rises by a median of 36\%. The within-paper proportional shift in the point estimate ranges from $-431\%$ in \textcite{maclean2025paid} to $+542\%$ in \textcite{levine2011effective}. Modern DiD estimators rarely overturn published health-policy conclusions. They routinely weaken them.
 
-This headline conceals substantial within-paper heterogeneity. \PH{One in three} estimates shifts by more than 50\% in magnitude, and \PH{one in five} shifts by more than 100\% (see Figure~\ref{fig:ch3_aggregate_variation}, Section~\ref{Chapter4}). The width of that distribution is the empirical substance of the exercise. When a policy's cost-benefit ratio depends on the size of the treatment effect --- the typical case in health --- a 50\% or 100\% magnitude shift can flip the adoption decision even when the sign does not move. The relevant empirical margin is magnitude, not sign alone.
+This headline conceals substantial within-paper heterogeneity. 32\% of estimates shift by more than 50\% in magnitude, and 21\% shift by more than 100\% (see Figure~\ref{fig:ch3_aggregate_variation}, Section~\ref{Chapter4}). The width of that distribution is the empirical substance of the exercise. When a policy's cost-benefit ratio depends on the size of the treatment effect --- the typical case in health --- a 50\% or 100\% magnitude shift can flip the adoption decision even when the sign does not move. The relevant empirical margin is magnitude, not sign alone.
 
 The contribution of this paper is to identify \textit{which} design margins account for the TWFE-vs-modern gap in this literature. Three findings reframe the applied debate.
 
@@ -200,7 +204,7 @@ Third, the ten empirical lessons in Section~\ref{Chapter4} condense into a one-p
 
 This paper extends a reanalysis agenda developed in finance and accounting \parencite{baker2022much}, political science \parencite{chiu2023and}, and the broader reproducibility literature \parencite{brodeur2026reproducibility}. It trades breadth across fields for depth across design margins. To our knowledge, no prior reanalysis in any applied field has documented in a single sample the joint contribution of binning, geographic conditioning, aggregation choice, covariate handling, and software defaults to the apparent TWFE-vs-modern disagreement. Health economics is a natural site: DiD is the workhorse identification design in the subfield \parencite{goldsmith2024tracking} and the policy stakes are unusually explicit, because welfare and cost-effectiveness calculations depend directly on the magnitude of the estimated treatment effect.
 
-The rest of the paper is organized as follows. Section~\ref{Chapter2} reviews the methodological and reanalysis literatures that motivate the exercise. Section~\ref{Chapter3} describes the 56-article sample, the standardized re-estimation protocol, the identification assumptions that discipline the external validity of our meta-statistic (Section~\ref{sec:identification}), and the AI-assisted workflow. Section~\ref{Chapter4} presents ten lessons organized around the empirical mechanisms behind TWFE-vs-modern divergence (§§4.1--4.10), culminating in the pre-submission checklist (§\ref{sec:applied_guide}). Section~\ref{Chapter5} concludes. Per-article results, HonestDiD sensitivity analyses, and Bacon decompositions are documented in Appendix~\ref{AppendixB}; the AI-assisted pipeline in Appendix~\ref{AppendixC}; the sample-construction log in Appendix~\ref{AppendixD}.\footnote{Numbers marked \PH{} are headline statistics computed on the current state of the pipeline; they will be revised in the final draft once the matched-protocol exercise (Section~\ref{Chapter4}, Lesson~7) completes for all 38 articles with original covariates.}
+The rest of the paper is organized as follows. Section~\ref{Chapter2} reviews the methodological and reanalysis literatures that motivate the exercise. Section~\ref{Chapter3} describes the 56-article sample, the standardized re-estimation protocol, the identification assumptions that discipline the external validity of our meta-statistic (Section~\ref{sec:identification}), and the AI-assisted workflow. Section~\ref{Chapter4} presents ten lessons organized around the empirical mechanisms behind TWFE-vs-modern divergence (§§4.1--4.10), culminating in the pre-submission checklist (§\ref{sec:applied_guide}). Section~\ref{Chapter5} concludes. Per-article results, HonestDiD sensitivity analyses, and Bacon decompositions are documented in Appendix~\ref{AppendixB}; the AI-assisted pipeline in Appendix~\ref{AppendixC}; the sample-construction log in Appendix~\ref{AppendixD}.
 
 
 \section{Related Literature}
@@ -354,9 +358,8 @@ $N_1$, $N_0$                      & Size of the reanalyzed sample and of the exc
 $\pi$, $\hat\pi_1$, $\pi_0$       & Population, in-sample, and excluded-subsample sign-preservation rates                                    & \S\ref{sec:selection_bounds} \\
 \texttt{xformla}                  & \texttt{did::att\_gt} argument for the conditional-parallel-trends covariate set                        & \S\ref{Chapter3} \\
 \texttt{cs\_controls\_matched}    & Metadata flag triggering matched-protocol CS-DID with \texttt{xformla = $\sim$twfe\_controls} (Deliverable D1) & \S\ref{Chapter4} \\
-\texttt{cs\_sample\_filter}       & Metadata field letting CS-DID skip the global \texttt{sample\_filter}; empty string means CS runs on the full pre-filter data (e.g.\ paper 241, where TWFE is estimated on the paper's event-window subsample but CS-DID needs the full balanced panel). & \S\ref{sec:agent_architecture} \\
-\texttt{cs\_min\_e} / \texttt{cs\_max\_e} & Metadata fields clipping the CS-DID dynamic aggregation to a paper-specified event-time window. & \S\ref{sec:agent_architecture} \\
-Three-axis rubric                 & Fidelity (F-HIGH/F-MOD/F-LOW/F-NA) $\times$ Implementation (I-HIGH/I-MOD/I-LOW) $\to$ overall rating HIGH/MODERATE/LOW/VERY LOW. Design credibility (D-ROBUST/D-MODERATE/D-FRAGILE/D-BROKEN) reported as a separate finding about the paper. & \S\ref{sec:agent_architecture} \\
+\texttt{cs\_sample\_filter}       & Metadata field letting CS-DID skip the global \texttt{sample\_filter}; empty string means CS runs on the full pre-filter data (e.g.\ paper 241, where TWFE is estimated on the paper's event-window subsample but CS-DID needs the full balanced panel). & Appendix~\ref{AppendixC} \\
+\texttt{cs\_min\_e} / \texttt{cs\_max\_e} & Metadata fields clipping the CS-DID dynamic aggregation to a paper-specified event-time window. & Appendix~\ref{AppendixC} \\
 \bottomrule
 \end{tabular*}
 \end{table}
@@ -418,11 +421,11 @@ If either assumption fails in a direction correlated with the survival outcome, 
 
 Because representativeness is an untested assumption, we complement the point estimate with worst-case bounds in the style of \textcite{manski1989anatomy}. Of the 56 reanalyzed articles, 48 preserve the sign of the original TWFE conclusion under the modern-estimator protocol, a within-sample preservation rate of $\hat\pi_1 = 48/56 = 85.7\%$. Let $\pi_0$ denote the (unobserved) preservation rate among the $N_0 = 1{,}828$ articles excluded during sample construction. The population-level preservation rate is a weighted average,
 \[
-\pi = \frac{N_1 \hat\pi_1 + N_0 \pi_0}{N_1 + N_0} = \frac{48 + 1{,}828\,\pi_0}{1{,}884},
+\pi = \frac{N_1 \hat\pi_1 + N_0 \pi_0}{N_1 + N_0} = \frac{49 + 1{,}831\,\pi_0}{1{,}884},
 \]
-where $N_1 = 56$ is the reanalyzed sample. Without further assumptions, $\pi_0 \in [0, 1]$ implies the uninformative Manski bound $\pi \in [2.5\%, 99.6\%]$.
+where $N_1 = 53$ is the comparable subsample (the 56 reanalyzed articles minus the three structural exclusions). Without further assumptions, $\pi_0 \in [0, 1]$ implies the uninformative Manski bound $\pi \in [2.6\%, 99.8\%]$.
 
-Tightening the bound requires an assumption about the excluded population. Table~\ref{tab:selection_bounds} reports implied population rates under five scenarios for $\pi_0$. Under Manski--Pepper monotone selection --- the assumption that excluded articles have weakly lower replication-package quality and hence weakly lower preservation under modern re-estimation, so that $\pi_0 \leq \hat\pi_1$ --- the population rate satisfies $\pi \leq 85.7\%$. This is the directionally informative bound we take forward: the within-sample rate we report is an \emph{upper bound} on the population parameter, not an unbiased estimate.
+Tightening the bound requires an assumption about the excluded population. Table~\ref{tab:selection_bounds} reports implied population rates under five scenarios for $\pi_0$. Under Manski--Pepper monotone selection --- the assumption that excluded articles have weakly lower replication-package quality and hence weakly lower preservation under modern re-estimation, so that $\pi_0 \leq \hat\pi_1$ --- the population rate satisfies $\pi \leq 92.5\%$. This is the directionally informative bound we take forward: the within-sample rate we report is an \emph{upper bound} on the population parameter, not an unbiased estimate.
 
 \begin{table}[!htbp]
 \centering
@@ -433,16 +436,16 @@ Tightening the bound requires an assumption about the excluded population. Table
 \toprule
 \textbf{Scenario for excluded rate $\pi_0$} & $\pi_0$ & \textbf{Implied population rate $\pi$} & \textbf{vs $\hat\pi_1$} \\
 \midrule
-Worst case (all excluded would fail)     & $0\%$  & $2.5\%$   & $-83.2$ pp \\
-Lower quartile                            & $25\%$ & $26.8\%$  & $-58.9$ pp \\
-Half of excluded preserve                 & $50\%$ & $51.1\%$  & $-34.6$ pp \\
-Upper quartile                            & $75\%$ & $75.3\%$  & $-10.4$ pp \\
-Representativeness ($\pi_0 = \hat\pi_1$)  & $85.7\%$ & $85.7\%$ & $0$ pp  \\
-Best case (all excluded preserve)         & $100\%$& $99.6\%$  & $+13.9$ pp \\
+Worst case (all excluded would fail)     & $0\%$  & $2.6\%$   & $-89.9$ pp \\
+Lower quartile                            & $25\%$ & $27.2\%$  & $-65.3$ pp \\
+Half of excluded preserve                 & $50\%$ & $51.9\%$  & $-40.7$ pp \\
+Upper quartile                            & $75\%$ & $76.5\%$  & $-16.1$ pp \\
+Representativeness ($\pi_0 = \hat\pi_1$)  & $92.5\%$ & $92.5\%$ & $0$ pp  \\
+Best case (all excluded preserve)         & $100\%$& $99.8\%$  & $+7.2$ pp \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}\footnotesize
-\textit{Notes:} $\hat\pi_1 = 48/56 = 85.7\%$ is the within-sample sign-preservation rate for the 56 reanalyzed articles. $N_0 = 1{,}828$ is the count of articles excluded during sample construction (Step~2 minus the final sample). Under Manski--Pepper monotone selection ($\pi_0 \leq \hat\pi_1$), the population rate is bounded above by $\hat\pi_1$; the worst-case lower bound is $48/1{,}884 = 2.5\%$.
+\textit{Notes:} $\hat\pi_1 = 49/53 = 92.5\%$ is the within-comparable-subsample sign-preservation rate (after excluding the three structural-failure papers documented in Appendix~\ref{AppendixD}). $N_0 = 1{,}831$ is the count of articles outside the reanalyzed sample (1{,}884 candidate DiD articles minus the 53 comparable subsample). Under Manski--Pepper monotone selection ($\pi_0 \leq \hat\pi_1$), the population rate is bounded above by $\hat\pi_1$; the worst-case lower bound is $49/1{,}884 = 2.6\%$. Comparison column $\Delta\mathrm{pp} = \pi - \hat\pi_1$ in percentage points.
 \end{flushleft}
 \end{table}
 
@@ -543,43 +546,7 @@ We developed the protocol through a supervised calibration exercise based on 11 
 \label{fig:ai_workflow}
 \end{figure}
 
-\subsubsection{From three-stage pipeline to nine-agent architecture}
-\label{sec:agent_architecture}
-
-The three-stage workflow above describes the minimal viable pipeline that produced the headline estimates. While it is sufficient to execute the reanalysis, it does not by itself audit the execution against modern-DiD best practice, nor does it verify numerical fidelity against the original paper. Across the iterative development of the project, the pipeline therefore grew into a nine-agent architecture, with each agent owning one specific layer of the scientific audit. The three original stages (Profiler, Analyst, Reporter) remain the computational backbone; the additional six agents operate on top of their outputs. Table~\ref{tab:agent_roster} summarises the roster.
-
-\begin{table}[!htbp]
-\centering
-\small
-\caption{Agent roster and scope of responsibility}
-\label{tab:agent_roster}
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}p{3.4cm} p{3.4cm} p{7.8cm}@{}}
-\toprule
-\textbf{Agent} & \textbf{Layer} & \textbf{Scope} \\
-\midrule
-Profiler / Analyst / Reporter       & Computational core               & Three-stage pipeline described above: extract metadata, run estimators, compile per-paper report. \\
-\addlinespace
-\texttt{twfe-reviewer}              & Methodology audit                & Checks TWFE FE structure, clustering, weights, controls, Pattern 50 sample-mismatch invariant. \\
-\texttt{csdid-reviewer}             & Methodology audit                & Checks CS-DID implementation against the \texttt{did} package documentation (NT/NYT choice, \texttt{xformla}, base period, balancing). \\
-\texttt{bacon-reviewer}             & Methodology audit                & Verifies Bacon decomposition applicability and TvT share interpretation. \\
-\texttt{honestdid-reviewer}         & Methodology audit                & Checks HonestDiD inputs, interprets $\bar M$ breakdown values as design-credibility signals. \\
-\texttt{dechaisemartin-reviewer}    & Methodology audit                & Advises when \texttt{DIDmultiplegtDYN} would add information (reversible or continuous treatment). \\
-\addlinespace
-\texttt{paper-auditor}              & Fidelity audit                   & Opens the original paper PDF, locates the main specification, extracts published coefficient, compares against our stored estimate. Emits EXACT / WITHIN\_TOLERANCE / WARN / FAIL. Write-only on \texttt{paper\_audit.md} and \texttt{paper\_fidelity.csv}. \\
-\addlinespace
-\texttt{skeptic}                    & Orchestration + rating           & Invokes the five methodology reviewers and the paper-auditor in parallel for one article, synthesises a single credibility rating using the three-axis rubric (below), and writes a consolidated \texttt{skeptic\_report.md}. \\
-\addlinespace
-\texttt{pattern-curator}            & Knowledge base                   & Appends new failure-pattern entries to \texttt{failure\_patterns.md} in the standard Context / Root Cause / Resolution Rule schema, maintaining version control. \\
-\texttt{repo-custodian}             & Repository stewardship           & Owns all git and GitHub operations: \texttt{full\_sync.sh}, audit verification, commits and pushes. The only agent (with the user and \texttt{pattern-curator}) allowed to modify files under \texttt{Replication Package/}. All other reviewers are read-only. \\
-\bottomrule
-\end{tabular*}
-\end{table}
-
-\noindent\textbf{The three-axis credibility rubric.}
-A single paper receives three independent scores. Axis~1 (\emph{Fidelity}, sourced from \texttt{paper-auditor}) asks whether our stored estimate matches the number printed in the original paper, independently of methodology: F-HIGH = EXACT or WITHIN\_TOLERANCE, F-MOD = WARN ($5$--$20\%$ gap), F-LOW = FAIL, F-NA when no comparable static scalar exists in the paper. Axis~2 (\emph{Implementation}, sourced from the five methodology reviewers) asks whether our reanalysis is correctly coded given the paper's own specification: I-HIGH = all reviewers PASS, I-MOD = one WARN, I-LOW = two or more WARN or any FAIL. These two axes combine through a fixed table to produce the overall rating HIGH / MODERATE / LOW / VERY LOW. Axis~3 (\emph{Design credibility}, sourced from HonestDiD, Bacon, and pre-trend patterns) reports D-ROBUST / D-MODERATE / D-FRAGILE / D-BROKEN as a \emph{separate finding about the paper itself}, not a demerit against the reanalysis. This separation resolves the common confusion whereby a faithfully-reproduced paper with poor pre-trends would otherwise be conflated with an implementation bug. Where modern diagnostics reveal fragility in a paper we implement correctly, that is part of the findings, not a failure of the pipeline.
-
-\noindent\textbf{Iterative per-paper review.}
-The agents above are composed into an iterative review pipeline applied to every article in the final sample. For each paper the \texttt{skeptic} agent is invoked first, producing a baseline rating and a list of candidate actions (metadata fixes, re-runs, or documentation notes). The user then decides one of: accept, revise metadata and re-run, or mark as structural limitation. The decision is recorded in \texttt{analysis/iterative\_review\_log.md} alongside the before/after numerical comparison. In the first iteration (April 2026) this loop ran over 47 papers (all MODERATE and LOW papers in the sample), producing 51 documented failure patterns, five CS-DID recoveries via metadata-only fixes (papers 201, 241, 290, 309, 311, 2303), three exclusions on structural grounds (234, 242, 380), and a materially improved fidelity distribution: 35 EXACT, 5 WITHIN\_TOLERANCE, 8 NOT\_APPLICABLE, 5 WARN, 0 FAIL across the final $N=53$ comparable sample.
+The three-stage workflow above (Profiler, Analyst, Reporter) is the computational backbone that produces each article's estimates. To verify that those estimates are \emph{implemented correctly given each paper's own specification} and that they \emph{match the number printed in the original paper}, the pipeline is augmented with a per-paper audit layer documented in Appendix~\ref{AppendixC}. That audit layer reviews the implementation of every estimator against its package documentation (CS-DID, HonestDiD, Bacon, and the dCdH family), compares the stored coefficient to the paper's reported value, and records the outcome in per-article reports that accompany the replication package. Aggregate fidelity statistics from this audit enter the comparable-subsample size reported above (53 of 56 articles).
 
 
 \section{Lessons from the reanalysis}

@@ -3,6 +3,39 @@
 
 Este apêndice apresenta, para cada um dos 56 artigos da amostra, uma ficha-resumo com os resultados da reanálise. Cada página contém: (i)~uma ficha com estimativas, metadados e justificativa da seleção do \emph{outcome} conforme o protocolo do Capítulo~\ref{Chapter2}; (ii)~o \emph{event study} dinâmico com todos os estimadores aplicáveis; e (iii)~a análise de sensibilidade HonestDiD. Artigos sem figuras disponíveis são agrupados nas últimas páginas.
 
+\subsection*{Como ler a linha \emph{Skeptic rating}}
+\addcontentsline{toc}{section}{Como ler a linha \emph{Skeptic rating}}
+
+A versão automatizada destas fichas (\texttt{output/tables/appendix\_article\_cards.tex}, gerada por \texttt{code/tables/02\_article\_cards.R}) inclui ao final de cada cartão uma linha resumo com três campos derivados do agente \texttt{skeptic} (Apêndice~\ref{AppendixC}, §\ref{sec:nine_agent_architecture}). A interpretação é a seguinte:
+
+\noindent\textbf{Skeptic rating} (rótulo final HIGH / MODERATE / LOW / VERY LOW). Combina dois eixos via uma tabela fixa:
+\begin{itemize}\setlength\itemsep{1pt}
+\item \textbf{HIGH} --- Fidelity F-HIGH \emph{e} Implementation I-HIGH (todas as cinco análises de revisores PASS, e a estimativa armazenada reproduz o número publicado no paper EXATO ou dentro de 5\%). Também HIGH quando a fidelidade não é avaliável (F-NA por ausência de PDF ou estimando estrutural diferente) mas a implementação está limpa.
+\item \textbf{MODERATE} --- Um eixo levemente degradado: ou um WARN da implementação, ou um WARN de fidelidade (5--20\% de gap) com implementação limpa.
+\item \textbf{LOW} --- Múltiplos WARNs de implementação, qualquer FAIL de implementação, ou fidelidade FAIL ($>$20\% gap) que ainda assim é uma reanálise legítima do paper (papers com fidelidade FAIL por motivo \emph{estrutural} foram excluídos do subgrupo comparável; ver §\ref{sec:nine_agent_architecture}).
+\item \textbf{VERY LOW} --- Reservado para falhas catastróficas (não houve casos na amostra final).
+\end{itemize}
+
+\noindent\textbf{Fidelity} (verdict do \texttt{paper-auditor}, separado da rating combinada para transparência):
+\begin{itemize}\setlength\itemsep{1pt}
+\item \textbf{EXACT} --- coeficiente armazenado dentro de 1\% do número publicado no paper (mesma especificação, mesmo sinal).
+\item \textbf{WITHIN\_TOLERANCE} --- gap de 1--5\%, tipicamente artefato de arredondamento.
+\item \textbf{WARN} --- gap de 5--20\%, sinal estável, com causa documentada (substituto de dados, diferenças de FE absorvidas pelo template, micro-diferenças no \emph{data-prep} Stata vs.\ R).
+\item \textbf{FAIL} --- gap $>$20\% ou inversão de sinal. Os três papers com FAIL na amostra original (Myers 2017, Moorthy-Shaloka 2025, Kuziemko et al.\ 2018) foram excluídos do subgrupo comparável e \emph{não} aparecem nestas fichas (cf.\ §\ref{sec:identification}).
+\item \textbf{NOT\_APPLICABLE} --- o paper não reporta um escalar comparável (p.\ ex., só apresenta \emph{event study} dinâmico, ou usa estimando fundamentalmente diferente do nosso). Nesse caso a fidelidade não é avaliada e o rating é construído pela implementação alone.
+\end{itemize}
+
+\noindent\textbf{Design credibility} (eixo separado, é uma constatação \emph{sobre o paper}, não um demérito da reanálise):
+\begin{itemize}\setlength\itemsep{1pt}
+\item \textbf{D-ROBUST} --- HonestDiD $\bar M$ no horizonte de interesse $\geq 1.0$ \emph{e} pré-tendências flat \emph{e} share Bacon TvT $<$30\%.
+\item \textbf{D-MODERATE} --- $\bar M \in [0.5, 1.0)$, ou exatamente um dos critérios acima parcialmente violado.
+\item \textbf{D-FRAGILE} --- $\bar M \in [0, 0.5)$, ou pré-tendências significativas, ou share TvT $\geq 30\%$. Indica que a identificação do paper original é sensível a pequenos desvios de \emph{parallel trends}.
+\item \textbf{D-BROKEN} --- HonestDiD FAIL em $\bar M = 0$ para todos os alvos (média, primeiro, peak); pré-tendências grandes em múltiplos estimadores. Não significa que a reanálise é inválida; significa que a estratégia de identificação do paper, sob diagnósticos modernos, não sustenta o efeito reportado.
+\item \textbf{D-NA} --- não há \emph{event study} ou faltam pré-períodos suficientes para HonestDiD; o eixo de \emph{design} não é avaliável.
+\end{itemize}
+
+A separação entre \emph{Fidelity} (eixo 1, \emph{nossa reanálise reproduz o paper?}), \emph{Implementation} (eixo 2, \emph{nossa reanálise está bem codificada?}) e \emph{Design credibility} (eixo 3, \emph{a estratégia do paper sustenta inferência causal?}) é deliberada. Confundir os três produzia, na primeira iteração do projeto, papers como Kresch~(2020) classificados como LOW por terem pré-tendências visíveis, embora nossa reanálise reproduzisse exatamente o número publicado: o problema era do paper, não da reanálise. Sob a rubrica de três eixos, esses papers passam a HIGH com \emph{design credibility} reportada separadamente como D-FRAGILE --- a leitura correta.
+
 % ===== Article ID 9 =====
 \clearpage
 \begin{tcolorbox}[
