@@ -43,6 +43,7 @@ declare -A MAP=(
   ["agregado/panel_csdid_controls_133.pdf"]="figure_4_8_panel_controls_133.pdf"
   ["agregado/panel_graduated_sensitivity.pdf"]="figure_4_9_graduated_sensitivity.pdf"
   ["agregado/figure_4_1_aggregate_scatter_matched.pdf"]="figure_4_1_aggregate_scatter_matched.pdf"
+  ["agregado/figure_4_1_signif_matrix.pdf"]="figure_4_1_signif_matrix.pdf"
 )
 for dst in "${!MAP[@]}"; do
   src="$OUT/figures/${MAP[$dst]}"

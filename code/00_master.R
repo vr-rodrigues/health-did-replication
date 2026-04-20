@@ -16,6 +16,7 @@
 #   code/tables/01_chapter_statistics.R
 #   code/tables/02_article_cards.R
 #   code/tables/03_margin_attribution.R (D7: joint margin decomposition)
+#   code/tables/04_selection_balance.R   (D6: 56 vs broader-pool balance)
 #   code/figures/01_aggregate_scatter.R
 #   code/figures/02_density_z.R
 #   code/figures/03_panel_event_study.R
@@ -94,6 +95,7 @@ run_script("code/aggregation/04_flag_excluded_in_cards.R")
 run_script("code/tables/01_chapter_statistics.R")
 run_script("code/tables/02_article_cards.R")
 run_script("code/tables/03_margin_attribution.R")
+run_script("code/tables/04_selection_balance.R")
 
 # Aggregate figures
 run_script("code/figures/01_aggregate_scatter.R")
@@ -102,6 +104,7 @@ run_script("code/figures/03_panel_event_study.R")
 run_script("code/figures/06_graduated_sensitivity.R")
 run_script("code/figures/07_density_covariates.R")
 run_script("code/figures/08_headline_composite.R")
+run_script("code/figures/09_signif_matrix.R")
 
 # ---------------- TIER 2: requires raw data ----------------
 
