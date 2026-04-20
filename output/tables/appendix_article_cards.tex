@@ -23,7 +23,8 @@
   \textbf{Collapse:} 0 \hfill \textbf{Citation:} column 4 our preferred estimate (footnote 23)\\
   \tcbline
   \textbf{Design:} escalonada\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} exp\\
+  \textbf{TWFE controls:} exp\\
+  \textbf{CS controls:} None\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -32,7 +33,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (8 pre, 9 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.75, CS-NT = 1.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.75, CS-NT = 1.00\\
+  \tcbline
+  \textbf{Skeptic rating:} MODERATE \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-MODERATE
 }
 
 
@@ -44,7 +47,8 @@
   \textbf{Collapse:} 0 \hfill \textbf{Citation:} preferred model; baseline specification\\
   \tcbline
   \textbf{Design:} escalonada\_sem\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -53,7 +57,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig. \hfill \textbf{ES:} Yes (4 pre, 2 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} MODERATE \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} WARN
 }
 
 
@@ -65,7 +71,8 @@
   \textbf{Collapse:} 0 \hfill \textbf{Citation:} preferred specification\\
   \tcbline
   \textbf{Design:} escalonada\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} bolsafamilia\_X\_date; spending\_education\_X\_date; spending\_sanitation\_health\_X\_date (+ 15 more)\\
+  \textbf{TWFE controls:} bolsafamilia\_X\_date; spending\_education\_X\_date; spending\_sanitation\_health\_X\_date (+ 15 more)\\
+  \textbf{CS controls:} None\\
   Add. FEs: UF[date]\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
@@ -75,7 +82,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (4 pre, 4 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 1.75, CS-NT = 1.50
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 1.75, CS-NT = 1.50\\
+  \tcbline
+  \textbf{Skeptic rating:} MODERATE \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-MODERATE
 }
 
 
@@ -89,7 +98,8 @@
   \textbf{Collapse:} 1 \hfill \textbf{Citation:} Table 2 presents the main results of the paper\\
   \tcbline
   \textbf{Design:} escalonada\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} log\_pop; x\_t\_insured; x\_t\_urban (+ 22 more)\\
+  \textbf{TWFE controls:} log\_pop; x\_t\_insured; x\_t\_urban (+ 22 more)\\
+  \textbf{CS controls:} None\\
   Add. FEs: ent[mydate]; ent[mydate2]; ent[mydate3]\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
@@ -99,7 +109,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign differs, both insig. \hfill \textbf{ES:} Yes (4 pre, 4 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NYT = 0.50
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NYT = 0.50\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} NOT\_APPLICABLE \hfill \textbf{Design:} D-FRAGILE
 }
 
 
@@ -111,7 +123,8 @@
   \textbf{Collapse:} 0 \hfill \textbf{Citation:} baseline specification\\
   \tcbline
   \textbf{Design:} unica\_controles $\cdot$ repeated\_cross\_section $\cdot$ single\\
-  \textbf{Controls:} kid; kidlt2; kidlt6 (+ 12 more)\\
+  \textbf{TWFE controls:} kid; kidlt2; kidlt6 (+ 12 more)\\
+  \textbf{CS controls:} None\\
   Add. FEs: educ\_category; ownershp; householdocc1990; workersB\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
@@ -121,7 +134,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (4 pre, 1 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 1.75, CS-NT = 1.25
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 1.75, CS-NT = 1.25\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} WARN
 }
 
 
@@ -133,7 +148,8 @@
   \textbf{Collapse:} 0 \hfill \textbf{Citation:} Main results\\
   \tcbline
   \textbf{Design:} escalonada\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} lncmi; pctmcaid; lnbeds; fp; hhi; sysoth\\
+  \textbf{TWFE controls:} lncmi; pctmcaid; lnbeds; fp; hhi; sysoth\\
+  \textbf{CS controls:} None\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -142,7 +158,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (4 pre, 4 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-FRAGILE
 }
 
 
@@ -156,7 +174,8 @@
   \textbf{Collapse:} 0 \hfill \textbf{Citation:} main results\\
   \tcbline
   \textbf{Design:} unica\_sem\_controles $\cdot$ repeated\_cross\_section $\cdot$ single\\
-  \textbf{Controls:} twoplus\_kids; eitc\_expand\\
+  \textbf{TWFE controls:} twoplus\_kids; eitc\_expand\\
+  \textbf{CS controls:} None\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -165,19 +184,22 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, both insig. \hfill \textbf{ES:} No\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NT = ---
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NT = ---\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} WARN \hfill \textbf{Design:} D-NA
 }
 
 
 \articlecard{%
   \footnotesize
-  \textbf{Monheit et al. (2011)} \hfill \textit{AEJ: Economic Policy}\\[2pt]
+  \textbf{Akosa Antwi, Moriya \& Simon (2013)} \hfill \textit{AEJ: Economic Policy}\\[2pt]
   \tcbline
   \textbf{Outcome:} \texttt{anyhi} \hfill \textbf{Rule:} i+iii(a)\\
   \textbf{Collapse:} 0 \hfill \textbf{Citation:} Main DD Results\\
   \tcbline
   \textbf{Design:} unica\_controles $\cdot$ repeated\_cross\_section $\cdot$ unica\\
-  \textbf{Controls:} elig\_mar10; female; ue (+ 9 more)\\
+  \textbf{TWFE controls:} elig\_mar10; female; ue (+ 9 more)\\
+  \textbf{CS controls:} None\\
   Add. FEs: age\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
@@ -187,7 +209,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig. \hfill \textbf{ES:} Yes (6 pre, 6 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-FRAGILE
 }
 
 
@@ -199,7 +223,8 @@
   \textbf{Collapse:} 0 \hfill \textbf{Citation:} preferred estimate\\
   \tcbline
   \textbf{Design:} unica\_sem\_controles $\cdot$ rcs $\cdot$ single\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -208,7 +233,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig. \hfill \textbf{ES:} No\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NT = ---
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NT = ---\\
+  \tcbline
+  \textbf{Skeptic rating:} HIGH \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-NA
 }
 
 
@@ -222,7 +249,8 @@
   \textbf{Collapse:} 0 \hfill \textbf{Citation:} core finding\\
   \tcbline
   \textbf{Design:} escalonada\_controles $\cdot$ repeated\_cross\_section $\cdot$ staggered\\
-  \textbf{Controls:} WIC\_ever; frstbrn; married (+ 18 more)\\
+  \textbf{TWFE controls:} WIC\_ever; frstbrn; married (+ 18 more)\\
+  \textbf{CS controls:} WIC\_ever; frstbrn; married (+ 5 more)\\
   Add. FEs: agegrp; childnm; mom\_ed; raceeth\_cat; mom\_agegrp\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
@@ -232,7 +260,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig. \hfill \textbf{ES:} Yes (4 pre, 4 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.50, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.50, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-MODERATE
 }
 
 
@@ -244,7 +274,8 @@
   \textbf{Collapse:} 0 \hfill \textbf{Citation:} main results\\
   \tcbline
   \textbf{Design:} escalonada\_controles $\cdot$ repeated\_cross\_section $\cdot$ staggered\\
-  \textbf{Controls:} MCV\_mandate; HPV\_mandate; Meas\_newlybind (+ 50 more)\\
+  \textbf{TWFE controls:} MCV\_mandate; HPV\_mandate; Meas\_newlybind (+ 50 more)\\
+  \textbf{CS controls:} female; married\\
   Add. FEs: age; fips\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
@@ -254,7 +285,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (6 pre, 6 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.25, CS-NT = 0.25
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.25, CS-NT = 0.25\\
+  \tcbline
+  \textbf{Skeptic rating:} MODERATE \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-MODERATE
 }
 
 
@@ -266,7 +299,8 @@
   \textbf{Collapse:} 0 \hfill \textbf{Citation:} preferred specification; main specification\\
   \tcbline
   \textbf{Design:} unica\_controles $\cdot$ repeated\_cross\_section $\cdot$ single\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   Add. FEs: bula\_3rd\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
@@ -276,7 +310,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, both insig. \hfill \textbf{ES:} Yes (2 pre, 2 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NT = ---
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NT = ---\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-NA
 }
 
 
@@ -290,7 +326,8 @@
   \textbf{Collapse:} 0 \hfill \textbf{Citation:} most conservative\\
   \tcbline
   \textbf{Design:} unica\_sem\_controles $\cdot$ repeated\_cross\_section $\cdot$ single\\
-  \textbf{Controls:} treated\_post\_year; treated\_year; treated; post; y; post\_year\\
+  \textbf{TWFE controls:} treated\_post\_year; treated\_year; treated; post; y; post\_year\\
+  \textbf{CS controls:} None\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -299,7 +336,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (6 pre, 4 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.50, CS-NT = 0.25
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.50, CS-NT = 0.25\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} WARN
 }
 
 
@@ -311,7 +350,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_controles $\cdot$ repeated\_cross\_section $\cdot$ staggered\\
-  \textbf{Controls:} married; student; female; ur; povratio; povratio2\\
+  \textbf{TWFE controls:} married; student; female; ur; povratio; povratio2\\
+  \textbf{CS controls:} None\\
   Add. FEs: a\_age\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
@@ -321,7 +361,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign differs, both insig. \hfill \textbf{ES:} Yes (4 pre, 4 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} MODERATE \hfill \textbf{Fidelity:} WITHIN\_TOLERANCE \hfill \textbf{Design:} D-FRAGILE
 }
 
 
@@ -333,7 +375,8 @@
   \textbf{Collapse:} 0 \hfill \textbf{Citation:} Main Estimates\\
   \tcbline
   \textbf{Design:} unica\_controles $\cdot$ repeated\_cross\_section $\cdot$ single\\
-  \textbf{Controls:} treat1; after; other (+ 7 more)\\
+  \textbf{TWFE controls:} treat1; after; other (+ 7 more)\\
+  \textbf{CS controls:} None\\
   Add. FEs: parvar\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
@@ -343,7 +386,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (3 pre, 4 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.25, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.25, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} WARN \hfill \textbf{Design:} WARN
 }
 
 
@@ -357,7 +402,8 @@
   \textbf{Collapse:} 1 \hfill \textbf{Citation:} preferred econometric specification\\
   \tcbline
   \textbf{Design:} escalonada\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} scaprange; scappolicy; tauSCL (+ 6 more)\\
+  \textbf{TWFE controls:} scaprange; scappolicy; tauSCL (+ 6 more)\\
+  \textbf{CS controls:} None\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -366,7 +412,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, both insig. \hfill \textbf{ES:} Yes (4 pre, 4 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} WARN \hfill \textbf{Design:} WARN
 }
 
 
@@ -378,7 +426,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_controles $\cdot$ repeated\_cross\_section $\cdot$ staggered\\
-  \textbf{Controls:} fam\_med; pto\_state; poverty (+ 16 more)\\
+  \textbf{TWFE controls:} fam\_med; pto\_state; poverty (+ 16 more)\\
+  \textbf{CS controls:} None\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -387,7 +436,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign reversal (one sig.) \hfill \textbf{ES:} Yes (7 pre, 7 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-FRAGILE
 }
 
 
@@ -399,16 +450,19 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} GDPadj; old; POP (+ 6 more)\\
+  \textbf{TWFE controls:} GDPadj; old; POP (+ 6 more)\\
+  \textbf{CS controls:} None\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
     TWFE & $0.0185$ & $0.0057$ & ** \\
-    CS-NYT & $-0.0128$ & $0.0171$ &  \\
+    CS-NYT & $0.0184$ & $0.0109$ & \dag \\
   \end{tabular}\\
   \tcbline
-  \textbf{Concordance:} Sign reversal (one sig.) \hfill \textbf{ES:} Yes (11 pre, 12 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.50, CS-NYT = 0.00
+  \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig. \hfill \textbf{ES:} Yes (11 pre, 12 post)\\
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.50, CS-NYT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} WITHIN\_TOLERANCE \hfill \textbf{Design:} D-FRAGILE/D-MODERATE
 }
 
 
@@ -422,7 +476,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} unica\_sem\_controles $\cdot$ repeated\_cross\_section $\cdot$ single\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -431,7 +486,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (3 pre, 3 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} MODERATE \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-FRAGILE
 }
 
 
@@ -443,16 +500,19 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_sem\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
     TWFE & $-1.2396$ & $0.3274$ & *** \\
-    CS-NT & $-1.6424$ & $0.3053$ & *** \\
+    CS-NT & $-0.9707$ & $0.2452$ & *** \\
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (5 pre, 5 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.25, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.25, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} MODERATE \hfill \textbf{Fidelity:} NOT\_APPLICABLE \hfill \textbf{Design:} D-MODERATE
 }
 
 
@@ -464,7 +524,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} unica\_controles $\cdot$ panel $\cdot$ single\\
-  \textbf{Controls:} pop\_log; gdp\_share\_state; gdp\_share\_brazil (+ 11 more)\\
+  \textbf{TWFE controls:} pop\_log; gdp\_share\_state; gdp\_share\_brazil (+ 11 more)\\
+  \textbf{CS controls:} None\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -473,32 +534,13 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (4 pre, 6 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.50
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.50\\
+  \tcbline
+  \textbf{Skeptic rating:} HIGH \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-FRAGILE
 }
 
 
 \clearpage
-
-\articlecard{%
-  \footnotesize
-  \textbf{Myers (2017)} \hfill \textit{J. Political Economy}\\[2pt]
-  \tcbline
-  \textbf{Outcome:} \texttt{firstbirth18} \hfill \textbf{Rule:} ---\\
-  \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
-  \tcbline
-  \textbf{Design:} escalonada\_sem\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} None\\
-  \tcbline
-  \begin{tabular}{@{}lccc@{}}
-    & $\hat{\beta}$ & SE & \\
-    TWFE & $-0.0033$ & $0.0087$ &  \\
-    CS-NT & $0.0027$ & $0.0097$ &  \\
-  \end{tabular}\\
-  \tcbline
-  \textbf{Concordance:} Sign differs, both insig. \hfill \textbf{ES:} Yes (5 pre, 5 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
-}
-
 
 \articlecard{%
   \footnotesize
@@ -508,43 +550,22 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_sem\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   Add. FEs: state^year\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
-    TWFE & $-33.65$ & $6.4859$ & *** \\
+    TWFE & $-31.52$ & $5.7669$ & *** \\
     CS-NT & $-48.49$ & $7.4843$ & *** \\
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (2 pre, 3 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.75, CS-NT = 0.75
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.75, CS-NT = 0.75\\
+  \tcbline
+  \textbf{Skeptic rating:} HIGH \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-MODERATE
 }
 
-
-\articlecard{%
-  \footnotesize
-  \textbf{Moorthy, Shaloka (2025)} \hfill \textit{AJ Health Economics}\\[2pt]
-  \tcbline
-  \textbf{Outcome:} \texttt{lnearns\_gen1\_a1499} \hfill \textbf{Rule:} ---\\
-  \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
-  \tcbline
-  \textbf{Design:} escalonada\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} i(year, medianhhinc1990); i(year, pcthighschool1990); i(year, pctmanufacturing1990) (+ 4 more)\\
-  Add. FEs: splay1\_year\_fe\\
-  \tcbline
-  \begin{tabular}{@{}lccc@{}}
-    & $\hat{\beta}$ & SE & \\
-    TWFE & $0.0194$ & $0.0076$ & * \\
-    CS-NT & $0.0083$ & $0.0075$ &  \\
-  \end{tabular}\\
-  \tcbline
-  \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig. \hfill \textbf{ES:} Yes (5 pre, 5 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.25, CS-NT = 0.25
-}
-
-
-\clearpage
 
 \articlecard{%
   \footnotesize
@@ -554,7 +575,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_sem\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -563,7 +585,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, TWFE insig./CS sig. \hfill \textbf{ES:} Yes (6 pre, 7 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-FRAGILE
 }
 
 
@@ -575,7 +599,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} unica\_sem\_controles $\cdot$ panel $\cdot$ single\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -584,9 +609,13 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (7 pre, 4 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NT = ---
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NT = ---\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} NOT\_APPLICABLE \hfill \textbf{Design:} D-NA
 }
 
+
+\clearpage
 
 \articlecard{%
   \footnotesize
@@ -596,7 +625,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} hs\_deg\_imp; health\_per\_cap; emp\_to\_pop\\
+  \textbf{TWFE controls:} hs\_deg\_imp; health\_per\_cap; emp\_to\_pop\\
+  \textbf{CS controls:} None\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -605,11 +635,11 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, TWFE insig./CS sig. \hfill \textbf{ES:} Yes (5 pre, 5 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-FRAGILE
 }
 
-
-\clearpage
 
 \articlecard{%
   \footnotesize
@@ -619,7 +649,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} unica\_controles $\cdot$ panel $\cdot$ single\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   Add. FEs: industry^time; prov\_id^time\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
@@ -629,7 +660,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig. \hfill \textbf{ES:} Yes (4 pre, 4 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.25
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.25\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} WARN
 }
 
 
@@ -641,7 +674,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_sem\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -650,9 +684,13 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, both insig. \hfill \textbf{ES:} Yes (5 pre, 5 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} MODERATE \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-FRAGILE
 }
 
+
+\clearpage
 
 \articlecard{%
   \footnotesize
@@ -662,7 +700,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} unica\_controles $\cdot$ panel $\cdot$ single\\
-  \textbf{Controls:} pr; at\\
+  \textbf{TWFE controls:} pr; at\\
+  \textbf{CS controls:} None\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -671,11 +710,11 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (5 pre, 5 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 2.00, CS-NT = ---
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 2.00, CS-NT = ---\\
+  \tcbline
+  \textbf{Skeptic rating:} HIGH \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-ROBUST
 }
 
-
-\clearpage
 
 \articlecard{%
   \footnotesize
@@ -685,7 +724,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} unica\_sem\_controles $\cdot$ panel $\cdot$ single\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -694,7 +734,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, both insig. \hfill \textbf{ES:} Yes (4 pre, 4 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} MODERATE \hfill \textbf{Fidelity:} NOT\_APPLICABLE \hfill \textbf{Design:} D-NA
 }
 
 
@@ -706,18 +748,23 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} new\_redetpause; MedicaidExpansion; cutoffmax (+ 5 more)\\
+  \textbf{TWFE controls:} new\_redetpause; MedicaidExpansion; cutoffmax (+ 5 more)\\
+  \textbf{CS controls:} None\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
     TWFE & $-0.0182$ & $0.0070$ & ** \\
-    CS-NT & $-0.0237$ & $0.0055$ & *** \\
+    CS-NT & $-0.0298$ & $0.0064$ & *** \\
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (5 pre, 5 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.25, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.25, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} MODERATE \hfill \textbf{Fidelity:} WARN \hfill \textbf{Design:} D-FRAGILE
 }
 
+
+\clearpage
 
 \articlecard{%
   \footnotesize
@@ -727,7 +774,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} unica\_sem\_controles $\cdot$ panel $\cdot$ single\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -736,11 +784,11 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} No\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NT = ---
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NT = ---\\
+  \tcbline
+  \textbf{Skeptic rating:} HIGH \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-NA
 }
 
-
-\clearpage
 
 \articlecard{%
   \footnotesize
@@ -750,17 +798,20 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_sem\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   Add. FEs: div\_9\_all^year\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
     TWFE & $-1.3479$ & $0.5229$ & ** \\
-    CS-NT & $3.6111$ & $1.2129$ & ** \\
+    CS-NT & $-1.5461$ & $0.6346$ & * \\
   \end{tabular}\\
   \tcbline
-  \textbf{Concordance:} Sign reversal (one sig.) \hfill \textbf{ES:} Yes (5 pre, 5 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
+  \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (5 pre, 5 post)\\
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-FRAGILE
 }
 
 
@@ -772,18 +823,23 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_sem\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
     TWFE & $-0.1367$ & $0.0461$ & ** \\
-    CS-NT & $-0.1869$ & $0.0436$ & *** \\
+    CS-NT & $-0.0326$ & $0.0741$ &  \\
   \end{tabular}\\
   \tcbline
-  \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (5 pre, 5 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.25, CS-NT = 0.00
+  \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig. \hfill \textbf{ES:} Yes (5 pre, 5 post)\\
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.25, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} HIGH \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-MODERATE
 }
 
+
+\clearpage
 
 \articlecard{%
   \footnotesize
@@ -793,20 +849,21 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_sem\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
     TWFE & $0.6625$ & $0.0504$ & *** \\
-    CS-NT & $0.7327$ & $0.0710$ & *** \\
+    CS-NT & $0.7135$ & $0.0331$ & *** \\
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (5 pre, 5 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.75, CS-NT = 1.25
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.75, CS-NT = 1.25\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-MODERATE
 }
 
-
-\clearpage
 
 \articlecard{%
   \footnotesize
@@ -816,7 +873,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} unica\_sem\_controles $\cdot$ panel $\cdot$ single\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -825,7 +883,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig. \hfill \textbf{ES:} Yes (4 pre, 3 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.75, CS-NT = 0.50
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.75, CS-NT = 0.50\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-FRAGILE
 }
 
 
@@ -837,7 +897,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} unica\_sem\_controles $\cdot$ panel $\cdot$ single\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -846,9 +907,13 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (2 pre, 4 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 1.50, CS-NT = ---
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 1.50, CS-NT = ---\\
+  \tcbline
+  \textbf{Skeptic rating:} HIGH \hfill \textbf{Fidelity:} NOT\_APPLICABLE \hfill \textbf{Design:} D-MODERATE
 }
 
+
+\clearpage
 
 \articlecard{%
   \footnotesize
@@ -858,7 +923,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} unica\_sem\_controles $\cdot$ panel $\cdot$ single\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -867,11 +933,11 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (36 pre, 36 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.25, CS-NT = 0.25
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.25, CS-NT = 0.25\\
+  \tcbline
+  \textbf{Skeptic rating:} MODERATE \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} WARN
 }
 
-
-\clearpage
 
 \articlecard{%
   \footnotesize
@@ -881,7 +947,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} unica\_controles $\cdot$ panel $\cdot$ single\\
-  \textbf{Controls:} pop\_urb; tourism; trial (+ 15 more)\\
+  \textbf{TWFE controls:} pop\_urb; tourism; trial (+ 15 more)\\
+  \textbf{CS controls:} None\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -890,7 +957,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (4 pre, 7 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} MODERATE \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-NA
 }
 
 
@@ -902,7 +971,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} unica\_sem\_controles $\cdot$ repeated\_cross\_section $\cdot$ single\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -911,9 +981,13 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig. \hfill \textbf{ES:} No\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NT = ---
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NT = ---\\
+  \tcbline
+  \textbf{Skeptic rating:} MODERATE \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-NA
 }
 
+
+\clearpage
 
 \articlecard{%
   \footnotesize
@@ -923,7 +997,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_controles $\cdot$ repeated\_cross\_section $\cdot$ staggered\\
-  \textbf{Controls:} female; i(age); black (+ 9 more)\\
+  \textbf{TWFE controls:} female; i(age); black (+ 9 more)\\
+  \textbf{CS controls:} None\\
   Add. FEs: fips[tt]\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
@@ -933,11 +1008,11 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (7 pre, 4 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-FRAGILE
 }
 
-
-\clearpage
 
 \articlecard{%
   \footnotesize
@@ -947,7 +1022,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} unica\_controles $\cdot$ repeated\_cross\_section $\cdot$ single\\
-  \textbf{Controls:} post; poorest; middle (+ 27 more)\\
+  \textbf{TWFE controls:} post; poorest; middle (+ 27 more)\\
+  \textbf{CS controls:} None\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -956,7 +1032,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} No\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NT = ---
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NT = ---\\
+  \tcbline
+  \textbf{Skeptic rating:} MODERATE \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-NA
 }
 
 
@@ -968,7 +1046,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_controles $\cdot$ repeated\_cross\_section $\cdot$ staggered\\
-  \textbf{Controls:} per\_female; per\_black; per\_foreign (+ 4 more)\\
+  \textbf{TWFE controls:} per\_female; per\_black; per\_foreign (+ 4 more)\\
+  \textbf{CS controls:} None\\
   Add. FEs: state\_city\_id[year]\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
@@ -978,28 +1057,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign differs, both insig. \hfill \textbf{ES:} Yes (5 pre, 5 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
-}
-
-
-\articlecard{%
-  \footnotesize
-  \textbf{Kuziemko, Meckel, Rossin-Slater (2018)} \hfill \textit{AEJ: Economic Policy}\\[2pt]
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00\\
   \tcbline
-  \textbf{Outcome:} \texttt{blan\_mort100} \hfill \textbf{Rule:} ---\\
-  \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
-  \tcbline
-  \textbf{Design:} escalonada\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} ln\_pop; ln\_inc; ln\_tran; unemp\\
-  \tcbline
-  \begin{tabular}{@{}lccc@{}}
-    & $\hat{\beta}$ & SE & \\
-    TWFE & $0.0683$ & $0.0733$ &  \\
-    CS-NT & $-0.0234$ & $0.3701$ &  \\
-  \end{tabular}\\
-  \tcbline
-  \textbf{Concordance:} Sign differs, both insig. \hfill \textbf{ES:} Yes (5 pre, 5 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-FRAGILE
 }
 
 
@@ -1013,7 +1073,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_sem\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -1022,7 +1083,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (5 pre, 0 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NYT = 1.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NYT = 1.00\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} NOT\_APPLICABLE \hfill \textbf{Design:} D-MODERATE
 }
 
 
@@ -1034,7 +1097,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_controles $\cdot$ repeated\_cross\_section $\cdot$ staggered\\
-  \textbf{Controls:} momage1; momage2; momage3 (+ 32 more)\\
+  \textbf{TWFE controls:} momage1; momage2; momage3 (+ 32 more)\\
+  \textbf{CS controls:} None\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -1043,7 +1107,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig. \hfill \textbf{ES:} Yes (5 pre, 5 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} WITHIN\_TOLERANCE \hfill \textbf{Design:} D-FRAGILE
 }
 
 
@@ -1055,7 +1121,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} unica\_controles $\cdot$ panel $\cdot$ single\\
-  \textbf{Controls:} gdpg; gdpp; temperature; lightbuffer5km\\
+  \textbf{TWFE controls:} gdpg; gdpp; temperature; lightbuffer5km\\
+  \textbf{CS controls:} None\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -1064,7 +1131,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig. \hfill \textbf{ES:} Yes (2 pre, 4 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NT = ---
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NT = ---\\
+  \tcbline
+  \textbf{Skeptic rating:} HIGH \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-NA
 }
 
 
@@ -1078,7 +1147,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} D\_pct59inclt3k\_t; D\_60pctnonwhit\_t; D\_60pctrurf\_t (+ 6 more)\\
+  \textbf{TWFE controls:} D\_pct59inclt3k\_t; D\_60pctnonwhit\_t; D\_60pctrurf\_t (+ 6 more)\\
+  \textbf{CS controls:} Durb\_f\\
   Add. FEs: Durb^year; stfips^year\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
@@ -1088,7 +1158,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (6 pre, 10 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.25, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.25, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} NOT\_APPLICABLE \hfill \textbf{Design:} D-MODERATE
 }
 
 
@@ -1100,7 +1172,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_sem\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   Add. FEs: st\_fips^year2\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
@@ -1110,7 +1183,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (10 pre, 11 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 2.00, CS-NT = 2.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 2.00, CS-NT = 2.00\\
+  \tcbline
+  \textbf{Skeptic rating:} HIGH \hfill \textbf{Fidelity:} NOT\_APPLICABLE \hfill \textbf{Design:} D-MODERATE\_to\_D-ROBUST
 }
 
 
@@ -1122,7 +1197,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} unica\_controles $\cdot$ panel $\cdot$ single\\
-  \textbf{Controls:} precip; temp; un\_rate; max\_speed\\
+  \textbf{TWFE controls:} precip; temp; un\_rate; max\_speed\\
+  \textbf{CS controls:} None\\
   Add. FEs: year; month\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
@@ -1132,7 +1208,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig. \hfill \textbf{ES:} Yes (6 pre, 6 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.25, CS-NT = 0.25
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.25, CS-NT = 0.25\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} WITHIN\_TOLERANCE \hfill \textbf{Design:} D-FRAGILE
 }
 
 
@@ -1146,7 +1224,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_sem\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -1155,7 +1234,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, both insig. \hfill \textbf{ES:} Yes (5 pre, 5 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-FRAGILE
 }
 
 
@@ -1167,7 +1248,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} unica\_sem\_controles $\cdot$ rcs $\cdot$ single\\
-  \textbf{Controls:} TREAT\\
+  \textbf{TWFE controls:} TREAT\\
+  \textbf{CS controls:} None\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -1176,7 +1258,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig. \hfill \textbf{ES:} No\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NT = ---
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = ---, CS-NT = ---\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} WITHIN\_TOLERANCE \hfill \textbf{Design:} D-NA
 }
 
 
@@ -1188,7 +1272,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} unica\_controles $\cdot$ panel $\cdot$ single\\
-  \textbf{Controls:} treatedXyear\_c; treated; year\_c\\
+  \textbf{TWFE controls:} treatedXyear\_c; treated; year\_c\\
+  \textbf{CS controls:} None\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -1197,7 +1282,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, Sig. \checkmark \hfill \textbf{ES:} Yes (12 pre, 6 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 1.00, CS-NT = 0.75
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 1.00, CS-NT = 0.75\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-FRAGILE
 }
 
 
@@ -1211,17 +1298,20 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_sem\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} None\\
+  \textbf{TWFE controls:} None\\
+  \textbf{CS controls:} \emph{matched (Spec A)}\\
   Add. FEs: industry\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
     TWFE & $-0.0465$ & $0.0409$ &  \\
-    CS-NT & $-0.0221$ & $0.0459$ &  \\
+    CS-NT & $-0.0131$ & $0.0660$ &  \\
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, both insig. \hfill \textbf{ES:} Yes (4 pre, 4 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.00\\
+  \tcbline
+  \textbf{Skeptic rating:} LOW \hfill \textbf{Fidelity:} WARN \hfill \textbf{Design:} WARN
 }
 
 
@@ -1233,7 +1323,8 @@
   \textbf{Collapse:} --- \hfill \textbf{Citation:} ---\\
   \tcbline
   \textbf{Design:} escalonada\_controles $\cdot$ panel $\cdot$ staggered\\
-  \textbf{Controls:} temperature; precipitation; windspeed (+ 4 more)\\
+  \textbf{TWFE controls:} temperature; precipitation; windspeed (+ 4 more)\\
+  \textbf{CS controls:} None\\
   \tcbline
   \begin{tabular}{@{}lccc@{}}
     & $\hat{\beta}$ & SE & \\
@@ -1242,7 +1333,9 @@
   \end{tabular}\\
   \tcbline
   \textbf{Concordance:} Sign \checkmark, TWFE sig./CS insig. \hfill \textbf{ES:} Yes (5 pre, 5 post)\\
-  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.25
+  \textbf{HonestDiD} $\bar{M}_{\text{peak}}$: TWFE = 0.00, CS-NT = 0.25\\
+  \tcbline
+  \textbf{Skeptic rating:} MODERATE \hfill \textbf{Fidelity:} EXACT \hfill \textbf{Design:} D-MODERATE
 }
 
 

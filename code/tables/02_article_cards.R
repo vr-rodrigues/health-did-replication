@@ -141,11 +141,27 @@ df <- consol %>%
                               card_treatment_timing = treatment_timing,
                               card_has_es = has_event_study,
                               event_pre, event_post,
-                              run_csdid_nt, run_csdid_nyt, notes),
+                              run_csdid_nt, run_csdid_nyt, notes,
+                              excluded_from_sample, exclusion_reason),
             by = "id") %>%
   left_join(journal_map, by = "id") %>%
   left_join(honest_merged, by = "id") %>%
   left_join(dlog_clean, by = "id")
+
+# Bring in the skeptic 3-axis rating (HIGH/MODERATE/LOW + design credibility).
+sk_path <- file.path(analysis_dir, "skeptic_ratings.csv")
+if (file.exists(sk_path)) {
+  sk <- read.csv(sk_path, stringsAsFactors = FALSE, check.names = FALSE)
+  sk <- sk %>% select(id,
+                      sk_rating = rating,
+                      sk_design = design_credibility,
+                      sk_fidelity = fidelity_verdict)
+  df <- df %>% left_join(sk, by = "id")
+} else {
+  df$sk_rating <- NA_character_
+  df$sk_design <- NA_character_
+  df$sk_fidelity <- NA_character_
+}
 
 # ── 6. Helper: compute significance stars ────────────────────────────────────
 
@@ -281,6 +297,14 @@ for (i in seq_len(nrow(df))) {
   tt  <- ifelse(is.na(r$card_treatment_timing) || r$card_treatment_timing == "",
                 esc(r$treatment_timing), esc(r$card_treatment_timing))
   ctrl <- trunc_controls(r$twfe_controls)
+  cs_ctrl <- trunc_controls(r$cs_controls)
+  # Show CS controls only if they differ from the TWFE list (matched protocol
+  # has cs_ctrl == ctrl, so we collapse the line); for the asymmetric C protocol
+  # the typical case is cs_ctrl="None" with ctrl non-empty.
+  cs_ctrl_line <- if (cs_ctrl == ctrl)
+    paste0("\\textbf{CS controls:} \\emph{matched (Spec A)}\\\\\n")
+  else
+    paste0("\\textbf{CS controls:} ", cs_ctrl, "\\\\\n")
   fes  <- ifelse(is.na(r$additional_fes) || r$additional_fes == "" ||
                    r$additional_fes == "NA", "", paste0("Add. FEs: ", esc(r$additional_fes)))
 
@@ -310,19 +334,28 @@ for (i in seq_len(nrow(df))) {
                    paste0("Yes (", r$event_pre, " pre, ", r$event_post, " post)"),
                    "No")
 
+  # Skeptic 3-axis rating string + excluded flag
+  rating_str <- ifelse(is.na(r$sk_rating) || r$sk_rating == "", "---", esc(r$sk_rating))
+  design_str <- ifelse(is.na(r$sk_design) || r$sk_design == "", "---", esc(r$sk_design))
+  fid_str    <- ifelse(is.na(r$sk_fidelity) || r$sk_fidelity == "", "---", esc(r$sk_fidelity))
+  excluded_banner <- if (isTRUE(r$excluded_from_sample))
+    "  \\textcolor{red}{\\textbf{EXCLUDED from comparable subsample}}\\\\\n" else ""
+
   # Build card
   card <- paste0(
     "\\articlecard{%\n",
     "  \\footnotesize\n",
     "  \\textbf{", auth, "} \\hfill \\textit{", jour, "}\\\\[2pt]\n",
     "  \\tcbline\n",
+    excluded_banner,
     "  \\textbf{Outcome:} \\texttt{", out_var, "} \\hfill ",
     "\\textbf{Rule:} ", rule_str, "\\\\\n",
     "  \\textbf{Collapse:} ", coll_str, " \\hfill ",
     "\\textbf{Citation:} ", cit_str, "\\\\\n",
     "  \\tcbline\n",
     "  \\textbf{Design:} ", grp, " $\\cdot$ ", ds, " $\\cdot$ ", tt, "\\\\\n",
-    "  \\textbf{Controls:} ", ctrl, "\\\\\n",
+    "  \\textbf{TWFE controls:} ", ctrl, "\\\\\n",
+    "  ", cs_ctrl_line,
     ifelse(fes != "", paste0("  ", fes, "\\\\\n"), ""),
     "  \\tcbline\n",
     "  \\begin{tabular}{@{}lccc@{}}\n",
@@ -334,7 +367,11 @@ for (i in seq_len(nrow(df))) {
     "  \\textbf{Concordance:} ", conc, " \\hfill ",
     "\\textbf{ES:} ", es_str, "\\\\\n",
     "  \\textbf{HonestDiD} $\\bar{M}_{\\text{peak}}$: ",
-    "TWFE = ", hd_twfe, ", ", cs_lab, " = ", hd_cs, "\n",
+    "TWFE = ", hd_twfe, ", ", cs_lab, " = ", hd_cs, "\\\\\n",
+    "  \\tcbline\n",
+    "  \\textbf{Skeptic rating:} ", rating_str,
+    " \\hfill \\textbf{Fidelity:} ", fid_str,
+    " \\hfill \\textbf{Design:} ", design_str, "\n",
     "}\n"
   )
 
