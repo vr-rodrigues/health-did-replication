@@ -573,23 +573,45 @@ hd <- tryCatch(read.csv(file.path(analysis_dir, "honest_did_v3_summary.csv"),
                          stringsAsFactors = FALSE),
                error = function(e) NULL)
 if (!is.null(hd) && nrow(hd) > 0) {
-  col <- names(hd)
-  grab <- function(p) { g <- grep(p, col, value=TRUE, ignore.case=TRUE); if (length(g)==0) NULL else g[1] }
-  f_twfe <- grab("mbar_?first_?twfe|first_?twfe")
-  f_cs   <- grab("mbar_?first_?cs|first_?cs")
-  p_twfe <- grab("mbar_?peak_?twfe|peak_?twfe")
-  p_cs   <- grab("mbar_?peak_?cs|peak_?cs")
+  # Long format: columns id, estimator, vcov_type, rm_first_Mbar, rm_peak_Mbar.
+  # Keep the canonical per-estimator row: TWFE with vcov_type="full",
+  # CS-NT (fallback CS-NYT) with vcov_type="full_IF".
+  hd_twfe <- hd[hd$estimator == "TWFE" & hd$vcov_type == "full", ]
+  hd_cs   <- hd[grepl("^CS", hd$estimator) & hd$vcov_type == "full_IF", ]
+  # Dedup: keep first row per id (CS-NT preferred over CS-NYT when both exist)
+  hd_cs   <- hd_cs[!duplicated(hd_cs$id), ]
 
-  safe_mean <- function(x) if (is.null(x)) NA else mean(hd[[x]],   na.rm=TRUE)
-  safe_med  <- function(x) if (is.null(x)) NA else median(hd[[x]], na.rm=TRUE)
-  safe_eq0  <- function(x) if (is.null(x)) NA else mean(hd[[x]]==0, na.rm=TRUE)
-  safe_gt0  <- function(x) if (is.null(x)) NA else mean(hd[[x]] >0, na.rm=TRUE)
+  f_twfe_v <- hd_twfe$rm_first_Mbar
+  f_cs_v   <- hd_cs$rm_first_Mbar
+  p_twfe_v <- hd_twfe$rm_peak_Mbar
+  p_cs_v   <- hd_cs$rm_peak_Mbar
+
+  safe_mean <- function(x) if (length(x) == 0) NA else mean(x,   na.rm=TRUE)
+  safe_med  <- function(x) if (length(x) == 0) NA else median(x, na.rm=TRUE)
+  safe_eq0  <- function(x) if (length(x) == 0) NA else mean(x == 0, na.rm=TRUE)
+  safe_gt0  <- function(x) if (length(x) == 0) NA else mean(x >  0, na.rm=TRUE)
   count_rel <- function(twfe_col, cs_col, op) {
-    if (is.null(twfe_col) || is.null(cs_col)) return(NA_integer_)
-    x <- hd[[twfe_col]]; y <- hd[[cs_col]]; keep <- !is.na(x) & !is.na(y)
-    switch(op, gt = sum(x[keep] > y[keep]), lt = sum(x[keep] < y[keep]),
-           eq = sum(x[keep] == y[keep]))
+    # Merge TWFE and CS values by id for paired comparison.
+    both <- merge(
+      data.frame(id = hd_twfe$id, t = twfe_col),
+      data.frame(id = hd_cs$id,   c = cs_col), by = "id")
+    both <- both[!is.na(both$t) & !is.na(both$c), ]
+    switch(op,
+           gt = sum(both$t > both$c),
+           lt = sum(both$t < both$c),
+           eq = sum(both$t == both$c))
   }
+  # Aliases so the existing printf lines keep working:
+  f_twfe <- TRUE; f_cs <- TRUE; p_twfe <- TRUE; p_cs <- TRUE
+  # Override safe_* to use pre-bound vectors for those 4 calls:
+  safe_mean_wrap <- function(which) safe_mean(switch(which,
+    ft = f_twfe_v, fc = f_cs_v, pt = p_twfe_v, pc = p_cs_v))
+  safe_med_wrap  <- function(which) safe_med(switch(which,
+    ft = f_twfe_v, fc = f_cs_v, pt = p_twfe_v, pc = p_cs_v))
+  safe_eq0_wrap  <- function(which) safe_eq0(switch(which,
+    ft = f_twfe_v, fc = f_cs_v, pt = p_twfe_v, pc = p_cs_v))
+  safe_gt0_wrap  <- function(which) safe_gt0(switch(which,
+    ft = f_twfe_v, fc = f_cs_v, pt = p_twfe_v, pc = p_cs_v))
   fmt3 <- function(x) ifelse(is.na(x), "---", sprintf("%.3f", x))
   fmtp <- function(x) ifelse(is.na(x), "---", sprintf("%.1f\\%%", 100*x))
 
@@ -604,16 +626,16 @@ if (!is.null(hd) && nrow(hd) > 0) {
     "\\textbf{Metric} & \\textbf{TWFE} & \\textbf{CS-DID} \\\\",
     "\\midrule",
     "\\multicolumn{3}{l}{\\textit{First post-treatment period}} \\\\",
-    sprintf("\\quad Mean $\\bar M$ & %s & %s \\\\", fmt3(safe_mean(f_twfe)), fmt3(safe_mean(f_cs))),
-    sprintf("\\quad Median $\\bar M$ & %s & %s \\\\", fmt3(safe_med(f_twfe)), fmt3(safe_med(f_cs))),
-    sprintf("\\quad Share with $\\bar M = 0$ & %s & %s \\\\", fmtp(safe_eq0(f_twfe)), fmtp(safe_eq0(f_cs))),
-    sprintf("\\quad Share with $\\bar M > 0$ & %s & %s \\\\", fmtp(safe_gt0(f_twfe)), fmtp(safe_gt0(f_cs))),
+    sprintf("\\quad Mean $\\bar M$ & %s & %s \\\\", fmt3(safe_mean_wrap("ft")), fmt3(safe_mean_wrap("fc"))),
+    sprintf("\\quad Median $\\bar M$ & %s & %s \\\\", fmt3(safe_med_wrap("ft")), fmt3(safe_med_wrap("fc"))),
+    sprintf("\\quad Share with $\\bar M = 0$ & %s & %s \\\\", fmtp(safe_eq0_wrap("ft")), fmtp(safe_eq0_wrap("fc"))),
+    sprintf("\\quad Share with $\\bar M > 0$ & %s & %s \\\\", fmtp(safe_gt0_wrap("ft")), fmtp(safe_gt0_wrap("fc"))),
     "\\addlinespace",
     "\\multicolumn{3}{l}{\\textit{Peak post-treatment effect}} \\\\",
-    sprintf("\\quad Mean $\\bar M$ & %s & %s \\\\", fmt3(safe_mean(p_twfe)), fmt3(safe_mean(p_cs))),
-    sprintf("\\quad Median $\\bar M$ & %s & %s \\\\", fmt3(safe_med(p_twfe)), fmt3(safe_med(p_cs))),
-    sprintf("\\quad Share with $\\bar M = 0$ & %s & %s \\\\", fmtp(safe_eq0(p_twfe)), fmtp(safe_eq0(p_cs))),
-    sprintf("\\quad Share with $\\bar M > 0$ & %s & %s \\\\", fmtp(safe_gt0(p_twfe)), fmtp(safe_gt0(p_cs))),
+    sprintf("\\quad Mean $\\bar M$ & %s & %s \\\\", fmt3(safe_mean_wrap("pt")), fmt3(safe_mean_wrap("pc"))),
+    sprintf("\\quad Median $\\bar M$ & %s & %s \\\\", fmt3(safe_med_wrap("pt")), fmt3(safe_med_wrap("pc"))),
+    sprintf("\\quad Share with $\\bar M = 0$ & %s & %s \\\\", fmtp(safe_eq0_wrap("pt")), fmtp(safe_eq0_wrap("pc"))),
+    sprintf("\\quad Share with $\\bar M > 0$ & %s & %s \\\\", fmtp(safe_gt0_wrap("pt")), fmtp(safe_gt0_wrap("pc"))),
     "\\bottomrule", "\\end{tabular*}",
     "", "\\vspace{0.4cm}", "",
     "\\begin{tabular*}{0.75\\textwidth}{@{\\extracolsep{\\fill}}lccc@{}}",
@@ -621,9 +643,9 @@ if (!is.null(hd) && nrow(hd) > 0) {
     "\\textbf{Post period} & \\textbf{TWFE $>$ CS} & \\textbf{TWFE $<$ CS} & \\textbf{TWFE $=$ CS} \\\\",
     "\\midrule",
     sprintf("First & %s & %s & %s \\\\",
-            count_rel(f_twfe, f_cs, "gt"), count_rel(f_twfe, f_cs, "lt"), count_rel(f_twfe, f_cs, "eq")),
+            count_rel(f_twfe_v, f_cs_v, "gt"), count_rel(f_twfe_v, f_cs_v, "lt"), count_rel(f_twfe_v, f_cs_v, "eq")),
     sprintf("Peak & %s & %s & %s \\\\",
-            count_rel(p_twfe, p_cs, "gt"), count_rel(p_twfe, p_cs, "lt"), count_rel(p_twfe, p_cs, "eq")),
+            count_rel(p_twfe_v, p_cs_v, "gt"), count_rel(p_twfe_v, p_cs_v, "lt"), count_rel(p_twfe_v, p_cs_v, "eq")),
     "\\bottomrule", "\\end{tabular*}",
     "\\begin{tablenotes}[flushleft]", "\\footnotesize",
     "\\item \\textit{Notes}: Higher values of $\\bar M$ indicate that the empirical conclusion survives larger departures from exact parallel trends.",

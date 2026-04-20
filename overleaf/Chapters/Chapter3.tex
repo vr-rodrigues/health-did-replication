@@ -123,11 +123,11 @@ If either assumption fails in a direction correlated with the survival outcome, 
 
 Because representativeness is an untested assumption, we complement the point estimate with worst-case bounds in the style of \textcite{manski1989anatomy}. Of the 56 reanalyzed articles, 48 preserve the sign of the original TWFE conclusion under the modern-estimator protocol, a within-sample preservation rate of $\hat\pi_1 = 48/56 = 85.7\%$. Let $\pi_0$ denote the (unobserved) preservation rate among the $N_0 = 1{,}828$ articles excluded during sample construction. The population-level preservation rate is a weighted average,
 \[
-\pi = \frac{N_1 \hat\pi_1 + N_0 \pi_0}{N_1 + N_0} = \frac{49 + 1{,}831\,\pi_0}{1{,}884},
+\pi = \frac{N_1 \hat\pi_1 + N_0 \pi_0}{N_1 + N_0} = \frac{47 + 1{,}831\,\pi_0}{1{,}884},
 \]
-where $N_1 = 53$ is the comparable subsample (the 56 reanalyzed articles minus the three structural exclusions). Without further assumptions, $\pi_0 \in [0, 1]$ implies the uninformative Manski bound $\pi \in [2.6\%, 99.8\%]$.
+where $N_1 = 53$ is the comparable subsample (the 56 reanalyzed articles minus the three structural exclusions). Without further assumptions, $\pi_0 \in [0, 1]$ implies the uninformative Manski bound $\pi \in [2.5\%, 99.8\%]$.
 
-Tightening the bound requires an assumption about the excluded population. Table~\ref{tab:selection_bounds} reports implied population rates under five scenarios for $\pi_0$. Under Manski--Pepper monotone selection --- the assumption that excluded articles have weakly lower replication-package quality and hence weakly lower preservation under modern re-estimation, so that $\pi_0 \leq \hat\pi_1$ --- the population rate satisfies $\pi \leq 92.5\%$. This is the directionally informative bound we take forward: the within-sample rate we report is an \emph{upper bound} on the population parameter, not an unbiased estimate.
+Tightening the bound requires an assumption about the excluded population. Table~\ref{tab:selection_bounds} reports implied population rates under five scenarios for $\pi_0$. Under Manski--Pepper monotone selection --- the assumption that excluded articles have weakly lower replication-package quality and hence weakly lower preservation under modern re-estimation, so that $\pi_0 \leq \hat\pi_1$ --- the population rate satisfies $\pi \leq 88.7\%$. This is the directionally informative bound we take forward: the within-sample rate we report is an \emph{upper bound} on the population parameter, not an unbiased estimate.
 
 \begin{table}[!htbp]
 \centering
@@ -138,16 +138,16 @@ Tightening the bound requires an assumption about the excluded population. Table
 \toprule
 \textbf{Scenario for excluded rate $\pi_0$} & $\pi_0$ & \textbf{Implied population rate $\pi$} & \textbf{vs $\hat\pi_1$} \\
 \midrule
-Worst case (all excluded would fail)     & $0\%$  & $2.6\%$   & $-89.9$ pp \\
-Lower quartile                            & $25\%$ & $27.2\%$  & $-65.3$ pp \\
-Half of excluded preserve                 & $50\%$ & $51.9\%$  & $-40.7$ pp \\
-Upper quartile                            & $75\%$ & $76.5\%$  & $-16.1$ pp \\
-Representativeness ($\pi_0 = \hat\pi_1$)  & $92.5\%$ & $92.5\%$ & $0$ pp  \\
-Best case (all excluded preserve)         & $100\%$& $99.8\%$  & $+7.2$ pp \\
+Worst case (all excluded would fail)     & $0\%$  & $2.5\%$   & $-86.2$ pp \\
+Lower quartile                            & $25\%$ & $27.0\%$  & $-61.7$ pp \\
+Half of excluded preserve                 & $50\%$ & $51.6\%$  & $-37.1$ pp \\
+Upper quartile                            & $75\%$ & $76.1\%$  & $-12.6$ pp \\
+Representativeness ($\pi_0 = \hat\pi_1$)  & $88.7\%$ & $88.7\%$ & $0$ pp  \\
+Best case (all excluded preserve)         & $100\%$& $99.8\%$  & $+11.1$ pp \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}\footnotesize
-\textit{Notes:} $\hat\pi_1 = 49/53 = 92.5\%$ is the within-comparable-subsample sign-preservation rate (after excluding the three structural-failure papers documented in Appendix~\ref{AppendixD}). $N_0 = 1{,}831$ is the count of articles outside the reanalyzed sample (1{,}884 candidate DiD articles minus the 53 comparable subsample). Under Manski--Pepper monotone selection ($\pi_0 \leq \hat\pi_1$), the population rate is bounded above by $\hat\pi_1$; the worst-case lower bound is $49/1{,}884 = 2.6\%$. Comparison column $\Delta\mathrm{pp} = \pi - \hat\pi_1$ in percentage points.
+\textit{Notes:} $\hat\pi_1 = 47/53 = 88.7\%$ is the within-comparable-subsample sign-preservation rate under the \texttt{chapter\_statistics.R} classification (same-sign between TWFE and CS-DID dynamic aggregate; 47 preserved and 6 reversed, matching the counts reported in Section~\ref{Chapter4}). $N_0 = 1{,}831$ is the count of articles outside the reanalyzed sample (1{,}884 candidate DiD articles minus the 53 comparable subsample). Under Manski--Pepper monotone selection ($\pi_0 \leq \hat\pi_1$), the population rate is bounded above by $\hat\pi_1$; the worst-case lower bound is $47/1{,}884 = 2.5\%$. Comparison column $\Delta\mathrm{pp} = \pi - \hat\pi_1$ in percentage points.
 \end{flushleft}
 \end{table}
 
