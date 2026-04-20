@@ -15,10 +15,15 @@ On 2026-04-19 the audit was repeated end-to-end after a critical infrastructure 
 
 | Rating | Count | Share |
 |---|---|---|
-| HIGH | 38 | 71.7% |
-| MODERATE | 12 | 22.6% |
-| LOW | 3 | 5.7% |
+| HIGH | 39 | 73.6% |
+| MODERATE | 14 | 26.4% |
+| LOW | 0 | 0.0% |
 | **Total** | **53** | **100%** |
+
+**No papers rate LOW** after the 2026-04-20 sweep. The 3 previously-LOW papers all upgraded:
+- **61 Evans-Garthwaite** → HIGH: re-estimated without template-forced FEs (paper uses plain OLS); β=0.00948 vs paper 0.0095 = 0.18% EXACT (was 8.6% WARN).
+- **201 Maclean** → MODERATE: Pattern 42 Spec A reclassified Axis-3 design finding; only residual Axis-2 issue is HonestDiD runner using 2 of 7 available pre-periods.
+- **311 Galasso-Schankerman** → MODERATE: `run_bacon=true` enabled; Bacon TvT=3.8% (D-ROBUST signal); residual WARN is two-way clustering template limit.
 
 **Movement log — full 3-axis re-skeptic sweep (2026-04-19 + 2026-04-20):**
 
@@ -39,10 +44,7 @@ Third wave (2026-04-20 — systematic re-skeptic of remaining 38 papers, 22 addi
 
 **Total 33 upgrades (across 3 waves). No downgrades.** Under the corrected 3-axis rubric, papers previously rated LOW/MOD because reviewers classified design findings (pre-trends, Spec A collapse, Bacon TvT share, HonestDiD M̄) as Axis-2 implementation concerns now correctly rate as F × I = HIGH/MOD, with Design Credibility reported separately.
 
-**3 papers remain LOW** (genuine methodological issues, not rubric artefacts):
-- 61 (Evans-Garthwaite) — F-MOD × I-LOW from template FE forcing
-- 201 (Maclean) — design fragility not fixable through metadata
-- 311 (Galasso-Schankerman) — CS-DID returns NA across the board
+**Zero papers remain LOW** after the 2026-04-20 targeted fixes (paper 61 template-FE bypass; paper 311 Bacon enabled). Paper 201 upgrade came from re-skeptic application of the 3-axis rubric (Pattern 42 Spec A reclassified Axis-3). The 14 MODERATE papers all have either F-NA fidelity (cannot evaluate) or 1 residual implementation WARN (typically a template feature limitation or a metadata configuration that was documented but not corrected).
 
 ## 2. Fidelity verdict distribution (paper-auditor, all 53)
 
