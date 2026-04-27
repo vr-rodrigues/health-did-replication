@@ -1,0 +1,3 @@
+"paper_id","paper_label","outcome","beta_twfe","beta_cs_static","beta_cs_dyn","mvpf_twfe","mvpf_cs_static","mvpf_cs_dyn","mvpf_min","mvpf_max","mvpf_range","g_twfe"
+"420","Bailey & Goodman-Bacon (2015)","amr_eld",-53.2073608219238,-6.78023645355946,7.45935797440315,8.9064,1.2264,0.7987,0.7987,8.9064,8.1077,0.2019
+"9","Dranove, Ody & Starc (2021)","lnpriceperpresc",-0.176305612449144,-0.0130115453827838,-0.00386033183030475,1.0248,1.0019,1.0006,1.0006,1.0248,0.0242,0.9758

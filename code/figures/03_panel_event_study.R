@@ -133,12 +133,117 @@ compute_id44 <- function() {
   rbind(twfe, nyt)
 }
 
+# ── Compute ID 2303 (Cao & Ma) — yearly event time ─────────────────────
+# Replicates the logic of the canonical es_2303.R script that produced the
+# appendix event study PDF (rel_year = year - year_month with year_month
+# defined as the first treated year per (id, month) pair; FE structure
+# id^month + prov^year^month; 7 weather controls). Gardner and SA are
+# omitted for the in-text panel per the panel's estimator whitelist.
+compute_id2303 <- function(ev_pre = 10L, ev_post = 11L) {
+  cat("Computing ID 2303 (Cao & Ma, yearly)...\n")
+  suppressPackageStartupMessages({
+    library(haven); library(data.table)
+  })
+
+  data_dir <- file.path(base_dir, "data", "raw", "2303")
+  dt <- as.data.table(read_dta(file.path(data_dir,
+                     "biomass_plant_year_month_MCD12Q1.dta")))
+
+  # Treatment indicator (Stata: gen tbp = ...)
+  dt[, tyear := as.integer(substr(edate, 1, 4))]
+  dt[, tmonth := as.integer(substr(edate, 6, 7))]
+  dt[, tbp := as.integer((year > tyear & !is.na(tyear)) |
+                          (year == tyear & month >= tmonth & !is.na(tmonth)))]
+  dt[is.na(tbp), tbp := 0L]
+  dt[, prov := as.integer(adcode %/% 10000)]
+
+  # Merge weather controls
+  weather <- as.data.table(read_dta(file.path(data_dir, "plant_weather.dta")))
+  dt <- merge(dt, weather, by = c("id", "year", "month"), all.x = TRUE)
+
+  # year_month = first treated year per (id, month) pair
+  # (Stata: bys id month: egen year_month = min(s1))
+  dt[, s1 := ifelse(tbp == 1L, year, NA_integer_)]
+  dt[, year_month := as.integer(min(s1, na.rm = TRUE)), by = .(id, month)]
+  dt[is.infinite(year_month) | is.nan(year_month), year_month := NA_integer_]
+
+  # Yearly event time
+  dt[, rel_year := year - year_month]
+  dt[, rel_year_b := pmax(as.integer(-ev_pre), pmin(as.integer(ev_post), rel_year))]
+  dt[, id_month := paste0(id, "_", month)]
+
+  # ─── TWFE (paper's FE structure + 7 weather controls) ───────────────
+  twfe_es <- tryCatch(
+    feols(ft90 ~ i(rel_year_b, ref = -1) +
+                 temperature + precipitation + windspeed + humidity +
+                 winddirection1 + winddirection2 + winddirection3 |
+                 id^month + prov^year^month,
+          data = dt, cluster = ~id),
+    error = function(e) { cat("  TWFE error:", conditionMessage(e), "\n"); NULL })
+
+  twfe <- if (!is.null(twfe_es)) {
+    cfs <- coef(twfe_es); ses <- se(twfe_es)
+    idx <- grepl("^rel_year_b::", names(cfs))
+    t_vals <- as.integer(sub("rel_year_b::", "", names(cfs)[idx]))
+    d <- data.frame(estimator = "TWFE", time = t_vals,
+                    coef = unname(cfs[idx]), se = unname(ses[idx]))
+    rbind(d, data.frame(estimator = "TWFE", time = -1L, coef = 0, se = 0))
+  } else NULL
+  if (!is.null(twfe)) cat("  TWFE OK (", nrow(twfe), "periods)\n")
+
+  # ─── CS-DID setup (yearly, unit = id_month combination) ─────────────
+  dt[, id_month_num := as.integer(as.factor(id_month))]
+  dt[, gvar_year := ifelse(!is.na(year_month), as.numeric(year_month), 0)]
+
+  # CS-NT (never-treated controls)
+  cs_nt <- tryCatch(
+    att_gt(yname = "ft90", tname = "year", idname = "id_month_num",
+           gname = "gvar_year", data = as.data.frame(dt),
+           control_group = "nevertreated", base_period = "universal",
+           est_method = "reg", print_details = FALSE),
+    error = function(e) { cat("  CS-NT error:", conditionMessage(e), "\n"); NULL })
+
+  nt <- if (!is.null(cs_nt)) {
+    agg <- aggte(cs_nt, type = "dynamic", na.rm = TRUE)
+    d <- data.frame(estimator = "CS-NT", time = agg$egt,
+                    coef = agg$att.egt, se = agg$se.egt)
+    d <- d[d$time >= -ev_pre & d$time <= ev_post & is.finite(d$se) & d$se > 0, ]
+    if (!any(d$time == -1))
+      d <- rbind(d, data.frame(estimator = "CS-NT", time = -1L, coef = 0, se = 0))
+    d
+  } else NULL
+  if (!is.null(nt)) cat("  CS-NT OK\n")
+
+  # CS-NYT (not-yet-treated controls)
+  cs_nyt <- tryCatch(
+    att_gt(yname = "ft90", tname = "year", idname = "id_month_num",
+           gname = "gvar_year", data = as.data.frame(dt),
+           control_group = "notyettreated", base_period = "universal",
+           est_method = "reg", print_details = FALSE),
+    error = function(e) { cat("  CS-NYT error:", conditionMessage(e), "\n"); NULL })
+
+  nyt <- if (!is.null(cs_nyt)) {
+    agg <- aggte(cs_nyt, type = "dynamic", na.rm = TRUE)
+    d <- data.frame(estimator = "CS-NYT", time = agg$egt,
+                    coef = agg$att.egt, se = agg$se.egt)
+    d <- d[d$time >= -ev_pre & d$time <= ev_post & is.finite(d$se) & d$se > 0, ]
+    if (!any(d$time == -1))
+      d <- rbind(d, data.frame(estimator = "CS-NYT", time = -1L, coef = 0, se = 0))
+    d
+  } else NULL
+  if (!is.null(nyt)) cat("  CS-NYT OK\n") else cat("  CS-NYT unavailable\n")
+
+  rbind(twfe, nt, nyt)
+}
+
 # ── Per-panel plot (preserved verbatim from original script) ───────────
 make_panel <- function(case_info) {
   id <- case_info$id
 
   if (id == 44) {
     es <- compute_id44()
+  } else if (id == 2303) {
+    es <- compute_id2303()
   } else {
     es <- tryCatch(load_es_data(id), error = function(e) {
       cat(sprintf("Error loading ID %d: %s\n", id, e$message)); NULL

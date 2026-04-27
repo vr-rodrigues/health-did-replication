@@ -31,7 +31,7 @@
 \usepackage{epigraph}
 \usepackage{enumitem}
 \usepackage{tikz}
-\usetikzlibrary{positioning,arrows.meta}
+\usetikzlibrary{positioning,arrows.meta,shapes.geometric,calc,shapes.multipart}
 
 \usepackage{pdflscape}
 \usepackage{graphicx}
@@ -52,7 +52,16 @@
 % Grep the source for \PH{ to find every pending number.
 \newcommand{\PH}[1]{\textcolor{red}{\textbf{#1}}}
 
-\usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex}
+\usepackage[
+  backend=biber,
+  style=authoryear,
+  maxcitenames=2,
+  mincitenames=1,
+  maxbibnames=99
+]{biblatex}
+
+\newcommand{\tabcite}[1]{\citeauthor{#1} (\citeyear{#1})}
+
 \addbibresource{example.bib}
 \usepackage[autostyle=true]{csquotes}
 
@@ -69,6 +78,9 @@
     bottom=2.5cm,
     includefoot
 }
+
+
+\usepackage{ragged2e}
 
 %----------------------------------------------------------------------------------------
 %   DRY CHAPTER / SECTION STYLE
@@ -194,45 +206,43 @@
 %   ABSTRACT
 %----------------------------------------------------------------------------------------
 
-\begin{abstract}
+\clearpage
+\phantomsection
 \addchaptertocentry{\abstractname}
+\thispagestyle{plain}
 
-Two-way fixed-effects (TWFE) difference-in-differences (DiD) has been the default
-estimator in applied health-policy research for decades, yet a rapidly growing
-methodological literature has shown that TWFE can implicitly weight cohort--time
-effects in ways that conflict with the causal parameter the analyst has in mind.
-This dissertation asks whether the conclusions of 53 published health-economics
-papers that used TWFE survive reestimation with modern heterogeneity-robust
-estimators: Callaway--Sant'Anna (CS-DID), Sun--Abraham (SA),
-Borusyak--Jaravel--Spiess (BJS), Goodman-Bacon's decomposition, and the
-Rambachan--Roth (HonestDiD) sensitivity framework.
+\vspace*{0.8cm}
 
-The exercise follows each paper's own preferred specification and replaces only
-the estimator, so any divergence is attributable to methodology rather than to
-redesign. Across the 53 comparable articles, the sign of the effect is preserved in 47 cases
-and reverses in 6 (88.7\% preservation rate). The more interesting changes happen on
-other margins. Standard errors rise by a median of 36\% under
-heterogeneity-robust estimation, 14 articles lose conventional statistical
-significance, and the magnitude of the point estimate moves by more than 50\% in
-32\% of designs (21\% move by more than 100\%). Bacon decompositions show that
-treated-versus-treated comparisons account for a substantial share of the
-identifying variation in staggered TWFE specifications, which is consistent with
-the mechanism emphasized by the theory literature. HonestDiD sensitivity
-exercises further show that robustness to parallel-trends violations is limited
-under both TWFE and CS-DID.
+\begin{center}
+{\small\scshape \univname\par}
 
-The contribution is threefold. First, I construct a reproducible metadata-driven
-pipeline that re-estimates each paper from its original replication package with
-a fixed random seed, making every bootstrap-dependent quantity bit-identical
-across runs. Second, the comparative evidence shows that the practical cost of
-legacy TWFE designs in health economics is concentrated in precision and
-magnitude rather than in directional conclusions. Third, the package itself
-(released under CC-BY-4.0 and compliant with the AEA Data and Code Availability
-Policy 1.0) provides a template for future methodological audits of applied
-literatures.
+\vspace{0.6cm}
 
-\end{abstract}
+{\Large\itshape Abstract\par}
 
+\vspace{0.5cm}
+
+{\bfseries \ttitle\par}
+
+\vspace{0.3cm}
+
+by \authorname
+\end{center}
+
+\vspace{0.8cm}
+
+\noindent
+Difference-in-differences (DiD) estimates in health-policy research often inform welfare, cost-effectiveness, and policy-ranking calculations. These uses depend on magnitude, not only on sign. This research re-estimates the headline results of 53 published health-economics DiD papers that used two-way fixed effects (TWFE), replacing TWFE with a standardized set of modern heterogeneity-robust estimators and diagnostics. The goal is empirical. It asks how often published conclusions survive modern re-estimation, and along which margins they change.
+
+\medskip
+
+\noindent
+The results show broad sign stability but substantial interpretive instability. The sign of the effect is preserved in 46 cases and reverses in 7, an 86.8\% preservation rate. Sixteen articles lose conventional statistical significance under the modern benchmark. Point estimates move by more than 50\% in 39.6\% of designs and by more than 100\% in 24.5\%. Negative weights are present in many staggered TWFE designs, but they are not the dominant source of divergence in this sample. Larger differences arise from control-group choice, covariate handling, dynamic aggregation, endpoint binning, support at long horizons, and software defaults. HonestDiD exercises also show that robustness to treatment-effect heterogeneity does not imply robustness to violations of parallel trends.
+
+\medskip
+
+\noindent
+The contribution is to document how the modern DiD critique changes interpretation in a defined published literature. The evidence does not show that the health-economics DiD literature collapses. It shows that many conclusions weaken along margins that matter for policy interpretation. The research produces two practical outputs: a pre-submission checklist and a design-triage decision tree for applied DiD work. The exercise is restricted to binary absorbing-treatment DiD designs in health economics.
 %----------------------------------------------------------------------------------------
 %   ACKNOWLEDGEMENTS
 %----------------------------------------------------------------------------------------
@@ -292,9 +302,10 @@ this dissertation.
 
 \appendix
 
-\include{Appendices/AppendixA}
-\include{Appendices/AppendixB}
-\include{Appendices/AppendixC}
-\include{Appendices/AppendixD}
+%\include{Appendices/AppendixA}
+%\include{Appendices/AppendixB}
+%\include{Appendices/AppendixC}
+%\include{Appendices/AppendixD}
+%\include{Appendices/AppendixE}
 
 \end{document}

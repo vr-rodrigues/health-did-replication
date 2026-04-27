@@ -1,183 +1,142 @@
 ###############################################################################
-# density_covariates_zscore.R
-# Overlapping density: TWFE (with controls) z-scores vs unconditional CS-DID
-# Shows the two distributions are nearly identical — style of density_z_dynamic
+# 07_density_covariates.R — Figure 4.7: 2-panel aggregate scatter restricted
+# to the 10 papers where all three specs are computed and non-degenerate.
+#
+# Panel A: TWFE (w/ ctrls)  vs  CS-DID (w/ ctrls, Spec A matched)
+# Panel B: TWFE (w/ ctrls)  vs  CS-DID (unconditional, no controls on CS side)
+#
+# Compares how much each CS-DID spec diverges from the paper's own TWFE,
+# on the same N=10 papers so the contrast is internal-consistent.
+#
+# Output: output/figures/figure_4_7_density_covariates.pdf
 ###############################################################################
 suppressPackageStartupMessages({
-  library(ggplot2); library(dplyr); library(jsonlite); library(tidyr)
+  library(ggplot2); library(dplyr); library(jsonlite); library(cowplot)
 })
 
-# Run from replication package root.
 base_dir <- getwd()
+con <- read.csv(file.path(base_dir, "analysis", "consolidated_results.csv"),
+                stringsAsFactors = FALSE)
 
-# ============ LOAD ALL RESULTS ============
-results_root <- file.path(base_dir, "results", "by_article")
-all_dirs <- list.dirs(results_root, recursive = FALSE, full.names = TRUE)
-ids <- basename(all_dirs)
-ids <- ids[grepl("^[0-9]+$", ids)]
-ids <- sort(as.integer(ids))
-ids <- ids[!ids %in% c(357, 382, 438, 234, 242, 380)]   # 2026-04-19 paper-auditor FAIL excluded
+# ── Filter: 10 papers where all three specs exist ─────────────────────────
+df <- con %>%
+  filter(
+    !is.na(beta_twfe),                 !is.na(se_twfe),                 se_twfe > 0,
+    !is.na(att_cs_nt_with_ctrls_dyn),  !is.na(se_cs_nt_with_ctrls_dyn), se_cs_nt_with_ctrls_dyn > 0,
+    abs(att_cs_nt_with_ctrls_dyn) > 1e-9,
+    !is.na(att_nt_dynamic),            !is.na(se_nt_dynamic),           se_nt_dynamic > 0
+  )
 
-rows <- list()
-for (id in ids) {
-  dir <- file.path(results_root, id)
-  meta_file <- file.path(dir, "metadata.json")
-  res_file  <- file.path(dir, "results.csv")
-  if (!file.exists(meta_file) || !file.exists(res_file)) next
+cat(sprintf("Papers with all three specs valid: %d\n", nrow(df)))
+cat("IDs:", paste(df$id, collapse = ", "), "\n\n")
 
-  meta <- tryCatch(fromJSON(meta_file), error = function(e) NULL)
-  if (is.null(meta)) next
-  res <- tryCatch(read.csv(res_file, stringsAsFactors = FALSE), error = function(e) NULL)
-  if (is.null(res)) next
+# ── Common axis: TWFE z on X, CS-DID z (scaled by TWFE SE) on Y ───────────
+# Same convention as Figure 4.1 scatter (CS-DID numerator, TWFE SE denominator)
+# so units are comparable across panels.
+df <- df %>% mutate(
+  z_twfe    = beta_twfe                / se_twfe,
+  z_cs_A    = att_cs_nt_with_ctrls_dyn / se_twfe,
+  z_cs_unc  = att_nt_dynamic           / se_twfe,
+  # For concordance classification we still use each CS's own SE
+  z_cs_A_own   = att_cs_nt_with_ctrls_dyn / se_cs_nt_with_ctrls_dyn,
+  z_cs_unc_own = att_nt_dynamic           / se_nt_dynamic,
+  short_label  = gsub(" et al\\.", "", author_label)
+)
+df$short_label <- gsub(" \\(\\d{4}[a-z]?\\)", "", df$short_label)
 
-  gcol <- function(name) {
-    if (name %in% names(res)) as.numeric(res[[name]][1]) else NA_real_
-  }
+crit <- 1.96
 
-  # Check if TWFE has controls
-  tw_ctrls <- meta$variables$twfe_controls
-  add_fes  <- meta$variables$additional_fes
-  if (is.null(tw_ctrls)) tw_ctrls <- character(0)
-  if (is.null(add_fes))  add_fes  <- character(0)
-  std_fes <- c(meta$variables$unit_id, meta$variables$time)
-  extra_fes <- setdiff(add_fes, std_fes)
-  n_ctrls <- length(tw_ctrls) + length(extra_fes)
-
-  if ("estimator" %in% names(res)) {
-    twfe_row  <- res[res$estimator == "TWFE", ]
-    csnt_row  <- res[res$estimator == "CS-NT", ]
-    csnyt_row <- res[res$estimator == "CS-NYT", ]
-    rows[[length(rows) + 1]] <- data.frame(
-      id = id, author_label = meta$author_label,
-      beta_twfe = if (nrow(twfe_row) > 0) as.numeric(twfe_row$att[1]) else NA,
-      se_twfe   = if (nrow(twfe_row) > 0) as.numeric(twfe_row$se[1])  else NA,
-      att_nt_dynamic = NA, se_nt_dynamic = NA,
-      att_nyt_dynamic = NA, se_nyt_dynamic = NA,
-      att_nt_group  = if (nrow(csnt_row) > 0)  as.numeric(csnt_row$att[1])  else NA,
-      se_nt_group   = if (nrow(csnt_row) > 0)  as.numeric(csnt_row$se[1])   else NA,
-      att_nyt_group = if (nrow(csnyt_row) > 0) as.numeric(csnyt_row$att[1]) else NA,
-      se_nyt_group  = if (nrow(csnyt_row) > 0) as.numeric(csnyt_row$se[1])  else NA,
-      has_controls = n_ctrls > 0, n_controls = n_ctrls,
-      stringsAsFactors = FALSE
-    )
-  } else {
-    rows[[length(rows) + 1]] <- data.frame(
-      id = id, author_label = meta$author_label,
-      beta_twfe = gcol("beta_twfe"), se_twfe = gcol("se_twfe"),
-      att_nt_dynamic  = gcol("att_nt_dynamic"),  se_nt_dynamic  = gcol("se_nt_dynamic"),
-      att_nyt_dynamic = gcol("att_nyt_dynamic"), se_nyt_dynamic = gcol("se_nyt_dynamic"),
-      att_nt_group    = gcol("att_csdid_nt"),    se_nt_group    = gcol("se_csdid_nt"),
-      att_nyt_group   = gcol("att_csdid_nyt"),   se_nyt_group   = gcol("se_csdid_nyt"),
-      has_controls = n_ctrls > 0, n_controls = n_ctrls,
-      stringsAsFactors = FALSE
-    )
-  }
+classify <- function(beta_t, se_t, att_c, se_c) {
+  sig_t <- abs(beta_t / se_t) > crit
+  sig_c <- abs(att_c / se_c) > crit
+  ss    <- sign(beta_t) == sign(att_c)
+  case_when(
+    !ss &  (sig_t | sig_c)          ~ "Sign\nreversal",
+    !ss &  !sig_t & !sig_c          ~ "Sign reversal\n(insig)",
+    ss  &   sig_t &  sig_c          ~ "Concordant",
+    ss  &   sig_t & !sig_c          ~ "Significance\nloss",
+    ss  &  !sig_t &  sig_c          ~ "Significance\ngain",
+    ss  &  !sig_t & !sig_c          ~ "Both\ninsignificant",
+    TRUE                             ~ "Other"
+  )
 }
 
-df <- bind_rows(rows) %>%
-  filter(!is.na(beta_twfe) & !is.na(se_twfe) & se_twfe > 0) %>%
-  mutate(
-    att_cs = coalesce(att_nt_dynamic, att_nyt_dynamic, att_nt_group, att_nyt_group),
-    se_cs  = coalesce(se_nt_dynamic, se_nyt_dynamic, se_nt_group, se_nyt_group)
-  ) %>%
-  filter(!is.na(att_cs) & !is.na(se_cs) & se_cs > 0) %>%
-  filter(has_controls)
+df$cat_A   <- classify(df$beta_twfe, df$se_twfe,
+                       df$att_cs_nt_with_ctrls_dyn, df$se_cs_nt_with_ctrls_dyn)
+df$cat_unc <- classify(df$beta_twfe, df$se_twfe,
+                       df$att_nt_dynamic,           df$se_nt_dynamic)
 
-cat(sprintf("Articles with TWFE controls and valid CS-DID: %d\n", nrow(df)))
+cat_colors <- c(
+  "Concordant"            = "black",
+  "Significance\nloss"    = "steelblue",
+  "Significance\ngain"    = "forestgreen",
+  "Sign\nreversal"        = "firebrick",
+  "Sign reversal\n(insig)"= "grey50",
+  "Both\ninsignificant"   = "grey50")
+cat_shapes <- c(
+  "Concordant"            = 16,
+  "Significance\nloss"    = 17,
+  "Significance\ngain"    = 15,
+  "Sign\nreversal"        = 4,
+  "Sign reversal\n(insig)"= 4,
+  "Both\ninsignificant"   = 1)
+cat_levels <- names(cat_colors)
 
-# ============ SCALED BETAS (both / TWFE SE) ============
-df <- df %>% mutate(
-  z_twfe = beta_twfe / se_twfe,
-  z_cs   = att_cs / se_twfe        # same denominator: TWFE SE
-)
+# Axis limits — common for both panels
+lim <- ceiling(max(abs(c(df$z_twfe, df$z_cs_A, df$z_cs_unc)), na.rm = TRUE) * 1.1)
 
-# ============ STATISTICS ============
-r <- cor(df$z_twfe, df$z_cs)
-ratio_att  <- df$att_cs / df$beta_twfe
-same_sign  <- sign(df$att_cs) == sign(df$beta_twfe)
-med_ratio  <- median(ratio_att[same_sign & is.finite(ratio_att)], na.rm = TRUE)
-mean_abs_diff <- mean(abs(df$z_twfe - df$z_cs))
+# Union of categories that appear in either panel — both panels use the
+# same factor levels + breaks so the legend extracted from one works for both.
+cats_shown <- intersect(cat_levels, union(unique(df$cat_A), unique(df$cat_unc)))
 
-cat(sprintf("Correlation (both / TWFE SE): %.3f\n", r))
-cat(sprintf("Median CS/TWFE ratio (same sign): %.2f\n", med_ratio))
-cat(sprintf("Mean |z_twfe - z_cs|: %.2f\n", mean_abs_diff))
+make_panel <- function(df, y_var, cat_var, subtitle, show_y_axis = TRUE) {
+  df$y   <- df[[y_var]]
+  df$cat <- factor(df[[cat_var]], levels = cats_shown)
+  p <- ggplot(df, aes(x = z_twfe, y = y, color = cat, shape = cat)) +
+    geom_hline(yintercept = 0,    color = "grey70", linetype = "dashed", linewidth = 0.3) +
+    geom_vline(xintercept = 0,    color = "grey70", linetype = "dashed", linewidth = 0.3) +
+    geom_abline(slope = 1, intercept = 0,
+                color = "grey55", linetype = "dashed", linewidth = 0.4) +
+    geom_point(size = 3) +
+    scale_color_manual(values = cat_colors, breaks = cats_shown,
+                       drop = FALSE, name = NULL) +
+    scale_shape_manual(values = cat_shapes, breaks = cats_shown,
+                       drop = FALSE, name = NULL) +
+    scale_x_continuous(limits = c(-lim, lim)) +
+    scale_y_continuous(limits = c(-lim, lim)) +
+    coord_fixed(ratio = 1) +
+    labs(title = subtitle,
+         x = "TWFE z-score (with controls)",
+         y = "CS-DID estimate / TWFE SE") +
+    theme_classic(base_size = 12) +
+    theme(plot.title = element_text(size = 12, face = "bold"),
+          legend.text = element_text(size = 9, lineheight = 0.9),
+          legend.key.size = unit(0.5, "cm"))
+  p
+}
 
-# ============ RESHAPE FOR DENSITY ============
-long <- df %>%
-  select(id, z_twfe, z_cs) %>%
-  pivot_longer(cols = c(z_twfe, z_cs),
-               names_to = "estimator", values_to = "z") %>%
-  mutate(estimator = factor(
-    ifelse(estimator == "z_twfe",
-           "TWFE (with controls)", "CS-DID (unconditional)"),
-    levels = c("TWFE (with controls)", "CS-DID (unconditional)")
-  ))
+pA <- make_panel(df, "z_cs_A",   "cat_A",
+                 "(a) TWFE  vs  CS-DID with controls")
+pB <- make_panel(df, "z_cs_unc", "cat_unc",
+                 "(b) TWFE  vs  CS-DID without controls")
 
-# ============ DENSITY PLOT ============
-p <- ggplot(long, aes(x = z, fill = estimator, color = estimator)) +
-  # Significance band (no border lines)
-  annotate("rect", xmin = -1.96, xmax = 1.96, ymin = -Inf, ymax = Inf,
-           fill = "grey90", alpha = 0.35) +
-  geom_vline(xintercept = 0, color = "grey70", linewidth = 0.3) +
-  # Density curves
-  geom_density(alpha = 0.2, linewidth = 0.7) +
-  # Rug marks
-  geom_rug(alpha = 0.4, linewidth = 0.3, length = unit(0.02, "npc")) +
-  # x-axis includes ±1.96
-  scale_x_continuous(breaks = sort(unique(c(seq(-15, 15, by = 5), -1.96, 1.96)))) +
-  # Annotation: correlation and ratio
-  annotate("text", x = Inf, y = Inf, hjust = 1.1, vjust = 1.5,
-           label = sprintf("r = %.3f\nMedian ATT ratio = %.2f", r, med_ratio),
-           size = 4, fontface = "italic", color = "grey30") +
-  # Scales
-  scale_fill_manual(
-    values = c("TWFE (with controls)" = "grey40",
-               "CS-DID (unconditional)" = "steelblue"),
-    name = NULL
-  ) +
-  scale_color_manual(
-    values = c("TWFE (with controls)" = "grey30",
-               "CS-DID (unconditional)" = "steelblue4"),
-    name = NULL
-  ) +
-  labs(
-    x = "Estimate / TWFE SE",
-    y = "Density",
-    title = sprintf("TWFE with controls vs. unconditional CS-DID — %d articles", nrow(df)),
-    subtitle = sprintf("Both scaled by TWFE SE  |  r = %.3f  |  Median ATT ratio = %.2f",
-                        r, med_ratio)
-  ) +
-  theme_classic(base_size = 14) +
-  theme(
-    legend.position = "bottom",
-    legend.text = element_text(size = 11),
-    legend.key.size = unit(0.5, "cm"),
-    plot.title = element_text(size = 14, face = "bold"),
-    plot.subtitle = element_text(size = 10.5, color = "grey40"),
-    axis.title = element_text(size = 13),
-    axis.text = element_text(size = 11)
-  )
+# Extract a single shared legend from pA, strip legends from both panels,
+# then arrange with cowplot so both panels keep their full axes (including
+# Y on the right panel) and we have exactly one legend at the bottom.
+legend_b <- cowplot::get_legend(
+  pA + theme(legend.position = "bottom",
+             legend.box.margin = margin(t = 0, b = 0)))
+
+row <- cowplot::plot_grid(
+  pA + theme(legend.position = "none"),
+  pB + theme(legend.position = "none"),
+  ncol = 2, align = "h", axis = "tb")
+
+panel <- cowplot::plot_grid(row, legend_b,
+                             ncol = 1, rel_heights = c(1, 0.08))
 
 out_dir <- file.path(base_dir, "output", "figures")
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 out_path <- file.path(out_dir, "figure_4_7_density_covariates.pdf")
-ggsave(out_path, p, width = 8, height = 5)
+ggsave(out_path, panel, width = 13, height = 6.5)
 cat(sprintf("\nSaved: %s\n", out_path))
-
-# ============ SUMMARY ============
-cat("\n=== SUMMARY ===\n")
-cat(sprintf("n = %d articles with TWFE controls\n", nrow(df)))
-cat(sprintf("Correlation (both / TWFE SE): %.3f\n", r))
-cat(sprintf("Median scaled beta TWFE: %.2f\n", median(df$z_twfe)))
-cat(sprintf("Median scaled beta CS:   %.2f\n", median(df$z_cs)))
-cat(sprintf("Mean |diff|: %.2f\n", mean_abs_diff))
-cat(sprintf("Median CS/TWFE ratio (same sign): %.2f\n", med_ratio))
-
-# CS-DID controls check
-cat("\n=== CS-DID CONTROLS CHECK ===\n")
-cat("Only 3/59 articles pass covariates to CS-DID xformla:\n")
-cat("  ID 420 (Bailey & Goodman-Bacon): urban bin FE\n")
-cat("  ID 76  (Lawler & Yewell): 8 demographics\n")
-cat("  ID 79  (Carpenter & Lawler): 2 demographics\n")
-cat("All other articles use xformla = ~1 (unconditional)\n")
-cat("No article passes geographic FEs to CS-DID\n")

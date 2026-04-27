@@ -55,6 +55,8 @@ for (est in c("TWFE", "CS-NYT")) {
 es_plot <- es_plot %>%
   mutate(time_d = time + ifelse(estimator == "TWFE", -0.1, 0.1))
 
+x_pa_min <- floor(min(es_plot$time, na.rm = TRUE))
+x_pa_max <- ceiling(max(es_plot$time, na.rm = TRUE))
 pa <- ggplot(es_plot, aes(x = time_d, y = coef, color = estimator, shape = estimator)) +
   geom_hline(yintercept = 0, color = "grey70", linetype = "dashed", linewidth = 0.3) +
   geom_vline(xintercept = -0.5, color = "grey60", linetype = "dotted", linewidth = 0.3) +
@@ -62,6 +64,7 @@ pa <- ggplot(es_plot, aes(x = time_d, y = coef, color = estimator, shape = estim
   geom_point(size = 2.0, stroke = 1.0) +
   scale_color_manual(values = c("TWFE" = "black", "CS-NYT" = "forestgreen")) +
   scale_shape_manual(values = c("TWFE" = 3, "CS-NYT" = 4)) +
+  scale_x_continuous(breaks = seq(x_pa_min, x_pa_max, by = 1)) +
   labs(x = "Relative time", y = "ATT",
        title = "(a) Event study: TWFE vs CS-NYT") +
   theme_panel
@@ -83,7 +86,10 @@ all_ctrls <- c("WIC_ever","frstbrn","married","female",
                "unemp_rate","styr_perblack","styr_perhispan",
                "styr_perother_eth","styr_perfemale","styr_perlt21",
                "styr_per21_64","styr_HSrate","styr_uni4rate","styr_povrate")
-fe_str <- "fips + byear + childnm + mom_ed + raceeth_cat + mom_agegrp"
+# 2026-04-21: Added `agegrp` to match metadata$variables$additional_fes.
+# Numerical impact is trivial (~0.0001) but it keeps this figure aligned with
+# the metadata-driven specification used everywhere else in the project.
+fe_str <- "fips + byear + agegrp + childnm + mom_ed + raceeth_cat + mom_agegrp"
 
 # TWFE BINNED — full sample
 df$m_treat_b <- case_when(
@@ -108,12 +114,17 @@ twfe_binned <- rbind(
              estimator = "TWFE (binned)"),
   data.frame(time = -1, coef = 0, se = 0, estimator = "TWFE (binned)"))
 
-# TWFE UNBINNED — restricted to [-8, 8]
-df_u <- df %>% filter(is.na(m_treat) | (m_treat >= -8 & m_treat <= 8))
-ty_u <- df_u$byear[!is.na(df_u$m_treat)]
-df_u <- df_u %>% filter(byear >= min(ty_u) & byear <= max(ty_u))
+# TWFE UNBINNED — full sample (no horizon window restriction), one dummy per
+# observed event-time. Estimating with every horizon as its own dummy is the
+# only specification that genuinely "removes the bin": no observation is
+# dropped, and no horizon is collapsed into a tail bin. The plot then shows
+# only the coefficients within [-5, 4] for visual comparison with the binned
+# specification, while the model itself uses all available variation.
+df_u <- df  # no horizon-window restriction
 bf_u <- ifelse(!is.na(df_u$baby_babyfr), df_u$baby_babyfr, 0)
-unb_range <- seq(-8L, 8L); unb_range <- unb_range[unb_range != -1L]
+m_min <- min(df_u$m_treat, na.rm = TRUE)
+m_max <- max(df_u$m_treat, na.rm = TRUE)
+unb_range <- seq(m_min, m_max); unb_range <- unb_range[unb_range != -1L]
 unb_names <- character(length(unb_range))
 for (i in seq_along(unb_range)) {
   v <- unb_range[i]
@@ -132,6 +143,14 @@ twfe_unb <- rbind(
              estimator = "TWFE (unbinned)"),
   data.frame(time = -1, coef = 0, se = 0, estimator = "TWFE (unbinned)"))
 
+cat(sprintf("[Panel b diagnostic] m_treat range = [%d, %d], %d unbinned dummies\n",
+            m_min, m_max, length(unb_names)))
+if ("UL_4" %in% unb_names) {
+  cat(sprintf("[Panel b diagnostic] UL_4 (t=4): coef = %+.4f, SE = %.4f, |t| = %.2f\n",
+              coef(fit_u)["UL_4"], se(fit_u)["UL_4"],
+              abs(coef(fit_u)["UL_4"] / se(fit_u)["UL_4"])))
+}
+
 # CS-NYT from saved data
 cs_nyt <- es_data %>% filter(estimator == "CS-NYT") %>%
   mutate(estimator = "CS-NYT")
@@ -140,6 +159,8 @@ if (!any(cs_nyt$time == -1))
 
 all_sens <- bind_rows(twfe_binned, twfe_unb, cs_nyt) %>%
   filter(!is.na(coef)) %>%
+  # Estimate on the full sample, plot only within the published event window.
+  filter(time >= -5 & time <= 4) %>%
   mutate(ci_lo = coef - 1.96 * se, ci_hi = coef + 1.96 * se,
          estimator = factor(estimator,
            levels = c("TWFE (binned)", "TWFE (unbinned)", "CS-NYT")),
@@ -161,6 +182,7 @@ pb <- ggplot(all_sens, aes(x = time_d, y = coef, color = estimator, shape = esti
   scale_shape_manual(values = c("TWFE (binned)" = 3,
                                  "TWFE (unbinned)" = 1,
                                  "CS-NYT" = 4)) +
+  scale_x_continuous(breaks = seq(-5, 4, by = 1)) +
   labs(x = "Relative time", y = "ATT",
        title = "(b) Sensitivity: binned vs unbinned") +
   theme_panel
@@ -238,9 +260,18 @@ cat("Panel (d): Progressive binning\n")
 k_values <- seq(0, 16, by = 2)
 prog_res <- data.frame(k = integer(), coef = numeric(), se = numeric(),
                         ci_lo = numeric(), ci_hi = numeric())
+# 2026-04-21: Window definition aligned with the canonical progbin convention
+# used in `_archive/.../progbin_summary.R` and Table~4.4. At k=0 the sample
+# window is exactly [-ev_pre, ev_post] = [-4, 4] for Lawler (so the F_5 bin
+# has zero observations); at k=K the window expands to [-(ev_pre+K), ev_post+K]
+# and the F_5 / L_4 bins absorb the additional periods. The previous spec
+# `lo <- -(5L + k)` already absorbed m_treat=-5 into F_5 at k=0, which yielded
+# beta=+0.029** instead of the table's beta=+0.031**.
+ev_pre  <- as.integer(meta$analysis$event_pre)   # 4 for Lawler
+ev_post <- as.integer(meta$analysis$event_post)  # 4 for Lawler
 
 for (k in k_values) {
-  lo <- -(5L + k); hi <- 4L + k
+  lo <- -ev_pre - k; hi <- ev_post + k
   dft <- df %>% filter(is.na(m_treat) | (m_treat >= lo & m_treat <= hi))
   ty <- dft$byear[!is.na(dft$m_treat)]
   dft <- dft %>% filter(byear >= min(ty) & byear <= max(ty))

@@ -10,6 +10,7 @@
 #   table_3_2_sample_detailed.tex       (Ch3 Table 2: design × data structure)
 #   table_3_3_journal_final.tex         (Ch3 Table 3: journal distribution)
 #   table_3_4_estimator_coverage.tex    (Ch3 Table 4: estimator coverage)
+#   table_3_5_covariate_coverage.tex    (Ch3 Table 5: covariate coverage of CS-DID)
 #   table_4_1_aggregate_concordance.tex (Ch4 Table 1: TWFE vs CS-DID)
 #   table_4_2_timing_heterogeneity.tex  (Ch4 Table 2: divergence by timing)
 #   table_4_3_bacon_summary.tex         (Ch4 Table 3: Bacon + dCdH decomposition)
@@ -89,16 +90,27 @@ con <- con %>% left_join(
   by = "id")
 
 con <- con %>% mutate(
+  # Unconditional CS-DID (dynamic preferred, static fallback)
+  att_cs_unc = coalesce(att_nt_dynamic, att_nyt_dynamic,
+                         att_csdid_nt,   att_csdid_nyt),
+  se_cs_unc  = coalesce(se_nt_dynamic,  se_nyt_dynamic,
+                         se_csdid_nt,    se_csdid_nyt),
+  # Matched CS-DID (covariates matched to TWFE) — NT preferred over NYT
+  att_cs_with_ctrls_dyn = coalesce(att_cs_nt_with_ctrls_dyn,
+                                    att_cs_nyt_with_ctrls_dyn),
+  # Composite cascade used across tables and figures: matched when valid,
+  # unconditional otherwise. Matches the logic in code/figures/01_aggregate_scatter.R.
+  specA_valid = !is.na(att_cs_with_ctrls_dyn) &
+                abs(att_cs_with_ctrls_dyn) > 1e-9 &
+                !is.na(se_cs_nt_with_ctrls_dyn) &
+                se_cs_nt_with_ctrls_dyn > 0,
+  att_cs = ifelse(specA_valid, att_cs_with_ctrls_dyn, att_cs_unc),
+  se_cs  = ifelse(specA_valid, se_cs_nt_with_ctrls_dyn, se_cs_unc),
+  # Legacy columns retained for downstream code (decomposition etc.)
   att_cs_dyn = coalesce(att_nt_dynamic, att_nyt_dynamic),
   se_cs_dyn  = coalesce(se_nt_dynamic,  se_nyt_dynamic),
   att_cs_grp = coalesce(att_csdid_nt,    att_csdid_nyt),
-  se_cs_grp  = coalesce(se_csdid_nt,     se_csdid_nyt),
-  att_cs     = coalesce(att_cs_dyn, att_cs_grp),
-  se_cs      = coalesce(se_cs_dyn,  se_cs_grp),
-  # Spec A (with covariates) dynamic CS-DID — NT preferred over NYT.
-  att_cs_with_ctrls_dyn = coalesce(att_cs_nt_with_ctrls_dyn,
-                                    att_cs_nyt_with_ctrls_dyn),
-  cs_nt_with_ctrls_status = cs_nt_with_ctrls_status)
+  se_cs_grp  = coalesce(se_csdid_nt,     se_csdid_nyt))
 
 crit <- 1.96
 con <- con %>% mutate(
@@ -121,8 +133,9 @@ pct  <- function(x, n) sprintf("%.1f\\%%", 100 * x / n)
 pct0 <- function(x)    sprintf("%.1f\\%%", 100 * x)
 
 # =============================================================================
-# TABLE 3.2 — Sample composition
+# TABLE 3.2 — Sample composition (Panel A: design type, Panel B: journal)
 # =============================================================================
+# Panel A: adoption type x data structure
 t32 <- meta_df %>% count(tt, ds) %>%
        pivot_wider(names_from = ds, values_from = n, values_fill = 0L)
 t32 <- bind_rows(t32 %>% filter(tt == "Staggered"),
@@ -131,13 +144,96 @@ for (c in c("Panel", "RCS")) if (!c %in% names(t32)) t32[[c]] <- 0L
 t32 <- t32 %>% mutate(Total = Panel + RCS, pct = 100 * Total / sum(Total))
 total_panel <- sum(t32$Panel); total_rcs <- sum(t32$RCS); total_n <- sum(t32$Total)
 
+# Panel B: journal distribution, using the authoritative journal_map
+# (mirrors the map in code/tables/02_article_cards.R, audited against first
+# page of each PDF). Metadata $journal is populated for only a subset of
+# articles; this map covers all 56 candidate IDs, with 234/242/380 excluded
+# from the final sample.
+journal_map <- data.frame(
+  id = c(9, 21, 25, 44, 47, 60, 61, 65, 68, 76, 79, 80, 97, 125, 133,
+         147, 201, 210, 213, 228, 233, 234, 241, 242, 253, 254, 262,
+         263, 267, 271, 281, 290, 304, 305, 309, 311, 321, 323, 333,
+         335, 337, 347, 358, 359, 380, 395, 401, 419, 420, 432, 433,
+         437, 525, 744, 1094, 2303),
+  journal = c(
+    "AEJ: Applied Economics",                        # 9
+    "AEJ: Economic Policy",                          # 21
+    "AEJ: Economic Policy",                          # 25
+    "AEJ: Economic Policy",                          # 44
+    "AEJ: Applied Economics",                        # 47
+    "AEJ: Economic Policy",                          # 60
+    "AEJ: Economic Policy",                          # 61
+    "AEJ: Economic Policy",                          # 65
+    "AEJ: Economic Policy",                          # 68
+    "AEJ: Applied Economics",                        # 76
+    "AEJ: Economic Policy",                          # 79
+    "AEJ: Economic Policy",                          # 80
+    "AEJ: Economic Policy",                          # 97
+    "AEJ: Economic Policy",                          # 125
+    "AEJ: Economic Policy",                          # 133
+    "American Economic Review",                      # 147
+    "Journal of Health Economics",                   # 201
+    "Journal of Health Economics",                   # 210
+    "Journal of Human Resources",                    # 213
+    "Journal of Public Economics",                   # 228
+    "AEJ: Economic Policy",                          # 233
+    "Journal of Political Economy",                  # 234 (excluded)
+    "AEJ: Economic Policy",                          # 241
+    "American Journal of Health Economics",          # 242 (excluded)
+    "Review of Economics and Statistics",            # 253
+    "Review of Economics and Statistics",            # 254
+    "Review of Economics and Statistics",            # 262
+    "AEJ: Applied Economics",                        # 263
+    "Journal of the European Economic Association",  # 267
+    "AEJ: Applied Economics",                        # 271
+    "Journal of Development Economics",              # 281
+    "American Journal of Health Economics",          # 290
+    "AEJ: Applied Economics",                        # 304
+    "Review of Economics and Statistics",            # 305
+    "Review of Economics and Statistics",            # 309
+    "Review of Economics and Statistics",            # 311
+    "Review of Economics and Statistics",            # 321
+    "Review of Economics and Statistics",            # 323
+    "Journal of Health Economics",                   # 333
+    "Review of Economics and Statistics",            # 335
+    "Quarterly Journal of Economics",                # 337
+    "Journal of the European Economic Association",  # 347
+    "Journal of Development Economics",              # 358
+    "AEJ: Applied Economics",                        # 359
+    "AEJ: Economic Policy",                          # 380 (excluded)
+    "Review of Economics and Statistics",            # 395
+    "AEJ: Applied Economics",                        # 401
+    "AEJ: Economic Policy",                          # 419
+    "American Economic Review",                      # 420
+    "AEJ: Applied Economics",                        # 432
+    "AEJ: Economic Policy",                          # 433
+    "AEJ: Economic Policy",                          # 437
+    "AEJ: Economic Policy",                          # 525
+    "AEJ: Applied Economics",                        # 744
+    "AEJ: Applied Economics",                        # 1094
+    "Journal of Development Economics"               # 2303
+  ),
+  stringsAsFactors = FALSE
+)
+# Sort by count descending, then alphabetical for ties
+jdf <- meta_df %>% select(id) %>% inner_join(journal_map, by = "id") %>%
+       count(journal) %>%
+       mutate(pct = 100 * n / sum(n)) %>%
+       arrange(desc(n), journal)
+total_j <- sum(jdf$n)
+
 lines <- c(
   "% Auto-generated by code/tables/01_chapter_statistics.R — DO NOT EDIT BY HAND.",
-  "\\begin{table}[!htbp]", "\\centering",
-  "\\caption{Detailed sample composition by design type}",
+  "\\begin{table}[!htbp]",
+  "\\centering",
+  "\\small",
+  "\\caption{Sample composition}",
   "\\label{tab:sample_detailed}",
   "\\begin{threeparttable}",
-  "\\begin{tabular}{lcccc}",
+  "",
+  "\\textbf{Panel A. Adoption type by data structure}",
+  "",
+  "\\begin{tabularx}{0.86\\textwidth}{@{}>{\\raggedright\\arraybackslash}Xcccc@{}}",
   "\\toprule",
   "\\textbf{Adoption type} & \\textbf{Panel} & \\textbf{RCS} & \\textbf{Total} & \\textbf{\\% of sample} \\\\",
   "\\midrule")
@@ -149,39 +245,40 @@ for (i in seq_len(nrow(t32))) {
 lines <- c(lines, "\\midrule",
   sprintf("\\textbf{Total} & \\textbf{%d} & \\textbf{%d} & \\textbf{%d} & \\textbf{100.0\\%%} \\\\",
           total_panel, total_rcs, total_n),
-  "\\bottomrule", "\\end{tabular}",
-  "\\begin{tablenotes}[flushleft]", "\\footnotesize",
-  "\\item Notes: ``Staggered'' indicates that different units adopt treatment at different points in time. ``RCS'' indicates \\emph{repeated cross-sections}. The combination of these two dimensions affects which estimators and diagnostics can be applied.",
-  "\\end{tablenotes}", "\\end{threeparttable}", "\\end{table}")
-write_tex("table_3_2_sample_detailed.tex", lines)
-
-# =============================================================================
-# TABLE 3.3 — Journal distribution
-# =============================================================================
-jdf <- meta_df %>% filter(!is.na(journal), journal != "") %>%
-       count(journal, sort = TRUE) %>% mutate(pct = 100 * n / sum(n))
-total_j <- sum(jdf$n)
-
-lines <- c(
-  "% Auto-generated by code/tables/01_chapter_statistics.R — DO NOT EDIT BY HAND.",
-  "\\begin{table}[!htbp]", "\\centering",
-  "\\caption{Distribution of the final sample by journal}",
-  "\\label{tab:journal_final}",
-  "\\begin{threeparttable}",
-  "\\begin{tabular}{p{8.5cm}cc}",
+  "\\bottomrule",
+  "\\end{tabularx}",
+  "",
+  "\\vspace{0.8em}",
+  "",
+  "\\textbf{Panel B. Distribution by journal}",
+  "",
+  "\\begin{tabularx}{0.86\\textwidth}{@{}>{\\raggedright\\arraybackslash}Xcc@{}}",
   "\\toprule",
   "\\textbf{Journal} & \\textbf{Articles in sample} & \\textbf{\\%} \\\\",
   "\\midrule")
 for (i in seq_len(nrow(jdf)))
-  lines <- c(lines, sprintf("\\emph{%s} & %d & %.1f \\\\",
+  lines <- c(lines, sprintf("\\emph{%s} & %d & %.1f\\%% \\\\",
                             jdf$journal[i], jdf$n[i], jdf$pct[i]))
 lines <- c(lines, "\\midrule",
-  sprintf("\\textbf{Total} & \\textbf{%d} & \\textbf{100.0} \\\\", total_j),
-  "\\bottomrule", "\\end{tabular}",
-  "\\begin{tablenotes}[flushleft]", "\\footnotesize",
-  "\\item Notes: This table reports the journals represented in the final sample of 53 reanalyzed articles.",
-  "\\end{tablenotes}", "\\end{threeparttable}", "\\end{table}")
-write_tex("table_3_3_journal_final.tex", lines)
+  sprintf("\\textbf{Total} & \\textbf{%d} & \\textbf{100.0\\%%} \\\\", total_j),
+  "\\bottomrule",
+  "\\end{tabularx}",
+  "",
+  "\\begin{tablenotes}[flushleft]",
+  "\\footnotesize",
+  "\\item \\textit{Notes.} Panel A cross-tabulates the final 53-article sample by adoption type (staggered versus one-time) and data structure. ``RCS'' denotes \\emph{repeated cross-sections}. Panel B reports the journals represented in the final sample.",
+  "\\end{tablenotes}",
+  "",
+  "\\end{threeparttable}",
+  "\\end{table}")
+write_tex("table_3_2_sample_detailed.tex", lines)
+
+# Table 3.3 retired — content merged into Table 3.2 Panel B. Write a stub
+# so any stray \input does not break compilation.
+write_tex("table_3_3_journal_final.tex", c(
+  "% Retired — content merged into Table 3.2 Panel B (tab:sample_detailed).",
+  "% This stub exists so accidental \\input{} calls do not break compilation."
+))
 
 # =============================================================================
 # TABLE 3.4 — Estimator coverage
@@ -236,15 +333,15 @@ fmt_b <- function(r) sprintf("%d & %d & %d & %d & %d & %d", r$N, r$twfe, r$csnt,
 
 lines <- c(
   "% Auto-generated by code/tables/01_chapter_statistics.R — DO NOT EDIT BY HAND.",
-  "\\begin{table}[!htbp]", "\\centering",
-  "\\caption{Estimator coverage under the dissertation protocol}",
+  "\\begin{table}[!htbp]", "\\centering", "\\small",
+  "\\caption{Estimator coverage under the reanalysis protocol}",
   "\\label{tab:estimator_coverage}",
   "\\begin{threeparttable}",
   "\\begin{tabular}{lcccccc}",
   "\\toprule",
   " & $N$ & \\textbf{TWFE} & \\textbf{CS-NT} & \\textbf{CS-NYT} & \\textbf{Gardner} & \\textbf{SA} \\\\",
   "\\midrule",
-  "\\multicolumn{7}{l}{\\emph{Panel A --- Static benchmark estimates}} \\\\[2pt]",
+  "\\multicolumn{7}{l}{\\emph{Panel A. Static benchmark estimates}} \\\\[2pt]",
   sprintf("One-time adoption  & %s \\\\", fmt_a(row_single_A)),
   sprintf("Staggered adoption & %s \\\\", fmt_a(row_stag_A)),
   "\\addlinespace",
@@ -254,7 +351,7 @@ lines <- c(
   sprintf("\\textbf{Total}     & \\textbf{%d} & \\textbf{%d} & \\textbf{%d} & \\textbf{%d} & --- & --- \\\\",
           panelA_tot["N"], panelA_tot["twfe"], panelA_tot["csnt"], panelA_tot["csnyt"]),
   "\\midrule",
-  "\\multicolumn{7}{l}{\\emph{Panel B --- Event-study estimates}} \\\\[2pt]",
+  "\\multicolumn{7}{l}{\\emph{Panel B. Event-study estimates}} \\\\[2pt]",
   sprintf("One-time adoption  & %s \\\\", fmt_b(row_single_B)),
   sprintf("Staggered adoption & %s \\\\", fmt_b(row_stag_B)),
   "\\addlinespace",
@@ -266,26 +363,95 @@ lines <- c(
           panelB_tot["gardner"], panelB_tot["sa"]),
   "\\bottomrule", "\\end{tabular}",
   "\\begin{tablenotes}[flushleft]", "\\footnotesize",
-  {
-    cs_nyt_onetime <- as.integer(row_single_A$csnyt)
-    cs_nyt_clause <- if (cs_nyt_onetime > 0)
-      sprintf("CS-NYT is estimated for %d staggered and %d one-time-adoption articles; in the latter, it coincides with CS-NT by construction.",
-              as.integer(row_stag_A$csnyt), cs_nyt_onetime)
-    else
-      sprintf("CS-NYT is estimated for %d staggered articles; for one-time-adoption designs it is not reported separately because it coincides with CS-NT by construction.",
-              as.integer(row_stag_A$csnyt))
-    paste0(
-      "\\item Notes: Panel~A reports the number of articles included in the static benchmark analysis. Under the protocol of this paper, static comparisons are based on TWFE, CS-NT, and CS-NYT, with CS-DID as the main modern benchmark. Gardner (\\texttt{did2s}) and SA (Sun \\& Abraham) are not reported in Panel~A because they are used here only in the dynamic analysis. Panel~B reports the number of articles for which each estimator produces an event study, conditional on the article having an estimable pre-treatment path (",
-      as.integer(panelB_tot["N"]), " of ", as.integer(panelA_tot["N"]),
-      "). CS-NT could not be estimated in ",
-      as.integer(row_stag_A$N) - as.integer(row_stag_A$csnt),
-      " staggered-adoption articles due to the absence of a never-treated group or matrix singularity. ", cs_nyt_clause,
-      " SA applies only to staggered-adoption settings; in ",
-      as.integer(row_stag_B$N) - as.integer(row_stag_B$sa),
-      " articles it could not be estimated for computational or specification reasons. Within each panel, the adoption-type and data-structure rows classify the same articles along different dimensions and should not be summed.")
-  },
+  "\\item \\textit{Notes.} Panel A reports estimator availability for the static benchmark analysis. Panel B reports availability for event-study estimation among the 47 articles with an estimable pre-treatment path. CS-NYT is reported only for staggered-adoption designs. Sun--Abraham applies only to staggered settings. Within each panel, the adoption-type and data-structure rows classify the same articles along different dimensions and should not be summed.",
   "\\end{tablenotes}", "\\end{threeparttable}", "\\end{table}")
 write_tex("table_3_4_estimator_coverage.tex", lines)
+
+# =============================================================================
+# TABLE 3.5 — Covariate coverage: can CS-DID match the paper's own controls?
+# Builds a 53-article breakdown by:
+#   (a) Original TWFE is unconditional -> comparison trivially symmetric.
+#   (b) Original TWFE has covariates -> did the matched doubly-robust CS-DID
+#       with the same controls converge? If not, classify the failure mode
+#       (silent collapse, FAIL_collinear, NOT_ATTEMPTED, legacy-format).
+# =============================================================================
+cov_rows <- list()
+for (id_i in sort(unique(con$id))) {
+  meta_f <- file.path(data_dir, "metadata", sprintf("%s.json", id_i))
+  if (!file.exists(meta_f)) next
+  m <- tryCatch(fromJSON(meta_f), error = function(e) NULL)
+  if (is.null(m) || isTRUE(m$excluded_from_sample)) next
+  n_twfe_ctrls <- if (!is.null(m$variables$twfe_controls))
+                    length(m$variables$twfe_controls) else 0
+  res_f <- file.path(results_dir, id_i, "results.csv")
+  if (!file.exists(res_f)) next
+  r <- tryCatch(read.csv(res_f, stringsAsFactors = FALSE),
+                error = function(e) NULL); if (is.null(r)) next
+  legacy <- "estimator" %in% names(r)
+  gr <- function(nm) if (!legacy && nm %in% names(r)) as.numeric(r[[nm]][1]) else NA_real_
+  status <- if (!legacy && "cs_nt_with_ctrls_status" %in% names(r))
+              as.character(r$cs_nt_with_ctrls_status[1]) else NA_character_
+  att_m <- gr("att_cs_nt_with_ctrls_dyn")
+  se_m  <- gr("se_cs_nt_with_ctrls_dyn")
+  specA_ok <- !is.na(att_m) && abs(att_m) > 1e-9 && !is.na(se_m) && se_m > 0
+  cov_rows[[length(cov_rows)+1]] <- data.frame(
+    id = id_i, n_twfe_ctrls = n_twfe_ctrls,
+    legacy = legacy, specA_ok = specA_ok, status = status,
+    att_m = att_m, se_m = se_m, stringsAsFactors = FALSE)
+}
+cov_df <- bind_rows(cov_rows)
+cov_df <- cov_df[cov_df$id %in% con$id, , drop = FALSE]
+N_tot <- nrow(cov_df)
+N_noctrl <- sum(cov_df$n_twfe_ctrls == 0)
+N_withctrl <- sum(cov_df$n_twfe_ctrls > 0)
+w <- cov_df[cov_df$n_twfe_ctrls > 0, ]
+N_matched_ok <- sum(w$specA_ok)
+N_fallback <- sum(!w$specA_ok)
+fb <- w[!w$specA_ok, ]
+mode <- ifelse(fb$legacy, "legacy",
+         ifelse(!is.na(fb$status) & fb$status == "FAIL_collinear", "collinear",
+          ifelse(!is.na(fb$status) & fb$status == "NOT_ATTEMPTED", "not_attempted",
+           ifelse(!is.na(fb$status) & fb$status == "OK" &
+                  (is.na(fb$att_m) | abs(fb$att_m) < 1e-9 | is.na(fb$se_m)),
+                  "silent_collapse", "other"))))
+N_silent  <- sum(mode == "silent_collapse")
+N_coll    <- sum(mode == "collinear")
+N_notatt  <- sum(mode == "not_attempted")
+N_legacy  <- sum(mode == "legacy")
+N_other   <- sum(mode == "other")
+pc <- function(k) sprintf("%.1f\\%%", 100 * k / N_tot)
+cat(sprintf("\n[table_3_5] covariate coverage: N=%d, noctrl=%d, ctrl=%d, matched_ok=%d, fallback=%d (silent=%d collinear=%d not_att=%d legacy=%d other=%d)\n",
+            N_tot, N_noctrl, N_withctrl, N_matched_ok, N_fallback,
+            N_silent, N_coll, N_notatt, N_legacy, N_other))
+
+lines <- c(
+  "% Auto-generated by code/tables/01_chapter_statistics.R -- DO NOT EDIT BY HAND.",
+  "\\begin{table}[!htbp]", "\\small", "\\centering",
+  "\\caption{Covariate coverage in the TWFE-versus-CS-DID comparison}",
+  "\\label{tab:covariate_coverage}",
+  "\\begin{threeparttable}",
+  "\\begin{tabular}{lrr}",
+  "\\toprule",
+  " & Articles & Share \\\\",
+  "\\midrule",
+  sprintf("Original TWFE has no covariates & %d & %s \\\\", N_noctrl, pc(N_noctrl)),
+  sprintf("Original TWFE includes covariates, matched CS-DID estimable & %d & %s \\\\", N_matched_ok, pc(N_matched_ok)),
+  sprintf("Original TWFE includes covariates, matched CS-DID not estimable & %d & %s \\\\", N_fallback, pc(N_fallback)),
+  "\\midrule",
+  sprintf("Total & %d & 100.0\\%% \\\\", N_tot),
+  "\\bottomrule",
+  "\\end{tabular}",
+  "\\begin{tablenotes}[flushleft]",
+  "\\footnotesize",
+  paste0(
+    "\\item Notes: The table reports whether the paper's original TWFE covariate structure can be carried over to CS-DID. In the ",
+    N_noctrl, " articles without covariates, the TWFE-versus-CS-DID comparison is unconditionally matched by construction. Among the ",
+    N_withctrl, " articles with covariates, ", N_matched_ok,
+    " admit a matched CS-DID with the same controls, while ", N_fallback,
+    " do not. In those ", N_fallback,
+    " cases, the aggregate comparisons use the closest feasible fallback, typically TWFE with controls versus CS-DID without controls. Lesson~3 examines this covariate margin directly."),
+  "\\end{tablenotes}", "\\end{threeparttable}", "\\end{table}")
+write_tex("table_3_5_covariate_coverage.tex", lines)
 
 # =============================================================================
 # TABLE 4.1 — Aggregate concordance
@@ -299,49 +465,9 @@ row_is    <- sum(!con$sig_twfe &  con$sig_cs)
 row_ii    <- sum(!con$sig_twfe & !con$sig_cs)
 row_50    <- sum(abs(con$delta_pct) > 50,  na.rm = TRUE)
 row_100   <- sum(abs(con$delta_pct) > 100, na.rm = TRUE)
-n_fallback_group <- sum(is.na(con$att_cs_dyn) & !is.na(con$att_cs_grp))
-
-# ── Decomposition row (Deliverable D1): separate the estimator margin
-# from the covariate margin in the headline Spec~C gap. The decomposition
-# is only meaningful on the subsample of papers whose original TWFE
-# specification includes covariates (T+ != T0); for no-covariate papers
-# the covariate margin is mechanically zero.
-abs_pgap <- function(a, b, d) {
-  x <- (a - b) / abs(d); x[!is.finite(x)] <- NA; abs(x)
-}
-gap_C  <- abs_pgap(con$beta_twfe, con$att_cs_dyn, con$beta_twfe)   # headline
-gap_A  <- abs_pgap(con$beta_twfe, con$att_cs_with_ctrls_dyn, con$beta_twfe)
-gap_B  <- abs_pgap(con$beta_twfe_no_ctrls, con$att_cs_dyn, con$beta_twfe)
-gap_X  <- abs_pgap(con$beta_twfe, con$beta_twfe_no_ctrls, con$beta_twfe)
-# Papers whose TWFE estimate changes between with/without ctrls (i.e.
-# whose original spec uses covariates). Tolerance 1e-8 on both beta
-# and SE differences to avoid floating-point noise.
-has_ctrls <- !is.na(con$beta_twfe) & !is.na(con$beta_twfe_no_ctrls) &
-             (abs(con$beta_twfe - con$beta_twfe_no_ctrls) > 1e-8 |
-              abs(con$se_twfe  - con$se_twfe_no_ctrls)  > 1e-8)
-# Spec~A mask: has_ctrls AND clean Spec~A estimate
-has_Ax <- has_ctrls &
-          !is.na(con$cs_nt_with_ctrls_status) &
-          con$cs_nt_with_ctrls_status == "OK" &
-          !is.na(con$att_cs_with_ctrls_dyn) &
-          abs(con$att_cs_with_ctrls_dyn) > 1e-9
-# Spec~B mask: has_ctrls AND unconditional CS available
-has_Bx <- has_ctrls & !is.na(con$beta_twfe_no_ctrls) & !is.na(con$att_cs_dyn)
-med_pct <- function(x, m) {
-  v <- x[m & is.finite(x)]
-  if (length(v) == 0) return("---")
-  sprintf("%.1f\\%%", 100 * median(v, na.rm=TRUE))
-}
-dec_C <- med_pct(gap_C, is.finite(gap_C))
-dec_A <- med_pct(gap_A, has_Ax)
-dec_B <- med_pct(gap_B, has_Bx)
-dec_X <- med_pct(gap_X, has_Bx)   # TWFE-side covariate margin
-n_A   <- sum(has_Ax & is.finite(gap_A))
-n_B   <- sum(has_Bx & is.finite(gap_B))
-
 lines <- c(
   "% Auto-generated by code/tables/01_chapter_statistics.R — DO NOT EDIT BY HAND.",
-  "\\begin{table}[htbp]", "\\centering",
+  "\\begin{table}[htbp]", "\\small", "\\centering",
   "\\caption{Aggregate comparison between TWFE and CS-DID}",
   "\\label{tab:ch3_aggregate_concordance}",
   "\\begin{threeparttable}",
@@ -357,28 +483,10 @@ lines <- c(
   sprintf("Insignificant $\\rightarrow$ insignificant & %d & %s \\\\", row_ii, pct(row_ii, n)),
   sprintf("$|\\Delta| > 50\\%%$ & %d & %s \\\\",  row_50,  pct(row_50, n)),
   sprintf("$|\\Delta| > 100\\%%$ & %d & %s \\\\", row_100, pct(row_100, n)),
-  "\\midrule",
-  "\\multicolumn{3}{l}{\\textit{Decomposition of the median headline gap}} \\\\",
-  sprintf("\\quad Spec~C headline: $|\\hat\\beta^{\\text{TWFE}}_{+X} - \\widehat{ATT}^{\\text{CS}}_{-X}|$ & & %s \\\\", dec_C),
-  sprintf("\\quad Spec~A estimator margin: $|\\hat\\beta^{\\text{TWFE}}_{+X} - \\widehat{ATT}^{\\text{CS}}_{+X}|$ (N=%d) & & %s \\\\", n_A, dec_A),
-  sprintf("\\quad Spec~B estimator margin: $|\\hat\\beta^{\\text{TWFE}}_{-X} - \\widehat{ATT}^{\\text{CS}}_{-X}|$ (N=%d) & & %s \\\\", n_B, dec_B),
-  sprintf("\\quad Covariate margin (TWFE): $|\\hat\\beta^{\\text{TWFE}}_{+X} - \\hat\\beta^{\\text{TWFE}}_{-X}|$ (N=%d) & & %s \\\\", n_B, dec_X),
   "\\bottomrule", "\\end{tabular}",
   "\\begin{tablenotes}[flushleft]", "\\footnotesize",
-  sprintf(paste0(
-    "\\item Notes: The CS-DID benchmark uses the dynamic aggregate, with the \\textit{never-treated} group when available and \\textit{not-yet-treated} otherwise. ",
-    "For %s article%s without a dynamic aggregate, the group average is used instead. ",
-    "The proportional change is defined as $\\Delta = (\\hat\\beta_{CS} - \\hat\\beta_{TWFE}) / |\\hat\\beta_{TWFE}|$. ",
-    "The decomposition block reports median $|\\Delta|/|\\hat\\beta^{\\text{TWFE}}_{+X}|$. ",
-    "Spec~C is the headline protocol gap; Spec~A holds covariates fixed (both estimators conditional); Spec~B holds covariates fixed (both unconditional); the TWFE-side covariate margin holds the estimator fixed. ",
-    "Under additivity: Spec~C $\\approx$ Spec~B estimator margin $+$ TWFE-side covariate margin; gaps from additivity reflect interaction (see Table~\\ref{tab:margin_attribution})."),
-    if (n_fallback_group == 0) "no" else
-    if (n_fallback_group == 1) "one" else
-    if (n_fallback_group == 2) "two" else
-    if (n_fallback_group == 3) "three" else
-    if (n_fallback_group == 4) "four" else
-    if (n_fallback_group == 5) "five" else as.character(n_fallback_group),
-    ifelse(n_fallback_group == 1, "", "s")),
+  paste0(
+    "\\item \\textit{Notes.} The CS-DID benchmark uses the matched doubly-robust estimate (CS-DID with the paper's own controls) when available and the unconditional CS-DID estimate otherwise. The dynamic aggregate is preferred; the group average is used when a dynamic aggregate is unavailable. The proportional change is $\\Delta = (\\hat\\beta_{CS} - \\hat\\beta_{TWFE}) / |\\hat\\beta_{TWFE}|$."),
   "\\end{tablenotes}", "\\end{threeparttable}", "\\end{table}")
 write_tex("table_4_1_aggregate_concordance.tex", lines)
 
@@ -399,9 +507,6 @@ lines <- c(
   "Metric & One-time adoption & Staggered adoption \\\\",
   "\\midrule",
   sprintf("Number of articles & %d & %d \\\\", nrow(single), nrow(stag)),
-  sprintf("Sign concordance & %s & %s \\\\",
-          pct0(mean(single$same_sign, na.rm=TRUE)),
-          pct0(mean(stag$same_sign,   na.rm=TRUE))),
   sprintf("Sign reversal & %s & %s \\\\",
           pct0(mean(!single$same_sign, na.rm=TRUE)),
           pct0(mean(!stag$same_sign,   na.rm=TRUE))),
@@ -411,12 +516,9 @@ lines <- c(
   sprintf("Insignificant $\\rightarrow$ significant & %s & %s \\\\",
           pct0(mean(!single$sig_twfe & single$sig_cs, na.rm=TRUE)),
           pct0(mean(!stag$sig_twfe   & stag$sig_cs,   na.rm=TRUE))),
-  sprintf("Median proportional change & $%.1f\\%%$ & $%.1f\\%%$ \\\\",
-          median(single$delta_pct, na.rm=TRUE),
-          median(stag$delta_pct,   na.rm=TRUE)),
-  sprintf("Mean proportional change & $%.1f\\%%$ & $%.1f\\%%$ \\\\",
-          mean(single$delta_pct, na.rm=TRUE),
-          mean(stag$delta_pct,   na.rm=TRUE)),
+  sprintf("Median $|\\Delta|$ & $%.1f\\%%$ & $%.1f\\%%$ \\\\",
+          median(abs(single$delta_pct), na.rm=TRUE),
+          median(abs(stag$delta_pct),   na.rm=TRUE)),
   sprintf("Share with $|\\Delta| > 50\\%%$ & %s & %s \\\\",
           pct0(mean(abs(single$delta_pct) > 50,  na.rm=TRUE)),
           pct0(mean(abs(stag$delta_pct)   > 50,  na.rm=TRUE))),
@@ -425,7 +527,7 @@ lines <- c(
           pct0(mean(abs(stag$delta_pct)   > 100, na.rm=TRUE))),
   "\\bottomrule", "\\end{tabular}",
   "\\begin{tablenotes}[flushleft]", "\\footnotesize",
-  "\\item Notes: $\\Delta = (\\hat\\beta_{CS} - \\hat\\beta_{TWFE}) / |\\hat\\beta_{TWFE}|$. The CS-DID benchmark uses the dynamic aggregate.",
+  "\\item Notes: $\\Delta = (\\hat\\beta_{CS} - \\hat\\beta_{TWFE}) / |\\hat\\beta_{TWFE}|$ is computed per article and summarized in absolute value to avoid cancellation across articles with opposite-signed movements. The CS-DID benchmark uses the dynamic aggregate.",
   "\\end{tablenotes}", "\\end{threeparttable}", "\\end{table}")
 write_tex("table_4_2_timing_heterogeneity.tex", lines)
 
@@ -466,6 +568,13 @@ if (!is.null(dcdh_df)) {
       (abs(dcdh_df$sum_negative) + dcdh_df$sum_positive)
     neg_col <- "share_neg_derived"
   }
+  # 2026-04-21: Restrict dCdH to the SAME in-sample staggered universe that
+  # feeds the Bacon panel. The combined CSV historically included 35 rows
+  # spanning one-time-adoption papers and 3 papers later excluded from the
+  # sample (paper-auditor FAIL: 234, 242, 380). Keeping those inflates the
+  # denominator and makes the table inconsistent with its "staggered" caption.
+  dcdh_df$id_str <- as.character(dcdh_df$id)
+  dcdh_df <- dcdh_df[dcdh_df$id_str %in% stag_ids, , drop = FALSE]
   dcdh_n      <- nrow(dcdh_df)
   dcdh_any    <- sum(dcdh_df[[neg_col]] > 0,        na.rm = TRUE)
   dcdh_mean   <- mean(dcdh_df[[neg_col]],            na.rm = TRUE)
@@ -505,19 +614,10 @@ lines <- c(
   "\\bottomrule", "\\end{tabular}",
   "\\begin{tablenotes}[flushleft]", "\\footnotesize",
   sprintf(paste0(
-    "\\item \\textit{Notes}: The Bacon decomposition \\citep{goodman2021difference} partitions the TWFE estimator into $2\\times2$ comparisons; treated-vs-treated (TvT) includes ``Earlier vs Later'' and ``Later vs Earlier'' comparisons, where already-treated units serve as controls. ",
-    "%d article%s have TvT $= 100\\%%$, meaning all units are eventually treated and the entire TWFE estimate relies on timing variation. ",
-    "The de Chaisemartin--d'Haultfoeuille decomposition \\citep{de2020two} expresses TWFE as a weighted sum of group--time ATTs; share of negative weights $= |\\Sigma\\,\\omega^{-}| \\,/\\, (|\\Sigma\\,\\omega^{-}| + \\Sigma\\,\\omega^{+})$.%s%s"),
-    bacon_eq100_n, ifelse(bacon_eq100_n == 1, "", "s"),
-    if (bacon_excl_n > 0)
-      sprintf(" %d staggered article%s %s excluded from the Bacon computation due to panel size exceeding computational limits or lack of treatment variation in the balanced panel.",
-              bacon_excl_n, ifelse(bacon_excl_n == 1, "", "s"),
-              ifelse(bacon_excl_n == 1, "is", "are"))
-    else "",
-    if (!is.na(dcdh_n) && (stag_total - dcdh_n) > 0)
-      sprintf(" %d %s excluded from the dCdH computation due to complex multi-file data construction.",
-              stag_total - dcdh_n, ifelse((stag_total - dcdh_n) == 1, "is", "are"))
-    else ""),
+    "\\item \\textit{Notes.} Both panels are restricted to the %d staggered-adoption articles in the comparable subsample. The Goodman-Bacon decomposition \\parencite{goodman2021difference} expresses TWFE as a weighted average of $2\\times 2$ comparisons. The treated-vs-treated (TvT) share collects the ``Earlier vs Later'' and ``Later vs Earlier'' components in which already-treated units serve as controls. The de Chaisemartin and d'Haultfoeuille decomposition \\parencite{dechaisemartin2020twfe} expresses TWFE as a weighted sum of group-time ATTs and reports the share of negative weights as $|\\Sigma\\,\\omega^{-}| / (|\\Sigma\\,\\omega^{-}| + \\Sigma\\,\\omega^{+})$. The Bacon panel loses %d article%s (panel size or no treatment variation in a balanced panel). The dCdH panel loses %d (complex multi-file data construction). Appendix~\\ref{AppendixC} gives the implementation and exclusion rules."),
+    stag_total,
+    bacon_excl_n, ifelse(bacon_excl_n == 1, "", "s"),
+    stag_total - dcdh_n),
   "\\end{tablenotes}", "\\end{threeparttable}", "\\end{table}")
 write_tex("table_4_3_bacon_summary.tex", lines)
 
@@ -531,23 +631,69 @@ if (!is.null(progbin) && nrow(progbin) > 0) {
   col <- names(progbin)
   id_col   <- grep("^id$|article|paper", col, value = TRUE, ignore.case = TRUE)[1]
   ds_col   <- grep("^ds$|design|data_structure|structure", col, value = TRUE, ignore.case = TRUE)[1]
-  k0_col   <- grep("k_?0|beta_k0|k0", col, value = TRUE, ignore.case = TRUE)[1]
-  kmax_col <- grep("k_?max|beta_kmax", col, value = TRUE, ignore.case = TRUE)[1]
-  kn_col   <- grep("^k_?max_?val|^kmax$|^k$", col, value = TRUE, ignore.case = TRUE)[1]
-  d_col    <- grep("delta|change_pct|pct_change", col, value = TRUE, ignore.case = TRUE)[1]
-  sig_col  <- grep("^sig$|^significant$|_sig$|^is_sig", col, value = TRUE, ignore.case = TRUE)[1]
-  auth_col <- grep("author|cite|biblio|textcite|ref|label", col, value = TRUE, ignore.case = TRUE)[1]
+  # The two coefficient columns and their SEs. We need explicit, distinct
+  # patterns: a generic "k0" pattern would match "kmax" too because grep is
+  # substring-based. Order also matters because of the [1] selector.
+  k0_col    <- "k0_coef"
+  kmax_col  <- "kmax_coef"
+  k0se_col  <- "k0_se"
+  kmaxse_col<- "kmax_se"
+  kn_col    <- grep("^k_?max_?val|^kmax$|^k$", col, value = TRUE, ignore.case = TRUE)[1]
+  d_col     <- grep("delta|change_pct|pct_change", col, value = TRUE, ignore.case = TRUE)[1]
+  sig_col   <- grep("^sig$|^significant$|_sig$|^is_sig", col, value = TRUE, ignore.case = TRUE)[1]
+  auth_col  <- grep("author|cite|biblio|textcite|ref|label", col, value = TRUE, ignore.case = TRUE)[1]
 
   progbin$.id     <- progbin[[id_col]]
   progbin$.ds     <- if (!is.na(ds_col))   progbin[[ds_col]]   else NA_character_
-  progbin$.k0     <- if (!is.na(k0_col))   progbin[[k0_col]]   else NA_real_
-  progbin$.kmax   <- if (!is.na(kmax_col)) progbin[[kmax_col]] else NA_real_
+  progbin$.k0     <- if (k0_col    %in% col) progbin[[k0_col]]    else NA_real_
+  progbin$.kmax   <- if (kmax_col  %in% col) progbin[[kmax_col]]  else NA_real_
+  progbin$.k0_se  <- if (k0se_col  %in% col) progbin[[k0se_col]]  else NA_real_
+  progbin$.kmax_se<- if (kmaxse_col%in% col) progbin[[kmaxse_col]]else NA_real_
   progbin$.kn     <- if (!is.na(kn_col))   progbin[[kn_col]]   else NA_integer_
   progbin$.delta  <- if (!is.na(d_col))    progbin[[d_col]]    else NA_real_
   progbin$.sig    <- if (!is.na(sig_col))  progbin[[sig_col]]  else
-                       (!is.na(progbin$.k0) & !is.na(progbin[["k0_se"]]) &
-                        progbin[["k0_se"]] > 0 & abs(progbin$.k0 / progbin[["k0_se"]]) > 1.96)
+                       (!is.na(progbin$.k0) & !is.na(progbin$.k0_se) &
+                        progbin$.k0_se > 0 & abs(progbin$.k0 / progbin$.k0_se) > 1.96)
   progbin$.author <- if (!is.na(auth_col)) progbin[[auth_col]] else as.character(progbin$.id)
+  # 2026-04-21: Map article id -> example.bib citation key. The progbin CSV
+  # only carries the display label (e.g. "Buchmueller, Carey (2018)"), which
+  # cannot be passed to \textcite{} verbatim because of the comma. Looking the
+  # key up here keeps the table compatible with the project's bibliography.
+  progbin_bibkeys <- c(
+    "21"  = "buchmueller2018effect",
+    "25"  = "carrillo2019provider",
+    "60"  = "schmitt2018multimarket",
+    "65"  = "akosaantwi2013effects",
+    "76"  = "lawler2023effect",
+    "79"  = "carpenter2019direct",
+    "125" = "levine2011effective",
+    "147" = "greenstone2014environmental",
+    "201" = "maclean2025paid",
+    "228" = "sarmiento2023air",
+    "234" = "myers2017power",
+    "242" = "moorthy2025bluecollar",
+    "253" = "bancalari2024unintended",
+    "262" = "anderson2024imposing",
+    "263" = "axbard2024informed",
+    "267" = "bhalotra2023maternal",
+    "271" = "sekhri2024curse",
+    "290" = "arbogast2024burdens",
+    "309" = "johnson2024legal",
+    "321" = "xu2023bureaucratic",
+    "333" = "clarke2021abortion")
+  progbin$.bibkey <- unname(progbin_bibkeys[as.character(progbin$.id)])
+  # 2026-04-22: read ev_post (the far-post bin position, i.e. the "t" in
+  # \hat\beta_{L_t}) from each paper's metadata so the table can report
+  # both (t, k) to make the progressive-binning experiment fully specified.
+  progbin$.t <- NA_integer_
+  for (j in seq_len(nrow(progbin))) {
+    mf <- file.path(data_dir, "metadata", sprintf("%s.json", progbin$.id[j]))
+    if (file.exists(mf)) {
+      mm <- tryCatch(fromJSON(mf), error = function(e) NULL)
+      if (!is.null(mm) && !is.null(mm$analysis$event_post))
+        progbin$.t[j] <- as.integer(mm$analysis$event_post)
+    }
+  }
   progbin <- progbin %>% arrange(.delta)
 
   n_articles <- nrow(progbin)
@@ -567,50 +713,82 @@ if (!is.null(progbin) && nrow(progbin) > 0) {
     "\\begin{table}[htbp]", "\\centering",
     "\\caption{Sensitivity of the far-post bin coefficient to progressive binning}",
     "\\label{tab:progbin_sensitivity}",
-    "\\small",
-    "\\begin{tabular}{lccccr}",
+    "\\footnotesize",
+    # 8 columns: Article, beta_k0, SE, beta_kmax, SE, t, kmax, Delta
+    "\\begin{tabular}{lrlrlccr}",
     "\\toprule",
-    "Article & Design & $\\hat\\beta_{k=0}$ & $\\hat\\beta_{k_{\\max}}$ & $k_{\\max}$ & $\\Delta$ \\\\",
+    "Article & \\multicolumn{2}{c}{$\\hat\\beta_{k=0}$} & \\multicolumn{2}{c}{$\\hat\\beta_{k_{\\max}}$} & $t$ & $k_{\\max}$ & $\\Delta$ \\\\",
+    "\\cmidrule(lr){2-3} \\cmidrule(lr){4-5}",
     "\\midrule")
+  # Standard econ-table convention:
+  #   *** p < 0.01, ** p < 0.05, * p < 0.10
+  # Falls back to the empty string when the SE is missing or non-positive.
+  # Returns the star suffix to be placed INSIDE the same math environment as
+  # the coefficient (e.g. coef "$-0.021^{*}$"). Putting the star outside the
+  # math env (e.g. "$-0.021$$^{*}$") produces awkward inter-character spacing.
+  sig_star <- function(coef, se) {
+    if (is.na(coef) || is.na(se) || se <= 0) return("")
+    z <- abs(coef / se)
+    if (z > 2.58)       "^{***}"
+    else if (z > 1.96)  "^{**}"
+    else if (z > 1.645) "^{*}"
+    else ""
+  }
   for (i in seq_len(nrow(progbin))) {
-    sig_val <- progbin$.sig[i]
-    is_sig <- isTRUE(sig_val) || identical(sig_val, TRUE) ||
-              identical(sig_val, "TRUE") || identical(sig_val, 1)
-    dag <- if (is_sig) "" else "\\textsuperscript{\\dag}"
-    author_tx <- progbin$.author[i]
-    if (!grepl("\\\\textcite|\\\\cite", author_tx))
-      author_tx <- sprintf("\\textcite{%s}", author_tx)
+    bk <- progbin$.bibkey[i]
+    if (!is.na(bk) && nzchar(bk)) {
+      author_tx <- sprintf("\\textcite{%s}", bk)
+    } else {
+      # Fallback if the id is missing from the lookup: emit the display label
+      # in plain text (no \textcite wrapper) so LaTeX does not generate a
+      # broken multi-key citation from a comma-containing label.
+      author_tx <- progbin$.author[i]
+      warning(sprintf("table_4_4: missing bibkey for id %s; emitted plain label.",
+                      as.character(progbin$.id[i])))
+    }
+    star_k0   <- sig_star(progbin$.k0[i],   progbin$.k0_se[i])
+    star_kmax <- sig_star(progbin$.kmax[i], progbin$.kmax_se[i])
+    # SE goes in its own column to the right of the coefficient -- this keeps
+    # each article on a single row (compact) and still uses the standard
+    # econometric "estimate (se)" pairing.
+    se0_tx <- if (is.na(progbin$.k0_se[i]))   "---" else sprintf("(%.3f)", progbin$.k0_se[i])
+    sek_tx <- if (is.na(progbin$.kmax_se[i])) "---" else sprintf("(%.3f)", progbin$.kmax_se[i])
     lines <- c(lines, sprintf(
-      "%s%s & %s & $%+.3f$ & $%+.3f$ & %s & $%+.0f\\%%$ \\\\",
-      author_tx, dag,
-      ifelse(is.na(progbin$.ds[i]), "---", as.character(progbin$.ds[i])),
-      progbin$.k0[i], progbin$.kmax[i],
+      "%s & $%+.3f%s$ & %s & $%+.3f%s$ & %s & %s & %s & $%+.0f\\%%$ \\\\",
+      author_tx,
+      progbin$.k0[i], star_k0, se0_tx,
+      progbin$.kmax[i], star_kmax, sek_tx,
+      ifelse(is.na(progbin$.t[i]),  "---", as.character(progbin$.t[i])),
       ifelse(is.na(progbin$.kn[i]), "---", as.character(progbin$.kn[i])),
       progbin$.delta[i]))
   }
   lines <- c(lines,
     "\\midrule",
-    sprintf("\\multicolumn{5}{l}{\\textit{Summary (all %d articles)}} \\\\", n_articles),
-    sprintf("\\multicolumn{3}{l}{\\quad Median $|\\Delta|$} & \\multicolumn{3}{r}{%.0f\\%%} \\\\",
+    sprintf("\\multicolumn{8}{l}{\\textit{Summary (all %d articles)}} \\\\", n_articles),
+    sprintf("\\multicolumn{4}{l}{\\quad Median $|\\Delta|$} & \\multicolumn{4}{r}{%.0f\\%%} \\\\",
             median_abs_delta),
-    sprintf("\\multicolumn{3}{l}{\\quad Share $|\\Delta| > 20\\%%$} & \\multicolumn{3}{r}{%.0f\\%% (%d/%d)} \\\\",
+    sprintf("\\multicolumn{4}{l}{\\quad Share $|\\Delta| > 20\\%%$} & \\multicolumn{4}{r}{%.0f\\%% (%d/%d)} \\\\",
             100*share_gt20/n_articles, share_gt20, n_articles),
-    sprintf("\\multicolumn{3}{l}{\\quad Share $|\\Delta| > 50\\%%$} & \\multicolumn{3}{r}{%.0f\\%% (%d/%d)} \\\\",
+    sprintf("\\multicolumn{4}{l}{\\quad Share $|\\Delta| > 50\\%%$} & \\multicolumn{4}{r}{%.0f\\%% (%d/%d)} \\\\",
             100*share_gt50/n_articles, share_gt50, n_articles),
     "\\addlinespace",
-    sprintf("\\multicolumn{5}{l}{\\textit{Summary excl.\\ \\dag\\ articles (%d articles, $\\hat\\beta_{k=0}$ significant)}} \\\\",
+    sprintf("\\multicolumn{8}{l}{\\textit{Summary, articles with $\\hat\\beta_{k=0}$ significant at 5\\%% (%d articles)}} \\\\",
             n_sig),
-    sprintf("\\multicolumn{3}{l}{\\quad Median $|\\Delta|$} & \\multicolumn{3}{r}{%s} \\\\",
+    sprintf("\\multicolumn{4}{l}{\\quad Median $|\\Delta|$} & \\multicolumn{4}{r}{%s} \\\\",
             ifelse(is.na(median_abs_delta_sig), "---",
                    sprintf("%.0f\\%%", median_abs_delta_sig))),
-    sprintf("\\multicolumn{3}{l}{\\quad Share $|\\Delta| > 20\\%%$} & \\multicolumn{3}{r}{%.0f\\%% (%d/%d)} \\\\",
+    sprintf("\\multicolumn{4}{l}{\\quad Share $|\\Delta| > 20\\%%$} & \\multicolumn{4}{r}{%.0f\\%% (%d/%d)} \\\\",
             ifelse(n_sig == 0, 0, 100*share_sig_gt20/n_sig), share_sig_gt20, n_sig),
     "\\bottomrule", "\\end{tabular}", "",
     "\\footnotesize",
-    paste0("\\textit{Notes:} $\\Delta = (\\hat\\beta_{k_{\\max}} - \\hat\\beta_{k_0}) / |\\hat\\beta_{k_0}|$. ",
-           "At $k = 0$ the far-post bin contains only the endpoint period and treated observations outside the event window are excluded; at $k_{\\max}$ the bin absorbs all available horizons. ",
+    "\\justifying",
+    paste0("\\textit{Notes:} Standard errors in parentheses. $^{*}$\\,$p<0.10$, $^{**}$\\,$p<0.05$, $^{***}$\\,$p<0.01$. ",
+           "The coefficient reported in both columns is $\\hat\\beta_{L_t}$: the far-post bin in the original event study, where $t$ is the paper's last uncensored horizon (from \\texttt{metadata.json.analysis.event\\_post}). The bin label $L_t$ is fixed across columns; what varies is the set of data the bin absorbs. ",
+           "At $k = 0$ the bin holds only horizon $t$ itself: the sample window is $[-\\text{ev}_{\\text{pre}}, t]$ and no extra periods are folded in. At $k = k_{\\max}$ the same $L_t$ bin absorbs the horizons $\\{t, t+1, \\ldots, t + k_{\\max}\\}$, drawn from the expanded window $[-(\\text{ev}_{\\text{pre}} + k_{\\max}),\\, t + k_{\\max}]$. ",
+           "Example: for \\textcite{clarke2021abortion} we report $t = 36$ and $k_{\\max} = 20$, so the $L_{36}$ coefficient at $k = 0$ is identified off horizon $36$ alone, while at $k = 20$ the same $L_{36}$ coefficient absorbs horizons $36$ through $56$. ",
+           "$\\Delta = (\\hat\\beta_{L_t,\\, k_{\\max}} - \\hat\\beta_{L_t,\\, 0}) / |\\hat\\beta_{L_t,\\, 0}|$ measures how this single bin coefficient moves once additional post-treatment horizons are folded into it; the bin position $t$ does not move. ",
            "Controls are restricted to the calendar-time range of the remaining treated observations at each $k$. ",
-           "\\dag~indicates $\\hat\\beta_{k=0}$ is not statistically significant at the 5\\% level; percentage changes for these articles are mechanically large and should be interpreted with caution."),
+           "Articles with $\\hat\\beta_{L_t, 0}$ not significant at the 5\\% level have mechanically large percentage changes and should be interpreted with caution."),
     "\\end{table}")
   write_tex("table_4_4_progbin_sensitivity.tex", lines)
 } else {
@@ -668,7 +846,7 @@ if (!is.null(hd) && nrow(hd) > 0) {
 
   lines <- c(
     "% Auto-generated by code/tables/01_chapter_statistics.R — DO NOT EDIT BY HAND.",
-    "\\begin{table}[htbp]", "\\centering",
+    "\\begin{table}[htbp]", "\\centering", "\\small",
     "\\caption{Sensitivity of dynamic effects to violations of parallel trends}",
     "\\label{tab:ch3_honestdid}",
     "\\begin{threeparttable}",
@@ -699,7 +877,7 @@ if (!is.null(hd) && nrow(hd) > 0) {
             count_rel(p_twfe_v, p_cs_v, "gt"), count_rel(p_twfe_v, p_cs_v, "lt"), count_rel(p_twfe_v, p_cs_v, "eq")),
     "\\bottomrule", "\\end{tabular*}",
     "\\begin{tablenotes}[flushleft]", "\\footnotesize",
-    "\\item \\textit{Notes}: Higher values of $\\bar M$ indicate that the empirical conclusion survives larger departures from exact parallel trends.",
+    "\\item \\textit{Notes}: Higher values of $\\bar M$ indicate that the empirical conclusion survives larger departures from exact parallel trends. The top panel reports the distribution of $\\bar M$ across articles for which the HonestDiD exercise is estimable under the indicated estimator; denominators can vary across cells and across the first-period vs.\\ peak-coefficient rows when an article lacks one of the two inputs. The bottom panel compares TWFE and CS-DID $\\bar M$ values on the subset of articles for which both estimators deliver a $\\bar M$ at the horizon in question; its row totals therefore need not equal the denominators of the top panel.",
     "\\end{tablenotes}", "\\end{threeparttable}", "\\end{table}")
   write_tex("table_4_5_honestdid.tex", lines)
 } else {
@@ -767,10 +945,8 @@ lines <- c(
     "``Significance loss'': same sign, TWFE significant but CS-DID not. ",
     "``Sign reversal ($\\geq$1 sig.)'': opposite signs and at least one individually significant at 5\\%%. ",
     "CS-DID uses the never-treated control group (not-yet-treated as fallback). ",
-    "%d article%s lack the simple aggregation, giving $n=%d$ in that column."),
-    c_dyn$total - c_sim$total,
-    ifelse((c_dyn$total - c_sim$total) == 1, "", "s"),
-    c_sim$total),
+    "Column totals differ because coverage is aggregation-specific: $n=%d$ under the dynamic rule, $n=%d$ under the group rule, and $n=%d$ under the simple rule."),
+    c_dyn$total, c_grp$total, c_sim$total),
   "\\end{tablenotes}", "\\end{threeparttable}", "\\end{table}")
 write_tex("table_4_6_aggte_comparison.tex", lines)
 

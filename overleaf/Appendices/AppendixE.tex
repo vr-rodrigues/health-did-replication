@@ -1,0 +1,74 @@
+\chapter{Notation and Technical Glossary}
+\label{AppendixE}
+
+This appendix lists the symbols, acronyms, and technical terms that appear in
+the compiled dissertation, grouped by topic. Each row gives a one-line
+definition and a pointer to the section, table, or figure where the object is
+first introduced or used. Default behaviours apply unless an article's metadata
+explicitly overrides them.
+
+\begin{small}
+\begin{longtable}{@{}p{3.5cm} p{9.5cm} p{2.0cm}@{}}
+\caption{Notation and technical terms}
+\label{tab:notation} \\
+\toprule
+\textbf{Symbol / term} & \textbf{Definition} & \textbf{First use} \\
+\midrule
+\endfirsthead
+
+\multicolumn{3}{l}{\footnotesize\textit{(Table~\ref{tab:notation} continued from previous page.)}} \\
+\toprule
+\textbf{Symbol / term} & \textbf{Definition} & \textbf{First use} \\
+\midrule
+\endhead
+
+\midrule
+\multicolumn{3}{r}{\footnotesize\textit{(Continues on next page.)}} \\
+\endfoot
+
+\bottomrule
+\endlastfoot
+
+\multicolumn{3}{l}{\textit{Estimators}} \\
+TWFE                              & Two-way fixed-effects regression with unit and time fixed effects                                      & \S\ref{Chapter2} \\
+CS-DID                            & \textcite{callaway2021difference} difference-in-differences                                             & \S\ref{Chapter2} \\
+CS-NT                             & CS-DID with never-treated comparison group                                                              & \S\ref{Chapter3} \\
+CS-NYT                            & CS-DID with not-yet-treated comparison group                                                            & \S\ref{Chapter3} \\
+SA                                & \textcite{sun2021estimating} event-study estimator                                                      & \S\ref{Chapter2} \\
+BJS (Gardner)                     & \textcite{borusyak2024revisiting} imputation estimator; here the \texttt{did2s} implementation of \textcite{gardner2022two} & \S\ref{Chapter3} \\
+dCdH                              & \textcite{dechaisemartin2020twfe} TWFE decomposition / \texttt{did\_multiplegt\_dyn} estimator          & \S\ref{Chapter2} \\
+HonestDiD                         & \textcite{rambachan2023more} sensitivity framework for parallel-trends violations                       & \S\ref{Chapter2} \\
+\addlinespace
+\multicolumn{3}{l}{\textit{Causal parameters and aggregations}} \\
+$ATT(g,t)$                        & Average treatment effect on cohort $g$ at time $t$ (Callaway--Sant'Anna's building block)               & \S\ref{Chapter2} \\
+CATT                              & Cohort-specific ATT; same object as $ATT(g,t)$ when indexed by cohort alone                             & \S\ref{Chapter2} \\
+Group aggregation                 & \texttt{aggte(type="group")} --- average within each cohort, then across cohorts                         & \S\ref{Chapter3} \\
+Simple aggregation                & \texttt{aggte(type="simple")} --- direct average across all $(g,t)$ cells                                & \S\ref{Chapter3} \\
+Dynamic aggregation               & \texttt{aggte(type="dynamic")} --- average across cohorts at each event-time horizon                     & \S\ref{Chapter3} \\
+\addlinespace
+\multicolumn{3}{l}{\textit{Event-study horizons and binning}} \\
+$e$                               & Event time: periods relative to first treatment ($e=0$ is the adoption period)                         & \S\ref{Chapter3} \\
+$F_K$, $L_K$                      & Far-pre and far-post endpoint bins ($e \leq -K_{\text{pre}}$ and $e \geq K_{\text{post}}$)             & \S\ref{sec:binning} \\
+$\hat\beta_{k=0}$, $\hat\beta_{k_{\max}}$ & Far-post coefficient when the bin holds only the terminal horizon ($k=0$) versus absorbing all distant horizons ($k_{\max}$) & \S\ref{sec:binning} \\
+$\Delta$                          & Progressive-binning sensitivity: $(\hat\beta_{k_{\max}} - \hat\beta_{k=0}) / |\hat\beta_{k=0}|$        & Table~\ref{tab:progbin_sensitivity} \\
+\addlinespace
+\multicolumn{3}{l}{\textit{Panel structure and balancing}} \\
+Balanced (R)                      & Keep only units observed in every period; \texttt{did::att\_gt(allow\_unbalanced\_panel=FALSE)} internal pair-balancing when data happen to be balanced & \S\ref{sec:li_sensitivity} \\
+Unbalanced (R)                    & Use all available observations; \texttt{did::att\_gt(allow\_unbalanced\_panel=TRUE)}                    & \S\ref{sec:li_sensitivity} \\
+Pair-balanced (Stata)             & Stata's \texttt{csdid2}: for each $(g,t)$, retain units observed in base period and in $t$             & \S\ref{sec:li_sensitivity} \\
+Fill rate                         & Fraction of $(\text{unit} \times \text{time})$ cells observed in the panel                              & \S\ref{sec:li_sensitivity} \\
+Base period (universal / varying) & Reference period for event-study normalization: $g-1$ (universal, CS--standardised) or $t-1$ (varying, Stata default) & \S\ref{sec:li_sensitivity} \\
+\addlinespace
+\multicolumn{3}{l}{\textit{Goodman-Bacon decomposition}} \\
+TvT share                         & Combined share of the ``Earlier vs Later'' and ``Later vs Earlier'' weights in the Bacon decomposition --- the treated-versus-treated comparisons & Table~\ref{tab:bacon_summary} \\
+\addlinespace
+\multicolumn{3}{l}{\textit{HonestDiD}} \\
+$\bar M$                          & Breakdown value under Rambachan--Roth relative-magnitude restrictions (the smallest $\bar M \geq 0$ at which the confidence interval covers zero) & Table~\ref{tab:ch3_honestdid} \\
+$\bar M_{\text{first}}$           & $\bar M$ evaluated at the first post-treatment period                                                    & Table~\ref{tab:ch3_honestdid} \\
+$\bar M_{\text{peak}}$            & $\bar M$ evaluated at the post-treatment event-time coefficient with the largest $|t|$                  & Table~\ref{tab:ch3_honestdid} \\
+\addlinespace
+\multicolumn{3}{l}{\textit{Metadata fields}} \\
+\texttt{xformla}                  & \texttt{did::att\_gt} argument for the conditional-parallel-trends covariate set                        & \S\ref{Chapter3} \\
+
+\end{longtable}
+\end{small}

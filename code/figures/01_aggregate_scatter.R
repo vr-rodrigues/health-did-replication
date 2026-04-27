@@ -70,6 +70,7 @@ for (id in ids) {
       att_cs_nt_with_ctrls = NA, se_cs_nt_with_ctrls = NA,
       att_cs_nt_with_ctrls_dyn = NA, se_cs_nt_with_ctrls_dyn = NA,
       cs_nt_with_ctrls_status = NA_character_,
+      beta_twfe_no_ctrls = NA, se_twfe_no_ctrls = NA,
       stringsAsFactors = FALSE)
   } else {
     rows[[length(rows) + 1]] <- data.frame(
@@ -88,6 +89,8 @@ for (id in ids) {
       se_cs_nt_with_ctrls_dyn  = gcol("se_cs_nt_with_ctrls_dyn"),
       cs_nt_with_ctrls_status = if ("cs_nt_with_ctrls_status" %in% names(res))
                                   as.character(res$cs_nt_with_ctrls_status[1]) else NA_character_,
+      beta_twfe_no_ctrls = gcol("beta_twfe_no_ctrls"),
+      se_twfe_no_ctrls   = gcol("se_twfe_no_ctrls"),
       stringsAsFactors = FALSE)
   }
 }
@@ -179,6 +182,104 @@ build_agg <- function(all_data, agg_type) {
       short_label = gsub(" et al\\.", "", author_label),
       short_label = gsub(" \\(\\d{4}[a-z]?\\)", "", short_label))
     return(df)
+  } else if (agg_type == "dynamic") {
+    # OFFICIAL COMPOSITE — simplified 2-level cascade.
+    #   Spec A (matched): TWFE and CS-DID both see the same covariate structure.
+    #     * Papers with no TWFE controls       -> beta_twfe + unconditional CS-DID.
+    #     * Papers with TWFE controls, valid   -> beta_twfe + att_cs_nt_with_ctrls_dyn.
+    #   Spec C (asymmetric fallback): TWFE w/ ctrls vs unconditional CS-DID.
+    #     * Used when the paper has controls but Spec A is degenerate
+    #       (doubly-robust CS-DID returns att=0 with se=NA, Pattern 42).
+    # The TWFE side always uses the paper's original beta_twfe (with its own
+    # controls). Fallback (C) papers are flagged is_fallback=TRUE and get a
+    # dagger in the plot. NT is the preferred CS estimator; NYT is a fallback
+    # only for papers where NT never estimated (e.g. IDs 44, 210).
+    df <- all_data %>%
+      filter(!is.na(beta_twfe) & !is.na(se_twfe) & se_twfe > 0)
+    df$att_cs <- NA_real_; df$se_cs <- NA_real_
+    df$cs_source <- NA_character_
+    df$is_fallback <- FALSE
+    df$spec <- NA_character_
+
+    pick_cs_unc <- function(i) {
+      # Prefer dynamic, fall back to group (static) when dynamic is NA.
+      if (!is.na(df$att_nt_dynamic[i]) && !is.na(df$se_nt_dynamic[i]) &&
+          df$se_nt_dynamic[i] > 0)
+        return(list(att = df$att_nt_dynamic[i], se = df$se_nt_dynamic[i],
+                    lab = "NT-unconditional"))
+      if (!is.na(df$att_nyt_dynamic[i]) && !is.na(df$se_nyt_dynamic[i]) &&
+          df$se_nyt_dynamic[i] > 0)
+        return(list(att = df$att_nyt_dynamic[i], se = df$se_nyt_dynamic[i],
+                    lab = "NYT-unconditional"))
+      if (!is.na(df$att_nt_group[i]) && !is.na(df$se_nt_group[i]) &&
+          df$se_nt_group[i] > 0)
+        return(list(att = df$att_nt_group[i], se = df$se_nt_group[i],
+                    lab = "NT-unconditional (static)"))
+      if (!is.na(df$att_nyt_group[i]) && !is.na(df$se_nyt_group[i]) &&
+          df$se_nyt_group[i] > 0)
+        return(list(att = df$att_nyt_group[i], se = df$se_nyt_group[i],
+                    lab = "NYT-unconditional (static)"))
+      NULL
+    }
+
+    for (i in seq_len(nrow(df))) {
+      if (df$n_twfe_controls[i] == 0) {
+        # Paper has no TWFE controls -> Spec A trivially matched (both unconditional)
+        cs <- pick_cs_unc(i)
+        if (!is.null(cs)) {
+          df$att_cs[i]    <- cs$att
+          df$se_cs[i]     <- cs$se
+          df$cs_source[i] <- paste0(cs$lab, " (no controls either side)")
+          df$spec[i]      <- "A_no_ctrls"
+        }
+      } else {
+        # Paper has TWFE controls -> try Spec A matched (CS w/ same controls)
+        specA_ok <- !is.na(df$att_cs_nt_with_ctrls_dyn[i]) &&
+                    abs(df$att_cs_nt_with_ctrls_dyn[i]) > 1e-9 &&
+                    !is.na(df$se_cs_nt_with_ctrls_dyn[i]) &&
+                    df$se_cs_nt_with_ctrls_dyn[i] > 0
+        if (specA_ok) {
+          df$att_cs[i]    <- df$att_cs_nt_with_ctrls_dyn[i]
+          df$se_cs[i]     <- df$se_cs_nt_with_ctrls_dyn[i]
+          df$cs_source[i] <- "NT-with-ctrls (Spec A matched)"
+          df$spec[i]      <- "A_w_ctrls"
+        } else {
+          # Spec C fallback: TWFE w/ ctrls vs CS-DID unconditional (asymmetric)
+          cs <- pick_cs_unc(i)
+          if (!is.null(cs)) {
+            df$att_cs[i]      <- cs$att
+            df$se_cs[i]       <- cs$se
+            df$cs_source[i]   <- paste0(cs$lab, " (Spec C fallback)")
+            df$is_fallback[i] <- TRUE
+            df$spec[i]        <- "C"
+          }
+        }
+      }
+    }
+    df <- df %>% filter(!is.na(att_cs) & !is.na(se_cs) & se_cs > 0)
+    crit <- 1.96
+    df <- df %>% mutate(
+      z_twfe = beta_twfe / se_twfe, z_cs = att_cs / se_twfe,
+      ratio_att = att_cs / beta_twfe, ratio_se = se_cs / se_twfe,
+      sig_twfe = abs(beta_twfe / se_twfe) > crit,
+      sig_cs   = abs(att_cs / se_cs) > crit,
+      same_sign = sign(beta_twfe) == sign(att_cs),
+      category = factor(case_when(
+        !same_sign & (sig_twfe | sig_cs) ~ "Sign\nreversal",
+        !same_sign & !sig_twfe & !sig_cs ~ "Sign reversal\n(insig)",
+        same_sign & sig_twfe & sig_cs    ~ "Concordant",
+        same_sign & sig_twfe & !sig_cs   ~ "Significance\nloss",
+        same_sign & !sig_twfe & sig_cs   ~ "Significance\ngain",
+        same_sign & !sig_twfe & !sig_cs  ~ "Both\ninsignificant",
+        TRUE ~ "Other"), levels = cat_levels),
+      short_label = gsub(" et al\\.", "", author_label),
+      short_label = gsub(" \\(\\d{4}[a-z]?\\)", "", short_label))
+    cat(sprintf("  Composite: %d Spec A (w/ ctrls) + %d Spec A (no ctrls, trivial) + %d Spec C (asymmetric fallback) = %d total\n",
+                sum(df$spec == "A_w_ctrls"),
+                sum(df$spec == "A_no_ctrls"),
+                sum(df$spec == "C"),
+                nrow(df)))
+    return(df)
   } else {
     nt_att <- "att_nt_dynamic"; nt_se <- "se_nt_dynamic"
     nyt_att <- "att_nyt_dynamic"; nyt_se <- "se_nyt_dynamic"
@@ -196,7 +297,8 @@ build_agg <- function(all_data, agg_type) {
       att_cs = ifelse(is.na(att_cs), .data[[fb_nt_att]], att_cs),
       se_cs  = ifelse(is.na(se_cs), .data[[fb_nt_se]], se_cs),
       att_cs = ifelse(is.na(att_cs), .data[[fb_nyt_att]], att_cs),
-      se_cs  = ifelse(is.na(se_cs), .data[[fb_nyt_se]], se_cs)
+      se_cs  = ifelse(is.na(se_cs), .data[[fb_nyt_se]], se_cs),
+      is_fallback = FALSE
     ) %>%
     filter(!is.na(att_cs) & !is.na(se_cs) & se_cs > 0)
 
@@ -239,7 +341,7 @@ make_hist_grob <- function(vals, title_text, xlab_text, xlim_range = NULL) {
 }
 
 # ============ SCATTER ============
-make_scatter <- function(df, agg_label) {
+make_scatter <- function(df, agg_label, show_insets = TRUE) {
   max_abs <- max(abs(c(df$z_twfe, df$z_cs)), na.rm = TRUE); lim <- ceiling(max_abs * 1.1)
   p <- ggplot(df, aes(x = z_twfe, y = z_cs, color = category, shape = category)) +
     geom_hline(yintercept = 0, color = "grey70", linetype = "dashed", linewidth = 0.3) +
@@ -257,6 +359,7 @@ make_scatter <- function(df, agg_label) {
           plot.title = element_text(size = 14, face = "bold")) +
     guides(color = guide_legend(nrow = 1, override.aes = list(size = 3))) +
     coord_fixed(ratio = 1)
+  if (!show_insets) return(p)
   valid_att <- df$ratio_att[df$same_sign & is.finite(df$ratio_att) & abs(df$ratio_att) < 5]
   valid_se  <- df$ratio_se[is.finite(df$ratio_se) & df$ratio_se > 0 & df$ratio_se < 5]
   h1 <- make_hist_grob(valid_att, "Ratio of Point Estimates:\nCS / TWFE", "CS / TWFE", c(-0.5, 3.5))
@@ -267,27 +370,67 @@ make_scatter <- function(df, agg_label) {
 
 # ============ DOT CHART ============
 make_dot <- function(df, agg_label) {
+  # If there are fallback papers (Spec C asymmetric because Spec A failed),
+  # prefix their author label with a dagger and append an explanatory note.
+  has_fb_col <- "is_fallback" %in% names(df)
+  any_fb <- has_fb_col && any(df$is_fallback, na.rm = TRUE)
   df2 <- df %>% mutate(
-    plot_label = author_label,
+    plot_label = if (has_fb_col)
+                   ifelse(is_fallback,
+                          paste0("\u2020 ", author_label),
+                          author_label)
+                 else author_label,
     delta_pct = (att_cs - beta_twfe) / abs(beta_twfe) * 100,
-    delta_pct_cap = pmin(pmax(delta_pct, -200), 200),
+    delta_pct_cap = pmin(pmax(delta_pct, -300), 300),
     label_pct = paste0(sprintf("%+.1f", delta_pct), "%"),
+    # For values that exceed the axis cap, flip the label direction so it
+    # reads INSIDE the bar (toward zero) instead of outside the capped tip
+    # (which would overlap the author-name column on the left).
+    is_capped = abs(delta_pct) > 300,
+    label_hjust = dplyr::case_when(
+      is_capped & delta_pct_cap < 0 ~ -0.15,   # capped negative: label on the right of point
+      is_capped & delta_pct_cap > 0 ~  1.15,   # capped positive: label on the left of point
+      delta_pct_cap >= 0            ~ -0.15,   # uncapped positive: label right
+      TRUE                          ~  1.15),  # uncapped negative: label left
     plot_label = reorder(plot_label, delta_pct))
-  ggplot(df2, aes(x = delta_pct_cap, y = plot_label)) +
-    geom_vline(xintercept = 0, color = "gray70", linetype = "dashed", linewidth = 0.3) +
-    geom_segment(aes(x = 0, xend = delta_pct_cap, yend = plot_label, color = category), linewidth = 0.5) +
-    geom_point(aes(color = category, shape = category), size = 2.5) +
-    geom_text(aes(label = label_pct), hjust = ifelse(df2$delta_pct_cap >= 0, -0.2, 1.2), size = 3) +
-    scale_color_manual(values = cat_colors, drop = TRUE, name = NULL) +
-    scale_shape_manual(values = cat_shapes, drop = TRUE, name = NULL) +
-    scale_x_continuous(limits = c(-220, 220), breaks = seq(-200, 200, 50),
-                       labels = paste0(seq(-200, 200, 50), "%")) +
+  # Relabel "Both insignificant" to avoid truncation on narrow legends,
+  # and replace the newline in category labels (\n) with a space for the legend.
+  cat_labels_display <- setNames(gsub("\n", " ", names(cat_colors)), names(cat_colors))
+  p <- ggplot(df2, aes(x = delta_pct_cap, y = plot_label)) +
+    geom_vline(xintercept = 0, color = "gray70", linetype = "dashed", linewidth = 0.4) +
+    geom_segment(aes(x = 0, xend = delta_pct_cap, yend = plot_label, color = category), linewidth = 0.6) +
+    geom_point(aes(color = category, shape = category), size = 3.2) +
+    geom_label(aes(label = label_pct, hjust = label_hjust),
+               size = 3.8, label.size = NA, label.padding = unit(0.10, "lines"),
+               fill = "white", alpha = 0.92) +
+    scale_color_manual(values = cat_colors, labels = cat_labels_display,
+                       drop = TRUE, name = NULL) +
+    scale_shape_manual(values = cat_shapes, labels = cat_labels_display,
+                       drop = TRUE, name = NULL) +
+    scale_x_continuous(breaks = seq(-300, 300, 50),
+                       labels = paste0(seq(-300, 300, 50), "%"),
+                       expand = expansion(mult = c(0.02, 0.02))) +
+    coord_cartesian(xlim = c(-325, 325), clip = "off") +
     labs(x = expression(Delta * "% = (CS-DID - TWFE) / |TWFE|"), y = NULL,
-         title = sprintf("Variation: CS-DID aggte(%s) vs. TWFE — %d articles", agg_label, nrow(df))) +
-    theme_classic(base_size = 12) +
-    theme(legend.position = "bottom", plot.title = element_text(size = 13, face = "bold"),
-          axis.text.y = element_text(size = 8.5)) +
-    guides(color = guide_legend(nrow = 1, override.aes = list(size = 2.5)))
+         title = sprintf("Variation: CS-DID aggte(%s) vs. TWFE - %d articles", agg_label, nrow(df))) +
+    theme_classic(base_size = 14) +
+    theme(legend.position = "bottom",
+          legend.text = element_text(size = 11),
+          legend.key.size = unit(0.55, "cm"),
+          legend.spacing.x = unit(0.3, "cm"),
+          plot.title = element_text(size = 16, face = "bold"),
+          plot.margin = margin(t = 6, r = 30, b = 6, l = 8),
+          axis.text.y = element_text(size = 11),
+          axis.text.x = element_text(size = 12),
+          axis.title.x = element_text(size = 13, margin = margin(t = 8))) +
+    guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 3)))
+  if (any_fb) {
+    note_txt <- "\u2020 TWFE with controls vs CS-DID without controls."
+    p <- p + labs(caption = note_txt) +
+      theme(plot.caption = element_text(size = 11, hjust = 0, face = "italic",
+                                        margin = margin(t = 8)))
+  }
+  p
 }
 
 # ============ GENERATE ============
@@ -299,7 +442,7 @@ out_names <- list(
   dynamic = list(scatter = "figure_4_1_aggregate_scatter_dynamic.pdf",
                  dot     = "figure_4_3_variation_pct_dynamic.pdf"),
   matched = list(scatter = "figure_4_1_aggregate_scatter_matched.pdf",
-                 dot     = "figure_4_3_variation_pct_matched.pdf")
+                 dot     = NULL)   # variacao_pct_matched not used in dissertation
 )
 
 for (agg in c("group", "simple", "dynamic", "matched")) {
@@ -308,9 +451,17 @@ for (agg in c("group", "simple", "dynamic", "matched")) {
   if (nrow(df) == 0) { cat("  No data\n"); next }
   cat(sprintf("  N articles: %d\n", nrow(df)))
   print(table(df$category))
-  ggsave(file.path(out_dir, out_names[[agg]]$scatter), make_scatter(df, agg), width=9, height=9)
-  ggsave(file.path(out_dir, out_names[[agg]]$dot), make_dot(df, agg), width=10, height=11)
-  cat(sprintf("  Saved: %s, %s\n", out_names[[agg]]$scatter, out_names[[agg]]$dot))
+  # Dynamic composite scatter omits the two ratio-histogram insets so the
+  # reader focuses on the per-article classification; the fallback message
+  # lives in the figure caption instead.
+  insets <- agg != "dynamic"
+  ggsave(file.path(out_dir, out_names[[agg]]$scatter),
+         make_scatter(df, agg, show_insets = insets), width=9, height=9)
+  if (!is.null(out_names[[agg]]$dot))
+    ggsave(file.path(out_dir, out_names[[agg]]$dot), make_dot(df, agg), width=12, height=14)
+  cat(sprintf("  Saved: %s%s\n",
+              out_names[[agg]]$scatter,
+              if (!is.null(out_names[[agg]]$dot)) paste0(", ", out_names[[agg]]$dot) else ""))
 }
 
 cat("\nDone: 01_aggregate_scatter.R\n")

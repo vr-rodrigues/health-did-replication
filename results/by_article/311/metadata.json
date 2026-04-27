@@ -27,7 +27,7 @@
     "run_csdid_nt": true,
     "run_csdid_nyt": false,
     "run_sa": true,
-    "run_bacon": false,
+    "run_bacon": true,
     "has_event_study": true,
     "event_pre": 5,
     "event_post": 5
@@ -43,5 +43,5 @@
     ]
   },
   "original_result": {},
-  "notes": "Staggered DiD: 6746 country×product units, 14 years (2005-2018). 7 treatment cohorts (2011-2017). 84.6% never-treated. Treatment = Medicines Patent Pool membership. Outcome = drug access (binary). Stata uses two-way clustering (product_code × country_code) but template uses one-way (product_code). Unbalanced panel (84.8% fill rate). Bacon decomposition disabled due to large dataset size. | FIX 2026-04-19: allow_unbalanced toggled false→true. With 84.8% fill rate and severe cohort imbalance, did_standarization balancing failed → NA. With allow_unbalanced=true: CS-NT=0.7135 (direction matches TWFE 0.6625, +7.7% magnitude). Paper-auditor EXACT (0.07%)."
+  "notes": "Staggered DiD: 6746 country×product units, 14 years (2005-2018). 7 treatment cohorts (2011-2017). 84.6% never-treated. Treatment = Medicines Patent Pool membership. Outcome = drug access (binary). Stata uses two-way clustering (product_code × country_code) but template uses one-way (product_code). Unbalanced panel (84.8% fill rate). Bacon decomposition initially disabled due to claimed large dataset size (incorrect — 7-cohort design = 28 two-by-two pairs). FIX 2026-04-20: run_bacon toggled false→true. | FIX 2026-04-19: allow_unbalanced toggled false→true. With 84.8% fill rate and severe cohort imbalance, did_standarization balancing failed → NA. With allow_unbalanced=true: CS-NT=0.7135 (direction matches TWFE 0.6625, +7.7% magnitude). Paper-auditor EXACT (0.07%)."
 }

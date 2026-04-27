@@ -23,6 +23,12 @@
 #   code/figures/06_graduated_sensitivity.R
 #   code/figures/07_density_covariates.R
 #   code/figures/08_headline_composite.R
+#   code/figures/10_bacon_dcdh_maclean.R   (Lesson 2 Bacon+dCdH panel)
+#   code/analysis/mvpf_pilots.R            (Lesson 8 MVPF table data)
+#   code/figures/11_mvpf_stress_test.R     (Lesson 8 MVPF panels A/B)
+#   code/audit/sync_final_outputs.R        (sync output -> LaTeX projects)
+#   code/audit/render_readme_pdf.R         (DCAS README PDF)
+#   code/audit/verify_reproducibility.R    (post-run consistency checks)
 #
 # TIER 2 — Requires original papers' raw data (see data_availability_statement.md)
 #   code/analysis/01_run_all_did.R    — TWFE/CS/SA/BJS for all 56 articles
@@ -37,7 +43,8 @@
 # replication package first — see data_availability_statement.md).
 ###############################################################################
 
-RUN_TIER2 <- TRUE
+RUN_TIER2 <- FALSE
+RUN_REPRO_CHECKS <- TRUE
 
 base_dir <- getwd()
 required_dirs <- c("code", "data", "analysis", "results")
@@ -48,13 +55,15 @@ if (length(missing_dirs) > 0) {
        paste(missing_dirs, collapse = ", "))
 }
 
-run_script <- function(rel_path) {
+run_script <- function(rel_path, required = TRUE) {
   cat(sprintf("\n\n################################################\n"))
   cat(sprintf("#  RUNNING: %s\n", rel_path))
   cat(sprintf("################################################\n"))
   src <- file.path(base_dir, rel_path)
   if (!file.exists(src)) {
-    cat(sprintf("  [SKIP] file not found: %s\n", src))
+    msg <- sprintf("file not found: %s", src)
+    if (isTRUE(required)) stop(msg, call. = FALSE)
+    cat(sprintf("  [SKIP] %s\n", msg))
     return(invisible(FALSE))
   }
   t0 <- Sys.time()
@@ -65,6 +74,9 @@ run_script <- function(rel_path) {
   cat(sprintf("  Elapsed: %.1fs  Status: %s\n",
               as.numeric(difftime(Sys.time(), t0, units = "secs")),
               if (isTRUE(ok)) "OK" else "FAIL"))
+  if (!isTRUE(ok) && isTRUE(required)) {
+    stop(sprintf("Required script failed: %s", rel_path), call. = FALSE)
+  }
   invisible(ok)
 }
 
@@ -96,6 +108,8 @@ run_script("code/tables/01_chapter_statistics.R")
 run_script("code/tables/02_article_cards.R")
 run_script("code/tables/03_margin_attribution.R")
 run_script("code/tables/04_selection_balance.R")
+run_script("code/tables/05_inject_skeptic_appendixB.R")
+run_script("code/analysis/mvpf_pilots.R")
 
 # Aggregate figures
 run_script("code/figures/01_aggregate_scatter.R")
@@ -105,6 +119,10 @@ run_script("code/figures/06_graduated_sensitivity.R")
 run_script("code/figures/07_density_covariates.R")
 run_script("code/figures/08_headline_composite.R")
 run_script("code/figures/09_signif_matrix.R")
+run_script("code/figures/10_bacon_dcdh_maclean.R")
+run_script("code/figures/11_mvpf_stress_test.R")
+run_script("code/audit/sync_final_outputs.R")
+run_script("code/audit/render_readme_pdf.R")
 
 # ---------------- TIER 2: requires raw data ----------------
 
@@ -129,5 +147,9 @@ if (isTRUE(RUN_TIER2)) {
 while (!is.null(grDevices::dev.list())) try(grDevices::dev.off(), silent = TRUE)
 stray <- file.path(base_dir, "Rplots.pdf")
 if (file.exists(stray)) invisible(file.remove(stray))
+
+if (isTRUE(RUN_REPRO_CHECKS)) {
+  run_script("code/audit/verify_reproducibility.R")
+}
 
 cat("\n\n=== 00_master.R finished ===\n")

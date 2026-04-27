@@ -3,44 +3,46 @@
 \centering
 \caption{Sensitivity of the far-post bin coefficient to progressive binning}
 \label{tab:progbin_sensitivity}
-\small
-\begin{tabular}{lccccr}
+\footnotesize
+\begin{tabular}{lrlrlccr}
 \toprule
-Article & Design & $\hat\beta_{k=0}$ & $\hat\beta_{k_{\max}}$ & $k_{\max}$ & $\Delta$ \\
+Article & \multicolumn{2}{c}{$\hat\beta_{k=0}$} & \multicolumn{2}{c}{$\hat\beta_{k_{\max}}$} & $t$ & $k_{\max}$ & $\Delta$ \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
 \midrule
-\textcite{Myers (2017)}\textsuperscript{\dag} & panel & $-0.003$ & $-0.021$ & 11 & $-658\%$ \\
-\textcite{Maclean & Pabilonia (2025)}\textsuperscript{\dag} & RCS & $-2.426$ & $-10.740$ & 20 & $-343\%$ \\
-\textcite{Arbogast et al. (2022)} & panel & $-0.013$ & $-0.026$ & 20 & $-104\%$ \\
-\textcite{Bhalotra, Clarke, Gomes, Venkataramani (2022)}\textsuperscript{\dag} & panel & $-0.064$ & $-0.124$ & 18 & $-92\%$ \\
-\textcite{Anderson, Charles, Rees (2020)}\textsuperscript{\dag} & panel & $+2.467$ & $+1.489$ & 1 & $-40\%$ \\
-\textcite{Levine, McKnight & Heep (2011)}\textsuperscript{\dag} & RCS & $-0.012$ & $-0.016$ & 4 & $-38\%$ \\
-\textcite{Buchmueller, Carey (2018)}\textsuperscript{\dag} & panel & $-0.001$ & $-0.001$ & 3 & $-34\%$ \\
-\textcite{Akosa Antwi, Moriya & Simon (2013)} & RCS & $+0.044$ & $+0.030$ & 7 & $-32\%$ \\
-\textcite{Sarmiento, Wagner & Zaklan (2023)} & panel & $-1.871$ & $-2.349$ & 5 & $-26\%$ \\
-\textcite{Carpenter, Lawler (2019)} & RCS & $+0.263$ & $+0.202$ & 5 & $-23\%$ \\
-\textcite{Bancalari (2024)} & panel & $+4.796$ & $+4.471$ & 3 & $-7\%$ \\
-\textcite{Moorthy, Shaloka (2025)} & panel & $+0.045$ & $+0.047$ & 5 & $+4\%$ \\
-\textcite{Sekhri, Shastry (2024)} & panel & $+65.154$ & $+68.568$ & 5 & $+5\%$ \\
-\textcite{Axbard, Deng (2024)} & panel & $+0.004$ & $+0.004$ & 7 & $+15\%$ \\
-\textcite{Johnson, Schwab, Koval (2024)} & panel & $-0.197$ & $-0.165$ & 9 & $+16\%$ \\
-\textcite{Carrillo, Feres (2019)} & panel & $+0.113$ & $+0.136$ & 15 & $+20\%$ \\
-\textcite{Schmitt (2018)}\textsuperscript{\dag} & panel & $+0.046$ & $+0.057$ & 10 & $+23\%$ \\
-\textcite{Greenstone, Hanna (2014)}\textsuperscript{\dag} & panel & $-25.756$ & $-16.334$ & 7 & $+37\%$ \\
-\textcite{Xu (2023)}\textsuperscript{\dag} & panel & $-0.177$ & $-0.111$ & 4 & $+37\%$ \\
-\textcite{Clarke, Muhlrad (2021)} & panel & $-0.108$ & $-0.067$ & 20 & $+38\%$ \\
-\textcite{Lawler, Yewell (2023)} & RCS & $+0.031$ & $+0.047$ & 12 & $+53\%$ \\
+\textcite{myers2017power} & $-0.003$ & (0.013) & $-0.021^{*}$ & (0.013) & 5 & 11 & $-658\%$ \\
+\textcite{maclean2025paid} & $-2.426$ & (10.023) & $-10.740$ & (7.475) & 7 & 20 & $-343\%$ \\
+\textcite{arbogast2024burdens} & $-0.013^{***}$ & (0.003) & $-0.026^{***}$ & (0.004) & 5 & 20 & $-104\%$ \\
+\textcite{bhalotra2023maternal} & $-0.064^{*}$ & (0.037) & $-0.124^{**}$ & (0.055) & 5 & 18 & $-92\%$ \\
+\textcite{anderson2024imposing} & $+2.467$ & (5.366) & $+1.489$ & (5.254) & 5 & 1 & $-40\%$ \\
+\textcite{levine2011effective} & $-0.012$ & (0.010) & $-0.016^{*}$ & (0.009) & 4 & 4 & $-38\%$ \\
+\textcite{buchmueller2018effect} & $-0.001$ & (0.001) & $-0.001$ & (0.001) & 2 & 3 & $-34\%$ \\
+\textcite{akosaantwi2013effects} & $+0.044^{**}$ & (0.021) & $+0.030^{**}$ & (0.014) & 6 & 7 & $-32\%$ \\
+\textcite{sarmiento2023air} & $-1.871^{***}$ & (0.420) & $-2.349^{***}$ & (0.508) & 5 & 5 & $-26\%$ \\
+\textcite{carpenter2019direct} & $+0.263^{***}$ & (0.047) & $+0.202^{***}$ & (0.057) & 6 & 5 & $-23\%$ \\
+\textcite{bancalari2024unintended} & $+4.796^{***}$ & (1.300) & $+4.471^{***}$ & (1.288) & 7 & 3 & $-7\%$ \\
+\textcite{moorthy2025bluecollar} & $+0.045^{***}$ & (0.009) & $+0.047^{***}$ & (0.010) & 5 & 5 & $+4\%$ \\
+\textcite{sekhri2024curse} & $+65.154^{***}$ & (9.893) & $+68.568^{***}$ & (11.215) & 5 & 5 & $+5\%$ \\
+\textcite{axbard2024informed} & $+0.004^{**}$ & (0.002) & $+0.004^{***}$ & (0.001) & 4 & 7 & $+15\%$ \\
+\textcite{johnson2024legal} & $-0.197^{***}$ & (0.057) & $-0.165^{***}$ & (0.050) & 5 & 9 & $+16\%$ \\
+\textcite{carrillo2019provider} & $+0.113^{***}$ & (0.008) & $+0.136^{***}$ & (0.008) & 4 & 15 & $+20\%$ \\
+\textcite{schmitt2018multimarket} & $+0.046^{*}$ & (0.024) & $+0.057^{**}$ & (0.025) & 4 & 10 & $+23\%$ \\
+\textcite{greenstone2014environmental} & $-25.756$ & (19.199) & $-16.334$ & (19.402) & 4 & 7 & $+37\%$ \\
+\textcite{xu2023bureaucratic} & $-0.177^{*}$ & (0.091) & $-0.111^{*}$ & (0.060) & 3 & 4 & $+37\%$ \\
+\textcite{clarke2021abortion} & $-0.108^{***}$ & (0.021) & $-0.067^{***}$ & (0.015) & 36 & 20 & $+38\%$ \\
+\textcite{lawler2023effect} & $+0.031^{**}$ & (0.015) & $+0.047^{***}$ & (0.011) & 4 & 12 & $+53\%$ \\
 \midrule
-\multicolumn{5}{l}{\textit{Summary (all 21 articles)}} \\
-\multicolumn{3}{l}{\quad Median $|\Delta|$} & \multicolumn{3}{r}{34\%} \\
-\multicolumn{3}{l}{\quad Share $|\Delta| > 20\%$} & \multicolumn{3}{r}{76\% (16/21)} \\
-\multicolumn{3}{l}{\quad Share $|\Delta| > 50\%$} & \multicolumn{3}{r}{24\% (5/21)} \\
+\multicolumn{8}{l}{\textit{Summary (all 21 articles)}} \\
+\multicolumn{4}{l}{\quad Median $|\Delta|$} & \multicolumn{4}{r}{34\%} \\
+\multicolumn{4}{l}{\quad Share $|\Delta| > 20\%$} & \multicolumn{4}{r}{76\% (16/21)} \\
+\multicolumn{4}{l}{\quad Share $|\Delta| > 50\%$} & \multicolumn{4}{r}{24\% (5/21)} \\
 \addlinespace
-\multicolumn{5}{l}{\textit{Summary excl.\ \dag\ articles (12 articles, $\hat\beta_{k=0}$ significant)}} \\
-\multicolumn{3}{l}{\quad Median $|\Delta|$} & \multicolumn{3}{r}{22\%} \\
-\multicolumn{3}{l}{\quad Share $|\Delta| > 20\%$} & \multicolumn{3}{r}{58\% (7/12)} \\
+\multicolumn{8}{l}{\textit{Summary, articles with $\hat\beta_{k=0}$ significant at 5\% (12 articles)}} \\
+\multicolumn{4}{l}{\quad Median $|\Delta|$} & \multicolumn{4}{r}{22\%} \\
+\multicolumn{4}{l}{\quad Share $|\Delta| > 20\%$} & \multicolumn{4}{r}{58\% (7/12)} \\
 \bottomrule
 \end{tabular}
 
 \footnotesize
-\textit{Notes:} $\Delta = (\hat\beta_{k_{\max}} - \hat\beta_{k_0}) / |\hat\beta_{k_0}|$. At $k = 0$ the far-post bin contains only the endpoint period and treated observations outside the event window are excluded; at $k_{\max}$ the bin absorbs all available horizons. Controls are restricted to the calendar-time range of the remaining treated observations at each $k$. \dag~indicates $\hat\beta_{k=0}$ is not statistically significant at the 5\% level; percentage changes for these articles are mechanically large and should be interpreted with caution.
+\justifying
+\textit{Notes:} Standard errors in parentheses. $^{*}$\,$p<0.10$, $^{**}$\,$p<0.05$, $^{***}$\,$p<0.01$. The coefficient reported in both columns is $\hat\beta_{L_t}$: the far-post bin in the original event study, where $t$ is the paper's last uncensored horizon (from \texttt{metadata.json.analysis.event\_post}). The bin label $L_t$ is fixed across columns; what varies is the set of data the bin absorbs. At $k = 0$ the bin holds only horizon $t$ itself: the sample window is $[-\text{ev}_{\text{pre}}, t]$ and no extra periods are folded in. At $k = k_{\max}$ the same $L_t$ bin absorbs the horizons $\{t, t+1, \ldots, t + k_{\max}\}$, drawn from the expanded window $[-(\text{ev}_{\text{pre}} + k_{\max}),\, t + k_{\max}]$. Example: for \textcite{clarke2021abortion} we report $t = 36$ and $k_{\max} = 20$, so the $L_{36}$ coefficient at $k = 0$ is identified off horizon $36$ alone, while at $k = 20$ the same $L_{36}$ coefficient absorbs horizons $36$ through $56$. $\Delta = (\hat\beta_{L_t,\, k_{\max}} - \hat\beta_{L_t,\, 0}) / |\hat\beta_{L_t,\, 0}|$ measures how this single bin coefficient moves once additional post-treatment horizons are folded into it; the bin position $t$ does not move. Controls are restricted to the calendar-time range of the remaining treated observations at each $k$. Articles with $\hat\beta_{L_t, 0}$ not significant at the 5\% level have mechanically large percentage changes and should be interpreted with caution.
 \end{table}

@@ -1,77 +1,11 @@
 \chapter{Empirical Design}
 \label{Chapter3}
 
-\section*{Notation}
-\label{sec:notation}
-
-Table~\ref{tab:notation} lists the symbols, acronyms, and technical terms used throughout the paper. Each row gives a one-line definition and a pointer to the section where the object is first used or defined; default values apply unless an article's metadata overrides them.
-
-\begin{table}[!htbp]
-\centering
-\small
-\caption{Notation and technical terms}
-\label{tab:notation}
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}p{3.5cm} p{9cm} p{2cm}@{}}
-\toprule
-\textbf{Symbol / term} & \textbf{Definition} & \textbf{First use} \\
-\midrule
-\multicolumn{3}{l}{\textit{Estimators}} \\
-TWFE                              & Two-way fixed-effects regression with unit and time fixed effects                                      & \S\ref{Chapter2} \\
-CS-DID                            & \textcite{callaway2021difference} difference-in-differences                                             & \S\ref{Chapter2} \\
-CS-NT                             & CS-DID with never-treated comparison group                                                              & \S\ref{Chapter3} \\
-CS-NYT                            & CS-DID with not-yet-treated comparison group                                                            & \S\ref{Chapter3} \\
-SA                                & \textcite{sun2021estimating} event-study estimator                                                      & \S\ref{Chapter2} \\
-BJS (Gardner)                     & \textcite{borusyak2024revisiting} imputation estimator; here the \texttt{did2s} implementation of \textcite{gardner2022two} & \S\ref{Chapter3} \\
-dCdH                              & \textcite{dechaisemartin2020twfe} TWFE decomposition / \texttt{did\_multiplegt\_dyn} estimator          & \S\ref{Chapter2} \\
-HonestDiD                         & \textcite{rambachan2023more} sensitivity framework for parallel-trends violations                       & \S\ref{Chapter2} \\
-\addlinespace
-\multicolumn{3}{l}{\textit{Causal parameters and aggregations}} \\
-$ATT(g,t)$                        & Average treatment effect on cohort $g$ at time $t$ (Callaway--Sant'Anna's building block)               & \S\ref{Chapter2} \\
-$CATT$                            & Cohort-specific ATT; same object as $ATT(g,t)$ when indexed by cohort alone                             & \S\ref{Chapter2} \\
-Group aggregation                 & \texttt{aggte(type="group")} --- average within each cohort, then across cohorts                         & \S\ref{Chapter3} \\
-Simple aggregation                & \texttt{aggte(type="simple")} --- direct average across all $(g,t)$ cells                                & \S\ref{Chapter3} \\
-Dynamic aggregation               & \texttt{aggte(type="dynamic")} --- average across cohorts at each event-time horizon                     & \S\ref{Chapter3} \\
-\addlinespace
-\multicolumn{3}{l}{\textit{Event-study horizons and binning}} \\
-$e$                               & Event time: periods relative to first treatment ($e=0$ is the adoption period)                         & \S\ref{Chapter3} \\
-$F_K$, $L_K$                      & Far-pre and far-post endpoint bins ($e \leq -K_{\text{pre}}$ and $e \geq K_{\text{post}}$)             & \S\ref{sec:binning} \\
-$\hat\beta_{k=0}$, $\hat\beta_{k_{\max}}$ & Far-post coefficient when the bin holds only the terminal horizon ($k=0$) versus absorbing all distant horizons ($k_{\max}$) & \S\ref{sec:binning} \\
-$\Delta$                          & Progressive-binning sensitivity: $(\hat\beta_{k_{\max}} - \hat\beta_{k=0}) / |\hat\beta_{k=0}|$        & Table~\ref{tab:progbin_sensitivity} \\
-\addlinespace
-\multicolumn{3}{l}{\textit{Panel structure and balancing}} \\
-Balanced (R)                      & Keep only units observed in every period; \texttt{did::att\_gt(allow\_unbalanced\_panel=FALSE)} internal pair-balancing when data happen to be balanced & \S\ref{sec:li_sensitivity} \\
-Unbalanced (R)                    & Use all available observations; \texttt{did::att\_gt(allow\_unbalanced\_panel=TRUE)}                    & \S\ref{sec:li_sensitivity} \\
-Pair-balanced (Stata)             & Stata's \texttt{csdid2}: for each $(g,t)$, retain units observed in base period and in $t$             & \S\ref{sec:li_sensitivity} \\
-Fill rate                         & Fraction of $(\text{unit} \times \text{time})$ cells observed in the panel                              & \S\ref{Chapter3} \\
-Base period (universal / varying) & Reference period for event-study normalization: $g-1$ (universal, CS--standardised) or $t-1$ (varying, Stata default) & \S\ref{sec:li_sensitivity} \\
-\addlinespace
-\multicolumn{3}{l}{\textit{Goodman-Bacon decomposition}} \\
-$\omega_j$                        & Weight on the $j$-th $2\times 2$ DiD in the Bacon decomposition of the TWFE estimand                    & \S\ref{Chapter2} \\
-TvU, EvL, LvE                     & Treated-vs-Untreated, Earlier-vs-Later-treated, Later-vs-Earlier-treated $2\times 2$ components         & Table~\ref{tab:bacon_summary} \\
-TvT share                         & Combined share of EvL and LvE weights --- the treated-versus-treated comparisons                        & Table~\ref{tab:bacon_summary} \\
-\addlinespace
-\multicolumn{3}{l}{\textit{HonestDiD}} \\
-$\bar M$                          & Breakdown value under Rambachan--Roth relative-magnitude restrictions (the smallest $\bar M \geq 0$ at which the confidence interval covers zero) & Table~\ref{tab:ch3_honestdid} \\
-$\bar M_{\text{first}}$           & $\bar M$ evaluated at the first post-treatment period                                                    & Table~\ref{tab:ch3_honestdid} \\
-$\bar M_{\text{peak}}$            & $\bar M$ evaluated at the post-treatment event-time coefficient with the largest $|t|$                  & Table~\ref{tab:ch3_honestdid} \\
-\addlinespace
-\multicolumn{3}{l}{\textit{Sample and protocol}} \\
-$N_1$, $N_0$                      & Size of the reanalyzed sample ($N_1=53$) and of the non-reanalyzed portion of the DiD-classified pool ($N_0=1{,}831$).                 & \S\ref{sec:selection_bounds} \\
-$\pi$, $\hat\pi_1$, $\pi_0$       & Population, in-sample, and excluded-subsample sign-preservation rates                                    & \S\ref{sec:selection_bounds} \\
-\texttt{xformla}                  & \texttt{did::att\_gt} argument for the conditional-parallel-trends covariate set                        & \S\ref{Chapter3} \\
-\texttt{cs\_controls\_matched}    & Metadata flag triggering matched-protocol CS-DID with \texttt{xformla = $\sim$twfe\_controls} (Deliverable D1) & \S\ref{Chapter4} \\
-\texttt{cs\_sample\_filter}       & Metadata field letting CS-DID skip the global \texttt{sample\_filter}; empty string means CS runs on the full pre-filter data (e.g.\ paper 241, where TWFE is estimated on the paper's event-window subsample but CS-DID needs the full balanced panel). & Appendix~\ref{AppendixC} \\
-\texttt{cs\_min\_e} / \texttt{cs\_max\_e} & Metadata fields clipping the CS-DID dynamic aggregation to a paper-specified event-time window. & Appendix~\ref{AppendixC} \\
-\bottomrule
-\end{tabular*}
-\end{table}
+This dissertation reanalyzes 53 replication packages with heterogeneous data structures and software environments, applies a common estimator menu, and produces estimates that are comparable across designs. This chapter describes the sample, the scope of the meta-statistic under two named assumptions, the estimator menu, and the AI-assisted protocol that reconciles the three.
 
 \section{Sample, protocol, and scope}
 
-The reanalysis draws on \textit{health economics} articles published between 2000 and 2025 in 17 general-interest and field journals. From 8,171 candidate articles retrieved from OpenAlex, an LLM-based screen of abstracts flags 1,884 as likely \emph{DiD} studies. We then search for replication materials, consolidate records across sources, deduplicate by DOI, and manually review 431 located cases for eligibility. The final sample contains 53 articles that use \emph{DiD} as the main empirical strategy, provide a full replication package, and whose main specification --- both the estimand and the data environment --- can be re-estimated under a common protocol. Table~\ref{tab:sample_pipeline} summarizes the selection process and Appendix~\ref{AppendixD} documents each stage of the collection pipeline in detail.
-
-Of the 53 reanalyzed articles, 29 use staggered adoption and 24 one-time adoption. Thirty-five use panel data and 18 use \emph{repeated cross-sections} (RCS), and 47 have an estimable dynamic \emph{event study}. Table~\ref{tab:sample_detailed} cross-tabulates adoption type and data structure. These dimensions determine estimator coverage and the construction of the counterfactual. The sample covers topics such as vaccination, insurance regulation, opioids, pollution, maternal and child health, tax credits, and epidemics. Table~\ref{tab:journal_final} reports the journal distribution, and Appendix~\ref{AppendixB} lists the reanalyzed studies.
-
+The reanalysis draws on health-economics articles published between 2000 and 2025 in 17 general-interest and field journals. Sample construction proceeds in four stages. We retrieve candidate articles from OpenAlex, screen abstracts with an AI classifier, validate flagged articles by hand and search for replication materials, and re-estimate each headline specification under a common protocol. The final sample contains 53 articles. Table~\ref{tab:sample_pipeline} summarizes the pipeline, and Appendix~\ref{AppendixD} documents each stage.
 
 \begin{table}[!htbp]
 \centering
@@ -79,99 +13,76 @@ Of the 53 reanalyzed articles, 29 use staggered adoption and 24 one-time adoptio
 \label{tab:sample_pipeline}
 \begin{threeparttable}
 \small
-\begin{tabular}{p{.6cm} p{4cm} p{4.2cm} p{1.2cm} p{2.5cm}}
+\begin{tabular}{p{.6cm} p{4cm} p{4.5cm} p{1cm} p{2.6cm}}
 \toprule
 \textbf{Step} & \textbf{Procedure} & \textbf{Retention criterion} & \textbf{$N$} & \textbf{Note} \\
 \midrule
-1 & Candidate articles in the search universe & Selected journals, 2000--2025 & 8,171 & 17 journals \\
+1 & Candidate articles in the search universe & Selected journals, 2000--2025 & 8,171 & OpenAlex retrieval \\
 \midrule
-2 & Identification of \emph{DiD} strategy & Article uses \emph{DiD} as the main empirical strategy & 1,884 & Automated AI-based classification \\
+2 & AI-based abstract screening & Abstract flagged as likely to describe a DiD design & 1,884 & Preliminary screen only \\
 \midrule
-3 & Location and manual screening of materials & Article with replication material located and eligible for individual review & 431 & Individual review of the 431 candidates \\
+3 & Manual validation and materials search & Article confirmed to use DiD as the main empirical strategy, with replication materials located and eligible for review & 431 & Manual review of AI-flagged cases \\
 \midrule
-4 & Completed reanalysis & Main specification re-estimable under the standardized protocol (the estimand, the design, and the data environment are all reproducible) & 53 & Final sample \\
+4 & Completed reanalysis & Headline specification re-estimable under the standardized protocol & 53 & Final sample \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: $N$ is the number of articles retained at the end of each stage. Step~1 is the total number of candidate articles downloaded via OpenAlex from the selected journals, including all articles from the health journals and articles with health-related keywords in the remaining journals. Step~2 applies an AI-assisted classifier that assesses whether the \emph{abstract} describes a \emph{DiD} strategy. Step~3 consolidates the five search sources described in the text and deduplicates by DOI. Step~4 involves human supervision: assessment of package quality, identification of the main specification, and confirmation that the paper's headline specification can be re-estimated under the standardized template. Three candidates dropped out at this stage because their headline specification could not be reproduced: one required restricted-access mortality data (not redistributable in our deposit), and two employed fixed-effects structures (county-specific linear trends, multivariate policy regressors) that our template does not accommodate. These articles are documented individually in Appendix~\ref{AppendixD}.
+\item \textit{Notes.} $N$ is the number of articles retained at the end of each stage. Step~1 is the universe of candidate articles downloaded from OpenAlex for the selected journals. Step~2 applies an AI-assisted classifier to abstracts and retains articles flagged as likely DiD studies. Step~3 combines two manual tasks: verification that the article in fact uses DiD as its main empirical strategy and search for replication materials across the sources described in the text, with deduplication by DOI. Step~4 retains the subset whose headline specification can be re-estimated under the standardized protocol. Three candidates dropped out at this final stage because the headline specification could not be reproduced under the common template. These cases are documented individually in Appendix~\ref{AppendixD}.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}
 
 
+The unit of analysis is the article's main specification. For each study we preserve the central empirical result and re-estimate it with alternative econometric tools. A fixed selection hierarchy limits case-by-case discretion. We prioritize the specification the authors call main, preferred, or baseline. When more than one candidate remains, we select the one estimated on the largest number of observations. Three tie-breakers follow in sequence. We prefer the most aggregated outcome, then the specification with fewer time-varying covariates, and as a last resort a documented random draw. When an article reports only a dynamic event study with no comparable static ATT, we re-estimate a collapsed version with a single post-treatment indicator while preserving the original sample, controls, fixed effects, and clustering level. All decisions are recorded in the auditable log described in Appendix~\ref{AppendixA}. Table~\ref{tab:sample_detailed} reports the joint distribution of adoption type and data structure, which jointly determine estimator coverage and counterfactual construction, along with the journal distribution. The sample spans vaccination, insurance regulation, opioids, pollution, maternal and child health, tax credits, and epidemics. Appendix~\ref{AppendixB} lists the reanalyzed studies.
 
 \input{Tables/table_3_2_sample_detailed.tex}
-
-\input{Tables/table_3_3_journal_final.tex}
-
-The unit of analysis is the article's main specification. For each study, we preserve the central empirical result and re-estimate it with alternative econometric tools. Doing so requires a consistent rule to select one outcome and one main specification per article, while avoiding case-by-case discretion. Selection follows a simple hierarchy. We first prioritize specifications explicitly described by the authors as main, preferred, or baseline. If more than one candidate remains, we choose the one estimated on the largest number of observations. In the event of a tie, we apply three tie-breakers, in this order: preference for the most aggregated outcome variable (e.g., all-cause mortality over cause-specific categories), then for specifications with fewer time-varying covariates, and, only as a last resort, a documented random selection. When the article reports only a dynamic event study, with no directly comparable static ATT, we re-estimate a collapsed version with a single post-treatment indicator while preserving the sample, controls, fixed effects, and clustering level of the original study. All decisions are recorded in an auditable log described in Appendix~\ref{AppendixA}.
 
 \section{Identification and scope of the meta-statistic}
 \label{sec:identification}
 
-\noindent\textbf{Identification.} The central meta-statistic of the paper --- the share of the 53 reanalyzed articles whose original TWFE conclusion is preserved under the standardized modern-estimator protocol --- targets the rate at which a representative published health-economics DiD study would survive modern re-estimation. This interpretation rests on two maintained assumptions.
+The central meta-statistic of this dissertation is the share of the 53 reanalyzed articles whose original TWFE sign is preserved under the standardized modern-estimator protocol.\footnote{At the narrowest level, this quantity describes the sign-preservation rate within the subset of published health-economics studies for which replication materials could be located and the headline specification could be re-estimated under a common protocol.} Reading it as a population parameter for a representative published health-economics DiD study requires two maintained assumptions. We state them now and use the same names throughout.
 
-\textit{Representativeness of the 53-paper sample.} The 53 reanalyzed articles are assumed to be representative of the larger population of 1,884 DiD candidate articles identified at Step~2 of the sample construction pipeline (Table~\ref{tab:sample_pipeline}) along the design margins that drive TWFE-vs-modern divergence: control-group choice, covariate set, dynamic aggregation rule, endpoint binning, geographic conditioning, and software defaults. This assumption is partially testable. Table~\ref{tab:selection_balance} reports observable-characteristic balance between the reanalyzed sample and a 537-article DiD-classified pool retained during sample construction, on publication year and journal tier. The reanalyzed sample trends slightly more recent (mean 2019.9 vs 2018.4, Welch $p=0.010$) and is heavily over-represented in AEJ-family journals (50.9\% vs 2.5\%) and in \emph{Review of Economics and Statistics} (18.9\% vs 1.0\%), while under-represented in field journals (24.5\% vs 95.2\%; all $p<0.001$). This concentration reflects the data-and-code policies of these venues and confirms that the reanalyzed sample is not a random draw from the DiD literature: it is the ``replication-package-available subset,'' skewed toward publication venues with strict reproducibility requirements. Because the 97\% attrition from 1,884 to 53 is concentrated at Step~3 (location and screening of replication materials), the selection effect plausibly biases the headline numbers toward the more careful end of the published literature. Where this margin matters for interpretation, we flag it explicitly in the text and, in Section~\ref{Chapter5}, discuss how robust the qualitative conclusions are to that bias.
+\textit{Assumption 1 (Sample Representativeness).} The 53-paper sample is informative about the larger population of articles flagged as likely DiD at Step~2 of the sample-construction pipeline (Table~\ref{tab:sample_pipeline}) along the design margins that drive TWFE-versus-modern divergence. These margins include control-group choice, covariate set, dynamic aggregation, endpoint binning, geographic conditioning, and software defaults. The assumption is only partly testable. Balance on these design margins is unobservable for the full Step~2 pool. Table~\ref{tab:selection_balance} compares the reanalyzed sample with a comparison pool of 484 non-reanalyzed articles on observable publication characteristics. Reanalyzed articles are more recent on average and concentrate in AEJ-family journals and \emph{Review of Economics and Statistics}, while field journals are under-represented. The pattern is consistent with selection through replication-material availability rather than random sampling from the published DiD literature. The 53 papers should be read as the replication-package-available subset of the health-economics DiD literature, skewed toward journals with stricter reproducibility policies. Attrition from 1,884 Step~2 articles to 53 is large and concentrated in the stage that combines manual validation with replication-material search, so the headline preservation rate is plausibly biased toward the more careful end of the published distribution.
 
 \input{Tables/table_3_selection_balance.tex}
 
-\textit{Estimator recovery by the reanalysis protocol.} Conditional on each article's declared specification and the design margins above, the AI-assisted reestimation protocol is assumed to recover the modern estimator that the original authors would have selected had they worked from the modern-DiD toolkit available in 2026. This assumption is not formally testable within this study. The protocol is deterministic for a fixed random seed, and the eleven held-out calibration articles (Appendix~\ref{AppendixC}) match the hand-coded benchmark exactly. That validation speaks to execution fidelity but not to the counterfactual estimator choice the original authors themselves would have debated had they rewritten the paper in 2026.
+\textit{Assumption 2 (Estimator Recovery).} Conditional on each article's declared specification and the design margins above, the re-estimation protocol recovers the prespecified modern counterpart defined by this dissertation's standardized decision rules. The assumption concerns execution fidelity. It does not require knowing which estimator the original authors would have chosen had they written the paper using the modern DiD toolkit. The protocol is deterministic for a fixed random seed, and the ten held-out calibration articles (Appendix~\ref{AppendixC}) match the hand-coded benchmark.
 
-If either assumption fails in a direction correlated with the survival outcome, the headline meta-statistic should be read as an internal descriptive fact about the 53-article sample rather than as a population parameter. Throughout the paper, we frame our findings as diagnoses of the 53 studies we actually re-estimated and are explicit when we extrapolate more broadly.
+If either assumption fails in a direction correlated with the survival outcome, the headline meta-statistic is a descriptive fact about the 53-article sample, not a population parameter. We frame the findings as diagnoses of the studies we re-estimated and flag any extrapolation explicitly.
 
-\subsection{Selection bounds on the population preservation rate}
-\label{sec:selection_bounds}
+Because Sample Representativeness is untested, we complement the within-sample preservation rate with worst-case bounds in the style of \textcite{manski1989anatomy}. Of the 53 reanalyzed articles, 46 preserve the sign of the original TWFE estimate under the modern-estimator protocol, so the within-sample preservation rate is $\hat\pi_1 = 46/53 = 86.8\%$. Without further assumptions, the implied preservation rate across the full Step~2 candidate pool lies in the uninformative Manski interval $[2.4\%, 99.6\%]$. Under Manski--Pepper monotone selection, inclusion in the reanalyzed sample is weakly positively associated with sign preservation under modern re-estimation, which gives $\pi \leq 86.8\%$. The within-sample rate is best read as an upper bound on the population parameter, not an unbiased estimate. Appendix~\ref{AppendixD} reports the full selection-bound scenarios and the attrition structure behind them.
 
-Because representativeness is an untested assumption, we complement the point estimate with worst-case bounds in the style of \textcite{manski1989anatomy}. Of the 53 reanalyzed articles, 47 preserve the sign of the original TWFE conclusion under the modern-estimator protocol, a within-sample preservation rate of $\hat\pi_1 = 47/53 = 88.7\%$. Let $\pi_0$ denote the (unobserved) preservation rate among the $N_0 = 1{,}831$ articles in the DiD-classified pool that are not part of the reanalyzed sample. The population-level preservation rate is a weighted average,
-\[
-\pi = \frac{N_1 \hat\pi_1 + N_0 \pi_0}{N_1 + N_0} = \frac{47 + 1{,}831\,\pi_0}{1{,}884},
-\]
-where $N_1 = 53$ is the reanalyzed sample. Without further assumptions, $\pi_0 \in [0, 1]$ implies the uninformative Manski bound $\pi \in [2.5\%, 99.8\%]$.
+The next question is what we re-estimate and which estimators are comparable across the designs in the sample.
 
-Tightening the bound requires an assumption about the excluded population. Table~\ref{tab:selection_bounds} reports implied population rates under five scenarios for $\pi_0$. Under Manski--Pepper monotone selection --- the assumption that excluded articles have weakly lower replication-package quality and hence weakly lower preservation under modern re-estimation, so that $\pi_0 \leq \hat\pi_1$ --- the population rate satisfies $\pi \leq 88.7\%$. This is the directionally informative bound we take forward: the within-sample rate we report is an \emph{upper bound} on the population parameter, not an unbiased estimate.
-
-\begin{table}[!htbp]
-\centering
-\caption{Selection-bound scenarios for the population preservation rate}
-\label{tab:selection_bounds}
-\small
-\begin{tabular}{lccr}
-\toprule
-\textbf{Scenario for excluded rate $\pi_0$} & $\pi_0$ & \textbf{Implied population rate $\pi$} & \textbf{vs $\hat\pi_1$} \\
-\midrule
-Worst case (all excluded would fail)     & $0\%$  & $2.5\%$   & $-86.2$ pp \\
-Lower quartile                            & $25\%$ & $27.0\%$  & $-61.7$ pp \\
-Half of excluded preserve                 & $50\%$ & $51.6\%$  & $-37.1$ pp \\
-Upper quartile                            & $75\%$ & $76.1\%$  & $-12.6$ pp \\
-Representativeness ($\pi_0 = \hat\pi_1$)  & $88.7\%$ & $88.7\%$ & $0$ pp  \\
-Best case (all excluded preserve)         & $100\%$& $99.8\%$  & $+11.1$ pp \\
-\bottomrule
-\end{tabular}
-\begin{flushleft}\footnotesize
-\textit{Notes:} $\hat\pi_1 = 47/53 = 88.7\%$ is the within-sample sign-preservation rate under the \texttt{chapter\_statistics.R} classification (same-sign between TWFE and CS-DID dynamic aggregate; 47 preserved and 6 reversed, matching the counts reported in Section~\ref{Chapter4}). $N_0 = 1{,}831$ is the count of articles outside the reanalyzed sample (1{,}884 candidate DiD articles minus the 53 reanalyzed). Under Manski--Pepper monotone selection ($\pi_0 \leq \hat\pi_1$), the population rate is bounded above by $\hat\pi_1$; the worst-case lower bound is $47/1{,}884 = 2.5\%$. Comparison column $\Delta\mathrm{pp} = \pi - \hat\pi_1$ in percentage points.
-\end{flushleft}
-\end{table}
-
-Two caveats accompany Table~\ref{tab:selection_bounds}. First, the scenarios are illustrative: we do not claim that the true $\pi_0$ equals any particular number in the range. Second, the 97\% attrition from 1,884 to 53 is concentrated at Step~3 --- location of replication materials --- and the selection mechanism is likely correlated with paper quality, author seniority, and journal data-sharing policies. A full balance analysis comparing observable characteristics of the 53 included articles against a random sample of the remaining 1,831 articles would sharpen the scenario selection; we report a partial exercise in Table~\ref{tab:selection_balance} above and acknowledge here that the chosen scenarios, while informative about sensitivity, do not resolve the underlying selection question.
 
 \section{Estimators and coverage}
 
-We re-estimate each article's main specification with different econometric tools. We reproduce the \emph{two-way fixed effects} (\emph{TWFE}) model as the baseline estimator, keeping the basic structure of the original article whenever possible. We do not audit the authors' code line by line. The goal is to reconstruct the original result in a standardized environment and compare it to modern estimators.
+We re-estimate each article's main specification with a fixed menu of econometric tools. The two-way fixed effects (TWFE) model is the baseline estimator, and we keep the structure of the original article whenever possible. We do not audit the authors' code line by line. The goal is to reconstruct the original result in a standardized environment and compare it with modern estimators.
 
-Our primary alternative is the estimator of \textcite{callaway2021difference} with dynamic agreggation. We use it because it accommodates treatment-effect heterogeneity under staggered adoption, makes the comparison group explicit, and allows versions with covariates and dynamic paths comparable to the \emph{event studies} used in the literature. Whenever the design allows, we estimate two CS-DID versions, one with a \emph{never-treated} comparison group and another with a \emph{not-yet-treated} group. We also estimate, when applicable, Sun and Abraham and Gardner (\texttt{did2s}).\footnote{The choice of \texttt{did2s} as an additional estimator mainly reflects operational convenience and broad compatibility with the designs observed in the sample, including \emph{repeated cross-sections}.} These estimators serve as cross-checks rather than replacements for the main benchmark. They indicate whether the main results survive different ways of handling heterogeneity, aggregation, and counterfactual construction.
+Our primary modern benchmark is the estimator of \textcite{callaway2021difference}. It accommodates treatment-effect heterogeneity, makes the comparison group explicit, handles covariates under a conditional-parallel-trends framework, and delivers static and dynamic estimands that map directly to the reporting conventions of the applied literature. We estimate both a never-treated and a not-yet-treated version whenever the design allows. When the original TWFE specification can be matched in CS-DID, we use that matched specification. When the original covariate structure or fixed-effects design cannot be carried over cleanly to the CS-DID template, the comparison falls back to the closest feasible CS-DID counterpart, which in some articles is the version without controls.\footnote{Table~\ref{tab:covariate_coverage} reports how often the original TWFE specification can be matched in CS-DID. We retain the fallback specification in the aggregate comparisons to preserve article coverage under a uniform rule. Some TWFE-versus-CS-DID contrasts then combine the estimator switch with a covariate margin. Lesson~3 examines the conditional-versus-unconditional CS-DID contrast directly.} Sun--Abraham and Gardner (\texttt{did2s}) appear as complementary dynamic cross-checks, not coequal benchmarks. Comparability across estimators is not uniform across articles, especially when the original TWFE specification carries covariate or fixed-effects structures that cannot transfer one-for-one. We discuss the margin explicitly in the results when it changes the conclusion. Appendix~\ref{AppendixB} reports article-level results, event studies, and sensitivity analyses. Implementing this estimator menu consistently across heterogeneous replication packages requires a separate protocol, described next.
 
-Not all estimators are used in every part of the reanalysis, and not all articles have an estimable pre-treatment path. In this paper, the static benchmark is based on TWFE, CS-NT, and CS-NYT, with CS-DID serving as the main modern DiD reference. Gardner and Sun \& Abraham are used in the dynamic analysis as robustness checks for event-study profiles, following a methodological choice of this paper rather than a limitation of those estimators. Appendix~\ref{AppendixB} presents the individual results, event studies, and sensitivity analyses for each of the 53 articles. Table~\ref{tab:estimator_coverage} summarizes estimator coverage under this protocol.
+\input{Tables/table_3_5_covariate_coverage.tex}
 
-\input{Tables/table_3_4_estimator_coverage.tex}
+
+
+
+%Table~\ref{tab:estimator_coverage} summarizes which estimators are available in the static and dynamic analyses under the protocol adopted here.
+
+%\input{Tables/table_3_4_estimator_coverage.tex}
+
 
 
 \section{AI-assisted estimation and calibration protocol}
 
-Reanalyzing 53 articles required a workflow that could handle heterogeneous replication packages without changing the estimation layer across studies. We built a semi-automated protocol adapted from the separation between substantive judgment and standardized execution emphasized by \textcite{xu2026scaling} and the broader use-case catalog for generative AI in economic research surveyed by \textcite{korinek2023generative}. The workflow has three stages, illustrated in Figure~\ref{fig:ai_workflow}. A profiling stage reads the article PDF and replication code to extract a structured specification file. An estimation stage feeds this specification into a fixed template that runs all applicable estimators, producing point estimates and event-study outputs. A reporting stage assembles the results into a standardized comparison with the original finding. The estimation template is the same for every article, and differences across studies enter only through the specification file and through documented preprocessing choices. Appendix~\ref{AppendixC} documents the full architecture, the metadata contract, and all pipeline stages in detail\footnote{The structured specification files, estimation scripts, outputs, and protocol-revision logs are available in the replication package.}.
+Re-estimating 53 articles by hand does not scale and does not produce outputs comparable across studies. The protocol separates manual specification recovery from standardized estimation, with a continuous audit layer on top. The infrastructure is a reusable component of the dissertation's replication protocol. It follows the separation-of-reasoning-and-execution logic in \textcite{xu2026scaling} and fits within the use of generative AI in economic research surveyed by \textcite{korinek2023generative}. The workflow has three stages. First, the article PDF and replication files feed the recovery of a structured specification file. Second, that file feeds a fixed estimation template that runs all applicable estimators and produces comparable static and dynamic outputs. Third, the results assemble into a standardized comparison with the published finding. The estimation template does not vary across articles. Differences enter through the recovered specification and through documented preprocessing choices. Figure~\ref{fig:ai_workflow} summarizes the workflow, and Appendix~\ref{AppendixC} describes the implementation and metadata structure.\footnote{The structured specification files, estimation scripts, outputs, and protocol-revision logs are available in the replication package.}
 
-We developed the protocol through a supervised calibration exercise based on 11 articles previously analyzed by hand. For each of these articles, the semi-automated workflow was asked to reconstruct the design from scratch under the standardized execution rules, without relying on the original hand-coded implementation. The resulting estimates were then compared against the manual benchmark. Any discrepancy triggered a diagnostic review, followed by revisions to the protocol until the automated reconstruction matched the benchmark sufficiently closely. This process produced a catalog of 28 recurring implementation problems and their corresponding resolution rules.\footnote{Examples include Stata date encodings, missing standard errors in plotting routines, silent dropping of horizons in event-study implementations, singular matrices in small-cohort CS-DID estimation, contamination of the never-treated comparison group by late-treated units, and differences between cumulative and marginal event-study aggregation across software. The full catalog is documented in Appendix~\ref{AppendixC}.} Once the workflow reliably reproduced the calibration set, it was extended to the remaining 42 articles in the sample. The researcher reviewed each specification before execution, inspected each event-study output, and approved all decisions involving sample restrictions, treatment timing, controls, and cross-estimator comparability. When an article required preprocessing beyond the default rules, that adjustment was encoded through standardized specification fields and documented for replication.\footnote{These cases included, for example, composite treatment indicators, time-varying treatment within units, and individual-level repeated cross-sections requiring aggregation.}
 
+We developed the protocol through supervised calibration on 10 articles previously analyzed by hand in Stata. For each article, the workflow reconstructed the design from scratch in R under the standardized execution rules, and the resulting estimates were compared with the manual benchmark. The cross-software separation avoids calibrating within the same implementation stack as the hand-coded analyses and makes software-specific differences easier to detect. Discrepancies triggered diagnostic review and protocol revision until the automated reconstruction matched the benchmark closely enough for replication use. The process produced a catalog of recurring implementation problems and corresponding resolution rules, reported in Appendix~\ref{AppendixC}.\footnote{Examples include Stata date encodings, missing standard errors in plotting routines, silent dropping of event-time horizons, singular matrices in small-cohort CS-DID estimation, and differences in event-study aggregation across software.} The calibrated protocol was then applied to the remaining 43 articles in R. Human review remained active throughout. The researcher reviewed each recovered specification, inspected each event-study output, and approved decisions involving sample restrictions, treatment timing, controls, and cross-estimator comparability. Additional preprocessing, when needed, was encoded through standardized specification fields and documented for replication.\footnote{These cases included composite treatment indicators, time-varying treatment within units, and individual-level repeated cross-sections requiring aggregation.}
+
+A per-article audit layer verifies implementation fidelity. The layer checks each estimator against package documentation, compares stored coefficients with the values reported in the original paper, and writes article-level audit reports included in the replication package. Aggregate fidelity statistics from this audit feed the eligibility gate at Step~4 of the sample-construction pipeline (Table~\ref{tab:sample_pipeline}).
+
+The audit layer is what distinguishes this protocol from a single-paper replication exercise. For each article, the methodology of every estimator (CS-DID, TWFE, Bacon, HonestDiD, and de Chaisemartin) is evaluated against the official package documentation and the recent literature, the stored estimates are compared against the paper's published values, and the verdicts are synthesized into a per-article credibility rating on a three-axis rubric. The 24-check aggregate audit and the per-article reports are included in the replication package and are reusable for reanalysis exercises in other fields. Appendix~\ref{AppendixC} documents the audit protocol, the rubric, and the implementation details.
 
 \begin{figure}[!htbp]
 \centering
@@ -204,7 +115,7 @@ We developed the protocol through a supervised calibration exercise based on 11 
 
 % --- Main flow ---
 \node[box] (manual)
-  {Manual analysis of 11 calibration articles};
+  {Manual analysis of 10 calibration articles};
 
 \node[box, below=of manual] (profiler)
   {LLM extracts structured specifications\\from PDF and replication code};
@@ -216,7 +127,7 @@ We developed the protocol through a supervised calibration exercise based on 11 
   {Compare with manual benchmark};
 
 \node[box, below=2.4cm of compare] (expand)
-  {Apply calibrated pipeline\\to 45 new articles};
+  {Apply calibrated pipeline\\to 43 new articles};
 
 \node[doublebox, below=of expand] (review)
   {Human review of specifications,\\event studies, and results};
@@ -242,12 +153,10 @@ We developed the protocol through a supervised calibration exercise based on 11 
 % --- Loop arrow (knowledge → profiler) ---
 \draw[arrow] (knowledge.north) |- ([xshift=3pt]profiler.east)
   node[label, pos=0.25, right, text width=2cm, align=left]
-  {revise \\protocol\\(28 patterns)};
+  {revise \\protocol};
 
 \end{tikzpicture}
 
-\caption{Calibration and expansion workflow for AI-assisted reanalysis}
+\caption[Calibration and expansion workflow]{The pipeline calibrates on 10 hand-coded articles and then runs on 43 new articles under the same fixed estimation template. Mismatches between manual and automated outputs feed back into protocol revisions. Matches release articles into the audited corpus.}
 \label{fig:ai_workflow}
 \end{figure}
-
-The three-stage workflow above (Profiler, Analyst, Reporter) is the computational backbone that produces each article's estimates. To verify that those estimates are \emph{implemented correctly given each paper's own specification} and that they \emph{match the number printed in the original paper}, the pipeline is augmented with a per-paper audit layer documented in Appendix~\ref{AppendixC}. That audit layer reviews the implementation of every estimator against its package documentation (CS-DID, HonestDiD, Bacon, and the dCdH family), compares the stored coefficient to the paper's reported value, and records the outcome in per-article reports that accompany the replication package. Aggregate fidelity statistics from this audit feed the eligibility gate at Step~4 of the sample-construction pipeline (Table~\ref{tab:sample_pipeline}).

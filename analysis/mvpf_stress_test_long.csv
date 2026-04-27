@@ -1,0 +1,7 @@
+"paper_id","paper_label","outcome","spec","beta","wtp","G","mvpf"
+"9","Dranove, Ody & Starc (2021)","lnpriceperpresc","TWFE_with_ctrls",-0.176305612449144,1,0.9758,1.0248
+"9","Dranove, Ody & Starc (2021)","lnpriceperpresc","CS_NT_with_ctrls_static",-0.0130115453827838,1,0.9981,1.0019
+"9","Dranove, Ody & Starc (2021)","lnpriceperpresc","CS_NT_with_ctrls_dyn",-0.00386033183030475,1,0.9994,1.0006
+"420","Bailey & Goodman-Bacon (2015)","amr_eld","TWFE_with_ctrls",-53.2073608219238,1.7981,0.2019,8.9064
+"420","Bailey & Goodman-Bacon (2015)","amr_eld","CS_NT_with_ctrls_static",-6.78023645355946,1.1017,0.8983,1.2264
+"420","Bailey & Goodman-Bacon (2015)","amr_eld","CS_NT_with_ctrls_dyn",7.45935797440315,0.8881,1.1119,0.7987

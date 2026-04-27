@@ -1,0 +1,42 @@
+% Auto-generated companion to code/analysis/mvpf_pilots.R; numbers source analysis/mvpf_stress_test.csv.
+% Do not edit by hand.
+\begin{table}[htbp]
+\centering
+\caption[Mechanical welfare sensitivity to matched-control estimates]{Mechanical welfare sensitivity to matched-control estimates.}
+\label{tab:mvpf_stress_test}
+\setlength{\tabcolsep}{5pt}
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Estimator & $\hat{\beta}$ & WTP & $G$ & MVPF \\
+\midrule
+\multicolumn{5}{@{}l}{%
+\begin{tabular}[t]{@{}l@{}}
+\emph{Panel A: \textcite{dranove2021dose} --- Medicaid managed care,} \\
+$\Delta \ln(\text{price/prescription})$
+\end{tabular}
+} \\
+\addlinespace
+TWFE with controls        & $-0.176$ & $1.00$ & $0.976$ & $1.025$ \\
+CS-DR static, with ctrls  & $-0.013$ & $1.00$ & $0.998$ & $1.002$ \\
+CS-DR dynamic, with ctrls & $-0.004$ & $1.00$ & $0.999$ & $1.001$ \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{MVPF range (max $-$ min):}} & $0.024$ \\
+\midrule
+\multicolumn{5}{@{}l}{%
+\begin{tabular}[t]{@{}l@{}}
+\emph{Panel B: \textcite{bailey2015war} --- Community Health Centers,} \\
+\emph{elderly mortality per $10^5$}
+\end{tabular}
+} \\
+\addlinespace
+TWFE with controls        & $-53.21$ & $1.80$ & $0.202$ & $8.91$ \\
+CS-DR static, with ctrls  & $-6.78$ & $1.10$ & $0.898$ & $1.23$ \\
+CS-DR dynamic, with ctrls & $+7.46$ & $0.89$ & $1.112$ & $0.80$ \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{MVPF range (max $-$ min):}} & $8.11$ \\
+\bottomrule
+\end{tabular}
+\\[2pt]
+{\footnotesize\textit{Notes:} WTP and $G$ are reported per \$1 of programmatic spending, so MVPF $=$ WTP$/G$ is dimensionless. The rows are a mechanical matched-control stress test: TWFE with controls, CS-DR static with controls, and CS-DR dynamic with controls. Panel~A uses drug-share $= 0.15$ and $G = 1 + 0.15(e^{\hat\beta}-1)$. Panel~B uses $\mathrm{WTP}(\hat\beta) = 1 + 0.015(-\hat\beta)$ and $G(\hat\beta) = 1 + 0.015\,\hat\beta$. The section text then applies the implementation audit before drawing the welfare conclusion.\par}
+\end{table}

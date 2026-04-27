@@ -1,0 +1,17 @@
+"pilot","paper","spec","beta","mvpf"
+"id_133","HMS2015","TWFE_with_ctrls",-0.386842368254676,1.1308
+"id_133","HMS2015","TWFE_no_ctrls",-0.447028136660399,1.1319
+"id_133","HMS2015","CS_NT_static",-0.403015667918745,1.1311
+"id_133","HMS2015","CS_NT_dynamic",-0.403015667918745,1.1311
+"id_61","EvansGarthwaite2014","TWFE_with_ctrls",0.00948290747000158,1.1343
+"id_61","EvansGarthwaite2014","TWFE_no_ctrls",-0.0195565943218006,1.1456
+"id_61","EvansGarthwaite2014","CS_NT_static",0.006514208761438,1.1309
+"id_61","EvansGarthwaite2014","CS_NT_dynamic",0.006514208761438,1.1309
+"id_9","DranoveOdyStarc2021","TWFE_with_ctrls",-0.176305612449144,1.0248
+"id_9","DranoveOdyStarc2021","TWFE_no_ctrls",-0.185884742305624,1.0261
+"id_9","DranoveOdyStarc2021","CS_NT_simple",-0.213803473901628,1.0297
+"id_9","DranoveOdyStarc2021","CS_NT_dynamic",-0.198484463998418,1.0278
+"id_9","DranoveOdyStarc2021","CS_NYT_simple",-0.219344916925632,1.0304
+"id_9","DranoveOdyStarc2021","CS_NYT_dynamic",-0.203321463305054,1.0284
+"id_9","DranoveOdyStarc2021","CS_NT_with_ctrls",-0.0130115453827838,1.0019
+"id_9","DranoveOdyStarc2021","CS_NYT_with_ctrls",-0.0128753955149762,1.0019

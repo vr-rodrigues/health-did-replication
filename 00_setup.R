@@ -19,10 +19,16 @@ pkgs <- c(
   "ggrepel",       # Non-overlapping labels
   "grid",          # Low-level graphics
   "gridExtra",     # Arrange multiple plots
+  "patchwork",     # Assemble multi-panel figures
+  "cowplot",       # Figure extraction/assembly helpers
+  "scales",        # Axis and label helpers
+  "stringr",       # String parsing for article cards
+  "data.table",    # Fast input for selected diagnostic panels
   "fixest",        # TWFE and Sun-Abraham estimation
   "did",           # Callaway-Sant'Anna estimator
   "did2s",         # Gardner (2022) imputation estimator
   "bacondecomp",   # Goodman-Bacon decomposition
+  "TwoWayFEWeights", # de Chaisemartin-D'Haultfoeuille weights
   "HonestDiD"      # Rambachan-Roth sensitivity analysis
 )
 
@@ -54,5 +60,6 @@ for (p in pkgs) {
 if (ok) {
   cat("\n=== All packages ready. ===\n")
 } else {
-  cat("\n=== Some packages failed. Please install them manually. ===\n")
+  stop("\nSome packages failed to load. Please install them manually before reproducing the package.",
+       call. = FALSE)
 }

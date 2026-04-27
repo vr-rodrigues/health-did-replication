@@ -12,16 +12,16 @@
 \multicolumn{2}{l}{\textit{Bacon decomposition ($N = 26$)}} \\
 \quad Mean treated-vs-treated share & 0.349 \\
 \quad Articles with TvT $> 50\%$ & 8 / 26 (31\%) \\[6pt]
-\multicolumn{2}{l}{\textit{de Chaisemartin--d'Haultfoeuille weights ($N = 35$)}} \\
-\quad Articles with any negative weight & 25 / 35 (71\%) \\
+\multicolumn{2}{l}{\textit{de Chaisemartin--d'Haultfoeuille weights ($N = 27$)}} \\
+\quad Articles with any negative weight & 21 / 27 (78\%) \\
 \quad Mean share of negative weights & 0.064 \\
-\quad Median share of negative weights & 0.004 \\
-\quad Maximum share of negative weights & 0.485 \\
+\quad Median share of negative weights & 0.025 \\
+\quad Maximum share of negative weights & 0.238 \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item \textit{Notes}: The Bacon decomposition \citep{goodman2021difference} partitions the TWFE estimator into $2\times2$ comparisons; treated-vs-treated (TvT) includes ``Earlier vs Later'' and ``Later vs Earlier'' comparisons, where already-treated units serve as controls. 4 articles have TvT $= 100\%$, meaning all units are eventually treated and the entire TWFE estimate relies on timing variation. The de Chaisemartin--d'Haultfoeuille decomposition \citep{de2020two} expresses TWFE as a weighted sum of group--time ATTs; share of negative weights $= |\Sigma\,\omega^{-}| \,/\, (|\Sigma\,\omega^{-}| + \Sigma\,\omega^{+})$. 3 staggered articles are excluded from the Bacon computation due to panel size exceeding computational limits or lack of treatment variation in the balanced panel.
+\item \textit{Notes.} Both panels are restricted to the 29 staggered-adoption articles in the comparable subsample. The Goodman-Bacon decomposition \parencite{goodman2021difference} expresses TWFE as a weighted average of $2\times 2$ comparisons. The treated-vs-treated (TvT) share collects the ``Earlier vs Later'' and ``Later vs Earlier'' components in which already-treated units serve as controls. The de Chaisemartin and d'Haultfoeuille decomposition \parencite{dechaisemartin2020twfe} expresses TWFE as a weighted sum of group-time ATTs and reports the share of negative weights as $|\Sigma\,\omega^{-}| / (|\Sigma\,\omega^{-}| + \Sigma\,\omega^{+})$. The Bacon panel loses 3 articles (panel size or no treatment variation in a balanced panel). The dCdH panel loses 2 (complex multi-file data construction). Appendix~\ref{AppendixC} gives the implementation and exclusion rules.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}
